@@ -8,9 +8,10 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/site.css`: base design and styles.
 - `dist/enhancements.css`: accessibility, mobile and shopping improvements.
 - `dist/*.html`: generated page documents, including individual tea pages.
-- `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR.
+- `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/config/business.json`: WhatsApp number and manual DuitNow payment settings.
 - `scripts/prepare-site.mjs`: refreshes initial HTML, sharing metadata and sitemap after content edits.
+- `scripts/make-photo-sizes.py`: creates the smaller copies of any new tea photo.
 
 ## Preview locally
 
@@ -39,6 +40,19 @@ npx prettier@3 --write dist/site.js dist/site.css dist/enhancements.css scripts/
 ```
 
 The generated `dist/*.html`, `sitemap.xml` and `robots.txt` files are collapsed in pull request diffs (see `.gitattributes` at the repository root).
+
+### Add a new tea
+
+1. Save its photo as `dist/assets/clean/09_Tea_Name.webp`, 1086 × 1448 pixels.
+2. Create the smaller copies (needs Python with Pillow: `pip install Pillow`):
+
+   ```sh
+   python scripts/make-photo-sizes.py
+   ```
+
+3. Add the tea to the `teas` list in `dist/site.js`, then run `node scripts/prepare-site.mjs` to create its page.
+
+The preparation script stops with an error if a photo's smaller copies are missing, so a deploy never publishes broken images.
 
 ## Publish changes
 

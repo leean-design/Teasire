@@ -33,6 +33,18 @@ const makeContext = (page, file, product) =>
 const inventory = makeContext("home", "index.html");
 vm.runInContext(renderSource, inventory);
 const teas = vm.runInContext("teas", inventory);
+// Phones are served smaller copies of each photo; stop before publishing broken images.
+const missing = teas.flatMap((t) =>
+  ["-480", "-800", ""]
+    .map((size) => `assets/clean/${t.image}${size}.webp`)
+    .filter((file) => !fs.existsSync(path.join(dist, file))),
+);
+if (missing.length)
+  throw new Error(
+    "Missing photo files:\n  " +
+      missing.join("\n  ") +
+      "\nRun `python scripts/make-photo-sizes.py` to create the smaller copies.",
+  );
 const productTemplate = fs.readFileSync(
   path.join(dist, "product.html"),
   "utf8",
@@ -98,7 +110,7 @@ for (const file of fs
     body = body.replace(tag, tag.replace(">", attrs + ">"));
   }
   // Meaningful initial HTML is served before the interactive script starts.
-  html = `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><meta name="theme-color" content="#ffffff"><link rel="canonical" href="${origin}/${file}">${noindex ? '<meta name="robots" content="noindex,follow">' : ""}<meta property="og:type" content="website"><meta property="og:site_name" content="Teasire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${origin}/${file}"><meta property="og:image" content="${image}"><meta name="twitter:card" content="summary_large_image"><link rel="icon" type="image/png" href="assets/teasire-magpie.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="site.css"><link rel="stylesheet" href="enhancements.css"><script src="site.js" defer></script></head><body data-page="${page}"${product ? ' data-product="' + product + '"' : ""}>${body}</body></html>\n`;
+  html = `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><meta name="theme-color" content="#ffffff"><link rel="canonical" href="${origin}/${file}">${noindex ? '<meta name="robots" content="noindex,follow">' : ""}<meta property="og:type" content="website"><meta property="og:site_name" content="Teasire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${origin}/${file}"><meta property="og:image" content="${image}"><meta name="twitter:card" content="summary_large_image"><link rel="icon" type="image/png" sizes="192x192" href="assets/teasire-icon-192.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="site.css"><link rel="stylesheet" href="enhancements.css"><script src="site.js" defer></script></head><body data-page="${page}"${product ? ' data-product="' + product + '"' : ""}>${body}</body></html>\n`;
   fs.writeFileSync(p, html);
   if (!noindex) urls.push(origin + "/" + file);
 }
