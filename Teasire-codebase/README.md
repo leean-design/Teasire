@@ -48,11 +48,12 @@ Prices are in RM per pack of 10 teabags, in `dist/site.js`:
 - `price` on each tea in the `teas` list.
 - `customBlendPrice` for blends made in the Blend Studio.
 - `freeDeliveryAbove` (RM150) decides when the bag shows free delivery. If you change it, also update the "above RM150" wording on the pages.
+- `deliveryFees`: the delivery fee for each location. The bag adds it to the total, and the Policies page lists it.
 
 ### Business details and shop policies
 
 - Business details live in `dist/config/business.json` under `business`: `registeredName`, `registrationNumber` (SSM), `email`, `address`, and full `https://` links for `instagram`, `facebook` and `tiktok`. Empty values are hidden, so nothing shows until it is filled in. The WhatsApp number is shown from `whatsappNumber`.
-- The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` just above it. The current text is a draft written as a placeholder: check every point matches how the shop runs.
+- The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` near the prices. The current text is a draft written as a placeholder: check every point matches how the shop runs.
 
 ### Add a new tea
 
