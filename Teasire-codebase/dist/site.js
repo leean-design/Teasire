@@ -198,7 +198,7 @@ function footer() {
   return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-legal"><span id="business-details"></span><nav class="footer-policies" aria-label="Shop policies"><a href="policies.html#delivery">Delivery</a><a href="policies.html#returns">Returns</a><a href="policies.html#terms">Terms</a><a href="policies.html#privacy">Privacy</a><span id="social-links"></span></nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;
 }
 function card(t) {
-  return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${t.name} tea with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p>${t.notes}</p><div class="product-foot"><span><strong>${rm(t.price)}</strong> · 10 teabags</span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
+  return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${t.name} tea with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p>${t.notes}</p><div class="product-foot"><span class="card-price"><strong>${rm(t.price)}</strong><small>10 teabags</small></span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
 }
 function intro(kicker, title, copy) {
   return `<div class="page-intro"><span class="eyebrow">${kicker}</span><h1>${title}</h1><p>${copy}</p></div>`;
@@ -206,11 +206,18 @@ function intro(kicker, title, copy) {
 function cta() {
   return `<section class="cta"><span class="eyebrow">YOUR NOTES. YOUR MOOD. YOUR TEA.</span><h2>Make a little room<br>for your own ritual.</h2><a class="button" href="blend-studio.html">Create your blend <span>↗</span></a></section>`;
 }
-function brew() {
-  return `<section class="tea-film-section" id="brew" aria-labelledby="tea-film-title"><div class="tea-film-layout"><div class="tea-film-copy"><span class="eyebrow">THE SIMPLE PLEASURE OF TEA</span><h2 id="tea-film-title">A moment<br>to savour.</h2><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><p>A little invitation to let the day soften, and enjoy something made just for you.</p><a class="button secondary" href="blend-studio.html">Make your own ritual <span>↗</span></a><div class="tea-film-notes"><span>Tea leaves.</span><span>A little care.</span><span>Your own pace.</span></div></div><figure class="tea-film-frame"><div class="tea-film-media"><video id="tea-film" muted playsinline preload="metadata" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light"><source src="assets/teasire-pouring-film.mp4" type="video/mp4"><p>Your browser cannot play this film. <a href="assets/teasire-pouring-film.mp4">Watch the tea film</a>.</p></video><div class="tea-film-controls glass"><button id="film-play" type="button" aria-label="Play tea film"><span id="film-play-icon" aria-hidden="true">▶</span><span id="film-play-label">Play film</span></button><span class="film-control-divider" aria-hidden="true"></span><button id="film-sound" type="button" aria-label="Turn sound on" aria-pressed="false">Sound off</button></div></div><figcaption><span>A LITTLE STILLNESS, POURED.</span><span>TEASIRE</span></figcaption></figure></div></section>`;
+// The film controls; the script near the end of this file wires them up.
+function filmControls() {
+  return `<div class="tea-film-controls glass"><button id="film-play" type="button" aria-label="Play tea film"><span id="film-play-icon" aria-hidden="true">▶</span><span id="film-play-label">Play film</span></button><span class="film-control-divider" aria-hidden="true"></span><button id="film-sound" type="button" aria-label="Turn sound on" aria-pressed="false">Sound off</button></div>`;
 }
 function home() {
-  return `<section class="hero"><div class="hero-labels"><span>A QUIETER KIND OF EVERYDAY</span><span>MALAYSIA · SMALL BATCHES</span></div><div class="liquid-orb orb-one"></div><div class="liquid-orb orb-two"></div><h1><span><b>A little tea.</b></span><span><b>A little stillness.</b></span></h1><div class="hero-visual"><img width="1086" height="1448" fetchpriority="high" decoding="async" id="hero-img" ${photoAttrs(teas[0], "large")} alt="Green Tea Jasmine"><a class="glass" id="hero-link" href="${productUrl(teas[0].id)}"><span id="hero-label">Green Tea Jasmine</span><span>↗</span></a><div class="hero-gallery-controls"><button type="button" id="hero-prev" aria-label="Previous tea photograph">←</button><span id="hero-count" aria-live="polite">1 / 8</span><button type="button" id="hero-next" aria-label="Next tea photograph">→</button><button type="button" id="hero-pause" aria-label="Pause tea slideshow">Pause</button></div></div><div class="hero-copy"><p>Let the day soften, one cup at a time.<br>Familiar tea leaves, fragrant flowers, and a moment just for you.</p><div class="hero-actions"><a class="button" href="flower-tea.html">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div></div><div class="hero-foot"><span>INDIVIDUALLY PACKED · START WITH 10</span><a href="#brew">SCROLL TO FEEL IT ↓</a></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div>${brew()}<section class="section"><div class="page-top"><div><span class="eyebrow">OUR COLLECTIONS</span><h2>Follow your senses.</h2></div><p>Fragrant flowers or sunlit fruit.<br>Two ways to find your next favourite cup.</p></div><div class="grid two"><a class="collection-tile" href="flower-tea.html"><img ${photoAttrs(teas[2], "large")} alt="Rose oolong tea and rose petals" loading="lazy"><div class="glass"><h3>Flower Tea</h3><span>Explore ↗</span></div></a><a class="collection-tile" href="fruit-tea.html"><img ${photoAttrs(teas[6], "large")} alt="Green tea with fresh orange" loading="lazy"><div class="glass"><h3>Fruit Tea</h3><span>Explore ↗</span></div></a></div></section><section class="section quiet-story"><div class="split"><img ${photoAttrs(teas[1], "large")} alt="A warm cup of osmanthus oolong with flowers" loading="lazy"><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
+  const series = (key, title) =>
+    `<div class="shop-series"><div class="shop-series-head"><h3>${title}</h3><a class="link" href="${key}-tea.html">See the series ↗</a></div><div class="grid">${teas
+      .filter((t) => t.series === key)
+      .map(card)
+      .join("")}</div></div>`;
+  const prices = [...new Set(teas.map((t) => t.price))];
+  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light"><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video>${filmControls()}</figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `Eight blends, each ${rm(prices[0])} for 10 individually packed teabags.` : "Eight blends in individually packed teabags."}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Find your tea in one question.</h3><p>Tell us which notes you love, and we’ll match you with a blend.</p></div><a class="button" href="discover.html">Find your tea <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><img ${photoAttrs(teas[1], "large")} alt="A warm cup of osmanthus oolong with flowers" loading="lazy"><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
 }
 function collection(series) {
   const flower = series === "flower";
@@ -772,14 +779,12 @@ if ("IntersectionObserver" in window && !reduced.matches) {
       }),
     { threshold: 0.05 },
   );
-  document
-    .querySelectorAll(".product,.split>*,.collection-tile,.cta>*")
-    .forEach((el) => {
-      if (el.getBoundingClientRect().top > innerHeight) {
-        el.classList.add("will-reveal");
-        observer.observe(el);
-      }
-    });
+  document.querySelectorAll(".product,.split>*,.cta>*").forEach((el) => {
+    if (el.getBoundingClientRect().top > innerHeight) {
+      el.classList.add("will-reveal");
+      observer.observe(el);
+    }
+  });
 }
 document.querySelectorAll(".glass").forEach((el) =>
   el.addEventListener(
@@ -799,56 +804,6 @@ document.querySelectorAll(".glass").forEach((el) =>
     { passive: true },
   ),
 );
-let heroSlide = 0,
-  heroPaused = reduced.matches,
-  heroTimer;
-function showHero(index) {
-  heroSlide = (index + teas.length) % teas.length;
-  const t = teas[heroSlide],
-    img = $("#hero-img");
-  if (!img) return;
-  img.srcset = photoSet(t);
-  img.src = photo(t);
-  img.alt = t.name;
-  $("#hero-label").textContent = t.name;
-  $("#hero-link").href = productUrl(t.id);
-  $("#hero-count").textContent = heroSlide + 1 + " / " + teas.length;
-}
-function setHeroPaused(paused) {
-  heroPaused = paused;
-  $("#hero-pause").textContent = paused ? "Play" : "Pause";
-  $("#hero-pause").setAttribute(
-    "aria-label",
-    paused ? "Play tea slideshow" : "Pause tea slideshow",
-  );
-}
-if (page === "home") {
-  setHeroPaused(heroPaused);
-  $("#hero-next").onclick = () => {
-    setHeroPaused(true);
-    showHero(heroSlide + 1);
-  };
-  $("#hero-prev").onclick = () => {
-    setHeroPaused(true);
-    showHero(heroSlide - 1);
-  };
-  $("#hero-pause").onclick = () => setHeroPaused(!heroPaused);
-  heroTimer = setInterval(() => {
-    const r = $(".hero-visual").getBoundingClientRect();
-    if (
-      !heroPaused &&
-      !document.hidden &&
-      !reduced.matches &&
-      r.bottom > 0 &&
-      r.top < innerHeight &&
-      !$(".hero-visual").matches(":hover,:focus-within")
-    )
-      showHero(heroSlide + 1);
-  }, 6500);
-  reduced.addEventListener("change", (e) => {
-    if (e.matches) setHeroPaused(true);
-  });
-}
 let frameQueued = false;
 function frame() {
   frameQueued = false;

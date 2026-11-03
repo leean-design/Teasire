@@ -98,73 +98,6 @@ h4 {
 .logo img {
   object-fit: contain;
 }
-.hero {
-  padding-top: 35px;
-  row-gap: 25px;
-}
-.hero h1 {
-  margin-top: 12px;
-  align-self: end;
-}
-.hero-labels {
-  font-size: 10px;
-  line-height: 1.7;
-  letter-spacing: 1.2px;
-}
-.hero-copy {
-  max-width: 440px;
-}
-.hero-copy p {
-  font-size: 15px;
-  line-height: 1.85;
-}
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 25px;
-}
-.hero-visual {
-  aspect-ratio: 3/4;
-  margin-bottom: 47px;
-}
-.hero-visual img {
-  object-fit: cover;
-}
-.hero-visual .glass {
-  font-size: 12px;
-  padding: 18px 20px;
-  min-height: 58px;
-}
-.hero-gallery-controls {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -47px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  height: 45px;
-  font-size: 11px;
-}
-.hero-gallery-controls button {
-  height: 44px;
-  min-width: 44px;
-  padding: 8px 12px;
-  border: 0;
-  background: #f5f6f3;
-  color: #3e5954;
-  font: inherit;
-}
-.hero-gallery-controls #hero-pause {
-  margin-left: auto;
-}
-.hero-foot {
-  font-size: 10px;
-  line-height: 1.6;
-  letter-spacing: 1px;
-}
 .marquee {
   padding: 18px 0;
 }
@@ -247,18 +180,6 @@ h4 {
 .add-button:hover {
   background: #3e5954;
   color: #fff;
-}
-.collection-tile {
-  aspect-ratio: 3/4;
-}
-.collection-tile .glass {
-  padding: 22px;
-  min-height: 75px;
-  font-size: 13px;
-}
-.collection-tile h3 {
-  margin: 0;
-  font-size: 27px;
 }
 .detail-image img {
   border-radius: 0;
@@ -456,22 +377,9 @@ textarea {
 .payment-option small {
   font-size: 10px;
 }
-.tea-film-copy p {
-  font-size: 15px;
-}
-.tea-film-notes {
-  font-size: 11px;
-  line-height: 1.7;
-}
 .tea-film-controls button {
   font-size: 11px;
   min-height: 44px;
-}
-.tea-film-frame figcaption {
-  font-size: 10px;
-  letter-spacing: 1px;
-  gap: 15px;
-  line-height: 1.7;
 }
 .footer-mood {
   font-size: 14px;
@@ -588,13 +496,6 @@ textarea {
   .site-header {
     padding-inline: 4%;
   }
-  .hero h1 {
-    font-size: 48px;
-  }
-  .hero-actions .button {
-    font-size: 11px;
-    padding-inline: 18px;
-  }
   .checkout-layout {
     gap: 20px;
   }
@@ -623,54 +524,6 @@ textarea {
   .menu-btn {
     min-width: 44px;
     min-height: 44px;
-  }
-  .hero {
-    padding: 27px 6% 30px;
-    gap: 24px;
-  }
-  .hero-labels {
-    font-size: 9px;
-    gap: 20px;
-    letter-spacing: 0.8px;
-  }
-  .hero-labels span:last-child {
-    max-width: 135px;
-  }
-  .hero h1 {
-    font-size: clamp(36px, 10vw, 54px);
-    grid-row: 2;
-    letter-spacing: -1.5px;
-  }
-  .hero-copy {
-    grid-row: 3;
-  }
-  .hero-copy p {
-    font-size: 14px;
-    margin: 0;
-  }
-  .hero-visual {
-    grid-row: 4;
-    margin-bottom: 47px;
-  }
-  .hero-foot {
-    grid-row: 5;
-    font-size: 9px;
-    align-items: start;
-  }
-  .hero-actions {
-    margin-top: 20px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  .hero-actions .button {
-    font-size: 12px;
-  }
-  .hero-visual .glass {
-    font-size: 12px;
-  }
-  .hero-gallery-controls {
-    font-size: 12px;
   }
   .page {
     padding: 35px 6% 55px;
@@ -771,19 +624,10 @@ textarea {
   .tng-content {
     padding: 0 15px 16px;
   }
-  .tea-film-copy p {
-    font-size: 14px;
-  }
-  .tea-film-notes {
-    font-size: 11px;
-  }
   .tea-film-controls {
     left: 12px;
     right: 12px;
     padding: 5px 9px;
-  }
-  .tea-film-frame figcaption {
-    font-size: 9px;
   }
   .footer-links {
     gap: 10px 24px;
@@ -818,9 +662,6 @@ textarea {
   .site-header .logo img {
     width: 48px;
   }
-  .hero h1 {
-    font-size: 34px;
-  }
   .grid {
     gap: 28px 12px;
   }
@@ -841,9 +682,6 @@ textarea {
   }
   .marquee-track {
     animation: none;
-  }
-  .hero-gallery-controls button {
-    transition: none;
   }
 }
 .product {
@@ -874,13 +712,6 @@ textarea {
 .detail-image img,
 .split > img {
   height: auto;
-}
-.collection-tile {
-  min-height: 0;
-  min-width: 0;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 3/4;
 }
 .grid > * {
   min-width: 0;
@@ -958,8 +789,6 @@ main li {
 }
 .page-intro p,
 .page-top p,
-.hero-copy p,
-.tea-film-copy p,
 .split p {
   font-size: 17px;
 }
@@ -968,9 +797,7 @@ main li {
   font-size: 14px;
 }
 .eyebrow,
-.hero-labels span,
 .marquee span,
-.tea-film-notes span,
 .facts div,
 th,
 .tng-status {
@@ -1063,4 +890,247 @@ details > summary {
 }
 .payment-option small {
   font-size: 12px;
+}
+
+/* Home: the pouring film opens the page.
+   Wide screens: a blurred still of the film fills the width, with the full
+   portrait film framed beside the headline.
+   Phones: the film fills the screen behind the headline. */
+.film-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--night);
+  color: var(--ivory);
+}
+.film-hero-ambient {
+  position: absolute;
+  inset: -60px;
+  z-index: -2;
+  background: url("assets/teasire-pouring-poster.jpg") center / cover;
+  filter: blur(50px) saturate(1.2);
+  opacity: 0.6;
+}
+.film-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgba(6, 13, 12, 0.9) 0%,
+    rgba(6, 13, 12, 0.6) 55%,
+    rgba(6, 13, 12, 0.3) 100%
+  );
+}
+.film-hero-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 48px 6%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: center;
+  gap: 56px;
+}
+.film-hero-copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 22px;
+  justify-items: start;
+}
+.film-hero .eyebrow,
+.film-hero-note {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: rgba(240, 237, 229, 0.75);
+}
+.film-hero h1 {
+  margin: 0;
+  font-family: Lora, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(44px, 5.6vw, 78px);
+  line-height: 1.04;
+  color: var(--ivory);
+  text-wrap: balance;
+}
+.film-hero p {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 18px;
+  line-height: 1.7;
+  color: rgba(240, 237, 229, 0.88);
+}
+.film-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.film-hero .button {
+  background: var(--ivory);
+  border-color: var(--ivory);
+  color: var(--night);
+}
+.film-hero .button.secondary {
+  background: transparent;
+  border-color: rgba(240, 237, 229, 0.6);
+  color: var(--ivory);
+}
+.film-hero-media {
+  position: relative;
+  margin: 0;
+  justify-self: end;
+  /* Fits the first screen below the header, with the play controls visible. */
+  height: clamp(420px, calc(100vh - 252px), 680px);
+  aspect-ratio: 9 / 16;
+  max-width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.45);
+}
+.film-hero-media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.film-hero-media::after {
+  content: none;
+}
+.film-hero .tea-film-controls {
+  z-index: 2;
+  left: 50%;
+  right: auto;
+  bottom: 16px;
+  transform: translateX(-50%);
+  gap: 6px;
+  border-radius: 40px;
+  white-space: nowrap;
+}
+.film-hero .tea-film-controls button {
+  font-size: 13px;
+}
+@media (max-width: 899px) {
+  .film-hero {
+    display: flex;
+    min-height: max(560px, calc(100vh - 96px));
+    min-height: max(560px, calc(100svh - 96px));
+  }
+  .film-hero::before,
+  .film-hero-ambient {
+    display: none;
+  }
+  .film-hero-inner {
+    position: relative;
+    flex: 1;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: end;
+    padding: 24px max(20px, env(safe-area-inset-right, 0px)) 32px
+      max(20px, env(safe-area-inset-left, 0px));
+  }
+  .film-hero-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    height: auto;
+    aspect-ratio: auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .film-hero-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgba(6, 13, 12, 0.92) 0%,
+      rgba(6, 13, 12, 0.62) 45%,
+      rgba(6, 13, 12, 0) 75%
+    );
+  }
+  .film-hero .tea-film-controls {
+    top: 14px;
+    right: 14px;
+    bottom: auto;
+    left: auto;
+    transform: none;
+  }
+  .film-hero h1 {
+    font-size: clamp(40px, 11vw, 54px);
+  }
+  .film-hero p {
+    font-size: 17px;
+  }
+  .film-hero-note {
+    display: none;
+  }
+  .film-hero-actions {
+    width: 100%;
+  }
+  .film-hero-actions .button {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}
+
+/* Home: every signature blend is shoppable, grouped by series. */
+.home-shop {
+  display: grid;
+  gap: 44px;
+}
+.shop-series {
+  display: grid;
+  gap: 20px;
+}
+.shop-series-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.shop-series-head h3 {
+  margin: 0;
+  font-family: Lora, Georgia, serif;
+  font-weight: 400;
+  font-size: 26px;
+}
+.quiz-nudge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 32px;
+  padding: 28px 32px;
+  background: #f6f7f3;
+  border: 1px solid var(--border);
+}
+.quiz-nudge h3 {
+  margin: 8px 0 6px;
+  font-family: Lora, Georgia, serif;
+  font-weight: 400;
+  font-size: 26px;
+}
+.quiz-nudge p {
+  margin: 0;
+  color: var(--green);
+}
+/* Four teas fill one row on wide screens instead of leaving one alone. */
+@media (min-width: 1100px) {
+  .grid:has(> .product:nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+/* Card price: the price, with the pack size on its own line underneath. */
+.product-foot > .card-price {
+  display: grid;
+  gap: 2px;
+}
+.card-price small {
+  font-size: 13px;
+  color: var(--green);
 }
