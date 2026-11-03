@@ -102,14 +102,6 @@ const teas = [
 ];
 const productUrl = (id) => "tea-" + id + ".html";
 const photo = (t) => "assets/clean/" + t.image + ".webp";
-const links = [
-  ["index.html", "Home"],
-  ["flower-tea.html", "Flower Tea"],
-  ["fruit-tea.html", "Fruit Tea"],
-  ["blend-studio.html", "Blend Studio"],
-  ["discover.html", "Discover"],
-  ["about.html", "Our Story"],
-];
 let bag = [];
 try {
   const b = JSON.parse(localStorage.getItem("teasire-bag") || "[]");
@@ -213,22 +205,19 @@ const ingredients = [
   { id: "osmanthus", name: "Osmanthus", cost: 0.65, max: 25 },
 ];
 let blend = {
-  mode: "guided",
   base: "green",
   main: "jasmine",
   side: "rose",
   qty: 10,
   name: "",
-  percent: { green: 65, jasmine: 25, rose: 10 },
 };
 function calculate() {
-  let p = {};
-  if (blend.mode === "guided") {
-    p[blend.base] = 70;
-    p[blend.main] = (p[blend.main] || 0) + 20;
-    if (blend.side !== "none") p[blend.side] = (p[blend.side] || 0) + 10;
-    else p[blend.base] += 10;
-  } else p = { ...blend.percent };
+  // Recipe: 70% tea base, 20% main note, 10% finishing note (or more base if none).
+  const p = {};
+  p[blend.base] = 70;
+  p[blend.main] = (p[blend.main] || 0) + 20;
+  if (blend.side !== "none") p[blend.side] = (p[blend.side] || 0) + 10;
+  else p[blend.base] += 10;
   const sum = Object.values(p).reduce((a, b) => a + Number(b), 0),
     errors = [];
   if (sum !== 100) errors.push("Percentages must total 100%.");
@@ -288,16 +277,6 @@ function renderBuilder() {
                 '"]',
             )
             ?.focus();
-        }),
-    );
-  $("#builder-fields")
-    .querySelectorAll("[data-percent]")
-    .forEach(
-      (i) =>
-        (i.oninput = () => {
-          blend.percent[i.dataset.percent] = Number(i.value);
-          $("#percent-" + i.dataset.percent).textContent = i.value + "%";
-          renderSummary();
         }),
     );
   renderSummary();
@@ -542,18 +521,6 @@ matchMedia("(min-width: 751px)").addEventListener("change", (e) => {
 if (page === "builder") {
   renderBuilder();
   renderSavedBlends();
-  document.querySelectorAll("[data-mode]").forEach(
-    (b) =>
-      (b.onclick = () => {
-        blend.mode = b.dataset.mode;
-        document.querySelectorAll("[data-mode]").forEach((t) => {
-          const selected = t === b;
-          t.classList.toggle("active", selected);
-          t.setAttribute("aria-selected", selected);
-        });
-        renderBuilder();
-      }),
-  );
   $("#blend-name").oninput = (e) => (blend.name = e.target.value);
   $("#blend-qty").onchange = (e) => {
     blend.qty = Number(e.target.value);

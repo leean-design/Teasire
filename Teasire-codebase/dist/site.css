@@ -516,27 +516,6 @@ section.section {
   margin: 0;
   font-size: 25px;
 }
-.feature-links {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-.feature-link {
-  padding: 35px;
-  display: block;
-  min-height: 210px;
-  transition: transform 0.4s;
-}
-.feature-link:hover {
-  transform: translateY(-8px);
-}
-.feature-link h3 {
-  font-size: 26px;
-  margin-top: 25px;
-}
-.feature-link p {
-  font-size: 11px;
-}
 .cta {
   padding: 85px 6%;
   text-align: center;
@@ -568,116 +547,6 @@ section.section {
   justify-content: space-between;
   gap: 20px;
 }
-.brew-story {
-  height: 270vh;
-  position: relative;
-  background: radial-gradient(ellipse at 65% 50%, #ffffffb0, transparent 65%),
-    #c6c2bb55;
-}
-.brew-sticky {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  align-items: center;
-  padding: 110px 8% 60px;
-  overflow: hidden;
-}
-.brew-copy {
-  z-index: 4;
-  max-width: 410px;
-}
-.brew-copy h2 {
-  font-size: clamp(36px, 4.3vw, 66px);
-}
-.brew-copy p {
-  min-height: 75px;
-  max-width: 340px;
-}
-.brew-stage {
-  height: 580px;
-  position: relative;
-  perspective: 1200px;
-}
-.cup-object {
-  position: absolute;
-  top: 28%;
-  left: 4%;
-  right: -3%;
-  height: 66%;
-  background: url("assets/brewing-photo-sheet.png") no-repeat 0 50%/175% 100%;
-  filter: drop-shadow(0 25px 22px #3e595425);
-  transform-style: preserve-3d;
-  will-change: transform;
-  z-index: 2;
-}
-.ingredient-object {
-  position: absolute;
-  top: 12%;
-  left: 50%;
-  width: 85px;
-  height: 85px;
-  z-index: 3;
-  will-change: transform, opacity;
-  filter: drop-shadow(0 10px 10px #060d0c22);
-}
-.botanical {
-  height: 100%;
-  width: 100%;
-  background: url("assets/brewing-photo-sheet.png") no-repeat;
-  background-size: 500% 300%;
-}
-.botanical.leaf {
-  background-position: 75% 0;
-}
-.botanical.jasmine {
-  background-position: 100% 0;
-}
-.botanical.rose {
-  background-position: 75% 50%;
-}
-.botanical.osmanthus {
-  background-position: 100% 50%;
-}
-.botanical.orange {
-  background-position: 75% 100%;
-}
-.botanical.date {
-  background-position: 100% 100%;
-}
-.brew-indicator {
-  display: flex;
-  gap: 15px;
-  margin: 30px 0;
-}
-.brew-indicator span {
-  height: 2px;
-  width: 45px;
-  background: #75888644;
-}
-.brew-indicator span.active {
-  background: var(--green);
-}
-.scene-caption {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: var(--green);
-}
-.stage-bubble {
-  position: absolute;
-  width: 220px;
-  height: 220px;
-  top: 15%;
-  left: 40%;
-  opacity: 0.5;
-}
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -705,23 +574,6 @@ section.section {
 .builder-summary {
   position: sticky;
   top: 110px;
-}
-.builder-modes {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 25px;
-}
-.builder-modes button {
-  border-radius: 25px;
-  border: 1px solid #75888666;
-  background: none;
-  padding: 12px 22px;
-  color: var(--green);
-  font-size: 11px;
-}
-.builder-modes button.active {
-  background: var(--green);
-  color: var(--ivory);
 }
 .options {
   display: flex;
@@ -1012,9 +864,6 @@ details p {
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .brew-copy h2 {
-    font-size: 45px;
-  }
 }
 @media (max-width: 750px) {
   .site-nav {
@@ -1111,7 +960,6 @@ details p {
   }
   .grid.three,
   .grid.two,
-  .feature-links,
   .split,
   .product-layout,
   .builder-layout,
@@ -1146,55 +994,6 @@ details p {
   }
   .split img {
     height: 440px;
-  }
-  .brew-story {
-    height: 260vh;
-  }
-  .brew-sticky {
-    display: block;
-    height: 100svh;
-    padding: 115px 7% 30px;
-  }
-  .brew-copy {
-    max-width: none;
-  }
-  .brew-copy h2 {
-    font-size: 36px;
-    margin-bottom: 16px;
-  }
-  .brew-copy p {
-    font-size: 11px;
-    min-height: 60px;
-    margin-bottom: 10px;
-  }
-  .brew-copy .eyebrow {
-    font-size: 8px;
-    margin-bottom: 15px;
-  }
-  .brew-indicator {
-    margin: 17px 0;
-  }
-  .brew-stage {
-    height: 45vh;
-    margin: 0 -20px;
-  }
-  .ingredient-object {
-    width: 55px;
-    height: 55px;
-  }
-  .cup-object {
-    top: 26%;
-    height: 70%;
-    left: 0;
-    right: 0;
-  }
-  .stage-bubble {
-    width: 150px;
-    height: 150px;
-  }
-  .scene-caption {
-    bottom: -4px;
-    font-size: 7px;
   }
   .builder-summary,
   .detail-image,
@@ -1234,9 +1033,6 @@ details p {
   .series-tabs a {
     font-size: 13px;
   }
-  .feature-link {
-    min-height: 170px;
-  }
   .pricing-table td,
   .pricing-table th {
     font-size: 10px;
@@ -1261,19 +1057,6 @@ details p {
     opacity: 1;
     transform: none;
   }
-  .brew-story {
-    height: auto;
-  }
-  .brew-sticky {
-    position: relative;
-    min-height: 750px;
-  }
-  .ingredient-object {
-    will-change: auto;
-  }
-  .cup-object {
-    will-change: auto;
-  }
 }
 @media (min-width: 751px) {
   .hero h1 {
@@ -1291,31 +1074,6 @@ details p {
   .hero h1 span + span b {
     padding-left: 0;
   }
-}
-
-.botanical.leaf {
-  background-size: 486.0274% 341.1538%;
-  background-position: 73.8112% 4.7847%;
-}
-.botanical.jasmine {
-  background-size: 572.2581% 328.5185%;
-  background-position: 96.9945% 3.2415%;
-}
-.botanical.rose {
-  background-size: 563.1746% 362.0408%;
-  background-position: 73.3379% 46.729%;
-}
-.botanical.osmanthus {
-  background-size: 591.3333% 369.5833%;
-  background-position: 97.0149% 47.1406%;
-}
-.botanical.orange {
-  background-size: 537.5758% 295.6667%;
-  background-position: 72.5762% 93.8671%;
-}
-.botanical.date {
-  background-size: 633.5714% 305.8621%;
-  background-position: 96.7202% 94.6399%;
 }
 /* A quieter botanical atmosphere, with a consistent five-section navigation. */
 body {
@@ -1634,23 +1392,6 @@ body:before {
   font-size: clamp(34px, 4.5vw, 62px);
   line-height: 1.2;
 }
-.brew-story {
-  background:
-    radial-gradient(ellipse at 65% 45%, #f0ede5d9, transparent 70%),
-    linear-gradient(90deg, #e3e3d8dd, #dedfd4bb),
-    url("assets/clean/01_Green_Tea_Jasmine.webp") center/cover;
-}
-.brew-copy h2 {
-  font-size: clamp(34px, 3.7vw, 55px);
-  line-height: 1.2;
-  letter-spacing: -2px;
-}
-.brew-copy p {
-  font-size: 12px;
-}
-.brew-stage .stage-bubble {
-  opacity: 0.2;
-}
 .panel.glass {
   background: linear-gradient(125deg, #ffffff85, #f0ede570);
   border-color: #ffffffdf;
@@ -1894,12 +1635,6 @@ body:before {
   }
   .builder-summary h2 {
     font-size: 30px;
-  }
-  .brew-copy h2 {
-    font-size: 35px;
-  }
-  .brew-copy p {
-    font-size: 11px;
   }
   .cta {
     padding-block: 65px;
