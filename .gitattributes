@@ -1,0 +1,6 @@
+# These files are rebuilt by Teasire-codebase/scripts/prepare-site.mjs.
+# Marking them as generated collapses them in pull request diffs, so reviews
+# focus on the real changes in site.js and the CSS files.
+Teasire-codebase/dist/*.html linguist-generated=true
+Teasire-codebase/dist/sitemap.xml linguist-generated=true
+Teasire-codebase/dist/robots.txt linguist-generated=true
