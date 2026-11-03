@@ -2,7 +2,9 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
 const root=path.resolve(import.meta.dirname,'..'),dist=path.join(root,'dist');
-const origin='https://teasire-blend-studio.jeanetteang.chatgpt.site';
+const origin='https://leean-design.github.io/Teasire';
+// Titles and descriptions read back from existing pages are already escaped; decode them so each run escapes them exactly once.
+const unesc=t=>{let prev;do{prev=t;t=t.replaceAll('&lt;','<').replaceAll('&quot;','"').replaceAll('&amp;','&');}while(t!==prev);return t;};
 const source=fs.readFileSync(path.join(dist,'site.js'),'utf8');
 const renderSource=source.slice(0,source.indexOf('document.body.innerHTML='));
 const makeContext=(page,file,product)=>vm.createContext({document:{body:{dataset:{page,product}},title:''},location:{pathname:'/'+file,search:''},localStorage:{getItem:()=>null},matchMedia:()=>({matches:true}),URLSearchParams});
@@ -15,8 +17,8 @@ for(const file of fs.readdirSync(dist).filter(f=>f.endsWith('.html')&&!f.startsW
  const p=path.join(dist,file);let html=fs.readFileSync(p,'utf8');const page=html.match(/data-page="([^"]+)"/)?.[1]||'home';const product=html.match(/data-product="([^"]+)"/)?.[1];
  const ctx=makeContext(page,file,product);vm.runInContext(renderSource,ctx);
  const markup=vm.runInContext(`'<a class="skip-link" href="#main-content">Skip to content</a>'+header()+'<main id="main-content" tabindex="-1">'+(content[page]||home)()+'</main>'+footer()`,ctx);
- const tea=teas.find(t=>t.id===product);const title=tea?tea.name+' — Teasire':html.match(/<title>(.*?)<\/title>/s)[1];
- const desc=tea?tea.description+' Individually packed teabags, available in Malaysia.':html.match(/<meta name="description" content="([^"]*)"/)?.[1]||'Discover Teasire botanical teas and create a personal daily ritual.';
+ const tea=teas.find(t=>t.id===product);const title=tea?tea.name+' — Teasire':unesc(html.match(/<title>(.*?)<\/title>/s)[1]);
+ const desc=tea?tea.description+' Individually packed teabags, available in Malaysia.':unesc(html.match(/<meta name="description" content="([^"]*)"/)?.[1]||'')||'Discover Teasire botanical teas and create a personal daily ritual.';
  const esc=t=>t.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');
  const image=origin+'/assets/clean/'+(tea?.image||'01_Green_Tea_Jasmine')+'.webp';
  const noindex=['checkout.html','pricing.html','product.html'].includes(file);
