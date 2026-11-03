@@ -1,4 +1,6 @@
 let businessPhone = "";
+// Set once the DuitNow QR is ready to show on the checkout page.
+let qrReady = false;
 const $ = (s) => document.querySelector(s);
 const page = document.body.dataset.page;
 const esc = (s) =>
@@ -114,6 +116,14 @@ const productUrl = (id) => "tea-" + id + ".html";
 const customBlendPrice = 25;
 // Orders above this amount (RM) get free delivery, as the site's delivery notes say.
 const freeDeliveryAbove = 150;
+// Delivery fee in RM for each delivery location, for orders up to RM150.
+// Draft values: change them to your real courier rates.
+const deliveryFees = {
+  "Peninsular Malaysia": 8,
+  Sabah: 15,
+  Sarawak: 15,
+  Labuan: 15,
+};
 const rm = (amount) => "RM" + amount.toFixed(2);
 // Price of a bag item: signature teas use their own price, custom blends the Blend Studio price.
 const itemPrice = (item) =>
@@ -221,7 +231,7 @@ function product() {
   if (!t)
     return `<div class="page">${intro("THE TEASIRE COLLECTION", "Find your cup.", "This blend could not be found. Explore our tea collections to find your next little ritual.")}<a class="button" href="flower-tea.html">Explore Flower Tea ↗</a></div>`;
   document.title = t.name + " — Teasire";
-  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${t.name}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><span class="eyebrow" style="margin-top:30px">${t.notes}</span><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">We confirm availability and delivery on WhatsApp before you pay.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. Free delivery on orders above RM150; other delivery charges are confirmed on WhatsApp before you pay. Card checkout is not active yet.</p><a class="link" href="policies.html#delivery">Delivery & returns ↗</a></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
+  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${t.name}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><span class="eyebrow" style="margin-top:30px">${t.notes}</span><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">Delivery for your location is added in your bag.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. Free delivery on orders above RM150; otherwise the delivery fee for your location is added in your bag. Card checkout is not active yet.</p><a class="link" href="policies.html#delivery">Delivery & returns ↗</a></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
     .filter((x) => x.series === t.series && x.id !== t.id)
     .map(card)
     .join("")}</div></section>`;
@@ -330,7 +340,7 @@ function pricing() {
     )
     .join(
       "",
-    )}<tr><td><a href="blend-studio.html">Your own blend</a></td><td>Blend Studio</td><td>${rm(customBlendPrice)} / 10 teabags</td></tr></tbody></table></div><div class="grid two" style="margin-top:35px"><div class="panel glass"><h3>Custom blending</h3><p>Choose your tea base and botanical notes in the Blend Studio. Custom blends start at 10 individually packed teabags.</p><a class="link" href="blend-studio.html">Explore the Blend Studio ↗</a></div><div class="panel glass"><h3>Delivery</h3><p>Free delivery on orders above RM150. Other delivery charges are confirmed on WhatsApp before you pay.</p><a class="link" href="checkout.html">Review your bag ↗</a></div></div></div>`;
+    )}<tr><td><a href="blend-studio.html">Your own blend</a></td><td>Blend Studio</td><td>${rm(customBlendPrice)} / 10 teabags</td></tr></tbody></table></div><div class="grid two" style="margin-top:35px"><div class="panel glass"><h3>Custom blending</h3><p>Choose your tea base and botanical notes in the Blend Studio. Custom blends start at 10 individually packed teabags.</p><a class="link" href="blend-studio.html">Explore the Blend Studio ↗</a></div><div class="panel glass"><h3>Delivery</h3><p>Free delivery on orders above RM150. Otherwise the fee for your location is added in your bag.</p><a class="link" href="checkout.html">Review your bag ↗</a></div></div></div>`;
 }
 function discover() {
   return `<div class="page">${intro("A LITTLE TEA DISCOVERY", "Find your kind<br>of cup.", "What sounds most like your perfect tea? Choose the notes you naturally gravitate towards.")}<div class="panel glass" style="max-width:760px"><h3>Follow your taste.</h3>${[
@@ -376,12 +386,6 @@ function upcoming(kind) {
   const c = content[kind];
   return `<div class="page">${intro(c[0], c[1], c[2])}<div class="split"><img ${photoAttrs(teas[kind === "gifts" ? 2 : 0], "large")} alt="${kind === "gifts" ? "Rose tea for a thoughtful gift" : "Jasmine tea and botanical flowers"}"><div class="panel glass"><span class="eyebrow">COMING SOON</span><h2>${c[3]}</h2><p>${c[4]}</p><a class="button" href="blend-studio.html">Create a personal blend ↗</a></div></div></div>`;
 }
-// Delivery fees in RM for orders up to RM150 (above that, delivery is free).
-// Draft values: change them to your real courier rates.
-const deliveryFees = [
-  ["Peninsular Malaysia", 8],
-  ["Sabah, Sarawak & Labuan", 15],
-];
 // Shop policies. These are drafts written as placeholders: check every point
 // matches how you actually run the shop before relying on them.
 function policies() {
@@ -392,7 +396,12 @@ function policies() {
 <li>Signature teas are packed within 1–2 working days of payment. Custom blends are blended to order and packed within 3–5 working days.</li>
 <li>After dispatch, delivery takes 2–4 working days in Peninsular Malaysia and 4–7 working days to Sabah, Sarawak and Labuan.</li>
 </ul>
-${deliveryFees.map(([zone, fee]) => `<div class="summary-row"><span>${zone}</span><strong>${rm(fee)}</strong></div>`).join("")}
+${Object.entries(deliveryFees)
+  .map(
+    ([zone, fee]) =>
+      `<div class="summary-row"><span>${zone}</span><strong>${rm(fee)}</strong></div>`,
+  )
+  .join("")}
 <div class="summary-row"><span>Orders above RM150</span><strong>Free</strong></div>
 </section>
 <section class="policy" id="returns"><h2>Returns & refunds</h2>
@@ -412,9 +421,9 @@ ${deliveryFees.map(([zone, fee]) => `<div class="summary-row"><span>${zone}</spa
 </section>
 <section class="policy" id="terms"><h2>Terms of sale</h2>
 <ul>
-<li>Prices are in Malaysian Ringgit (RM), per pack of 10 individually packed teabags. Delivery is charged separately unless your order is above RM150.</li>
-<li>You order by sending your bag to us on WhatsApp. We reply to confirm availability, delivery and your total. Your order is confirmed once we receive your payment.</li>
-<li>We accept DuitNow QR, including Touch ’n Go eWallet. Please pay only the total we confirm.</li>
+<li>Prices are in Malaysian Ringgit (RM), per pack of 10 individually packed teabags. Delivery for your location is added in your bag unless your order is above RM150.</li>
+<li>You order by sending your bag to us on WhatsApp and paying the total shown. We confirm your order once we have checked your payment. If anything is unavailable, we refund it in full.</li>
+<li>We accept DuitNow QR, including Touch ’n Go eWallet. Please pay the exact total shown in your order.</li>
 <li>Our teas are made from natural botanicals, so colour and flavour can vary slightly between batches. If an ingredient is unavailable, we’ll offer a substitute or a refund for that item.</li>
 <li>Green, black and oolong teas contain caffeine. Our teas are not medicines. If you are pregnant, breastfeeding, taking medication or have allergies, check the ingredients and ask your doctor if unsure.</li>
 <li>We may update these policies. The version on this page when you order applies to your order.</li>
@@ -466,11 +475,11 @@ function about() {
     ],
     [
       "Do you deliver within Malaysia?",
-      "Malaysia is our launch market. Delivery is free for orders above RM150; zones and any delivery charges are confirmed before payment.",
+      "Yes, anywhere in Malaysia. Delivery is free for orders above RM150; otherwise the fee for your location is added in your bag.",
     ],
     [
       "Can I pay by card?",
-      "Card checkout is not active yet. Send your order on WhatsApp from the checkout page, then pay by DuitNow QR once we confirm it.",
+      "Card checkout is not active yet. Send your order on WhatsApp from the checkout page, then pay the total by DuitNow QR and send us the receipt.",
     ],
     [
       "Are subscriptions available?",
@@ -481,7 +490,32 @@ function about() {
     .join("")}</section></div>`;
 }
 function checkout() {
-  return `<div class="page">${intro("YOUR NEXT LITTLE RITUAL", "Make it yours.", "Review your tea selection and send your order on WhatsApp. We’ll confirm availability and delivery before you pay.")}<div class="checkout-layout"><div class="panel glass"><h2 style="font-size:25px">Your details</h2><form id="order-form"><div class="row"><label class="field">Full name *<input name="name" id="customer-name" autocomplete="name" maxlength="100" required></label><label class="field">Email address *<input name="email" id="customer-email" autocomplete="email" type="email" maxlength="150" required></label></div><label class="field">Delivery location<select id="customer-delivery"><option value="">Select a location</option><option>Peninsular Malaysia</option><option>Sabah</option><option>Sarawak</option><option>To be confirmed</option></select></label><label class="field">Anything you’d like us to know?<textarea id="customer-notes" maxlength="1000" rows="3" placeholder="Taste preferences or gifting requests…"></textarea></label><p class="fine">Your details stay on this page until you choose to open WhatsApp or copy your request.</p><button class="button" id="prepare" type="submit">Prepare order request ↗</button></form><div id="order-review" class="hidden" style="margin-top:30px"><h3>Your order request</h3><p class="fine">This is a draft. No request has been sent and no payment has been taken.</p><label class="field">Order details<textarea id="request-text" readonly rows="10"></textarea></label><div class="request-actions"><a id="send-request" class="button hidden" target="_blank" rel="noopener noreferrer">Open request in WhatsApp ↗</a><button class="button secondary" id="copy-request">Copy request</button></div><p class="fine">Review your message in WhatsApp and tap Send. We’ll confirm availability and your total before you pay.</p><p id="copy-status" role="status" class="fine" style="margin-top:15px"></p></div><div style="border-top:1px solid var(--border);padding-top:30px;margin-top:35px"><h3>Payment after confirmation</h3><ol class="order-steps"><li>Send your tea request on WhatsApp.</li><li>Receive confirmation of availability, delivery and your total.</li><li>Pay the confirmed amount, then share your receipt.</li></ol><details class="tng-payment"><summary><span class="tng-payment-name"><span class="tng-mark" aria-hidden="true">TNG</span><span>Touch ’n Go / DuitNow QR</span></span><span class="tng-status" id="tng-status">NOT ACTIVE YET</span></summary><div class="tng-content"><p class="fine" id="tng-description">Touch ’n Go eWallet payment is being set up. Please prepare your order request first; the final amount and payment details must be confirmed before paying.</p><div id="tng-ready" class="hidden"><p class="fine">Use your banking or eWallet app to scan the QR. On the same phone, save the QR and choose the image from your app’s scanner. Pay only your confirmed total and check the recipient name before confirming.</p><p id="tng-merchant" class="fine"></p><img id="tng-qr" class="hidden" alt="DuitNow payment QR for LEE AN" width="827" height="1280" loading="lazy"><a id="tng-download" class="button secondary full hidden" download="Teasire-DuitNow-QR.png">Save QR image ↓</a><a id="tng-open" class="button full hidden" target="_blank" rel="noopener noreferrer">Open payment link ↗</a><a id="tng-receipt" class="link hidden" target="_blank" rel="noopener noreferrer">Share your receipt on WhatsApp ↗</a><p class="fine">Payments are checked manually. Preparing a request or viewing this QR does not confirm payment.</p></div></div></details><details class="card-availability"><summary>Card payment availability</summary><div class="payment-option"><span>Credit / debit card</span><small>NOT ACTIVE YET</small></div><p class="fine">Secure hosted card checkout will be available once the payment provider and final prices are connected.</p><button class="button full" disabled>Continue to card payment ↗</button><p class="fine" style="margin-top:15px">No card details are collected on this page.</p></details></div></div><aside class="panel glass"><span class="eyebrow">IN YOUR BAG</span><h3>Your tea selection</h3><div id="checkout-items"></div><div id="checkout-totals"></div></aside></div></div>`;
+  return `<div class="page">${intro("YOUR NEXT LITTLE RITUAL", "Make it yours.", "Review your tea selection, send your order on WhatsApp and pay by DuitNow QR. We’ll confirm once we’ve checked your payment.")}<div class="checkout-layout"><div class="panel glass"><h2 style="font-size:25px">Your details</h2><form id="order-form"><div class="row"><label class="field">Full name *<input name="name" id="customer-name" autocomplete="name" maxlength="100" required></label><label class="field">Email address *<input name="email" id="customer-email" autocomplete="email" type="email" maxlength="150" required></label></div><label class="field">Delivery location *<select id="customer-delivery" required><option value="">Select a location</option>${Object.keys(
+    deliveryFees,
+  )
+    .map((zone) => `<option>${zone}</option>`)
+    .join(
+      "",
+    )}</select></label><label class="field">Anything you’d like us to know?<textarea id="customer-notes" maxlength="1000" rows="3" placeholder="Taste preferences or gifting requests…"></textarea></label><p class="fine">Your details stay on this page until you choose to open WhatsApp or copy your request.</p><button class="button" id="prepare" type="submit">Prepare order request ↗</button></form><div id="order-review" class="hidden" style="margin-top:30px"><h3>Your order request</h3><p class="fine">This is a draft. No request has been sent and no payment has been taken.</p><label class="field">Order details<textarea id="request-text" readonly rows="10"></textarea></label><div class="request-actions"><a id="send-request" class="button hidden" target="_blank" rel="noopener noreferrer">Open request in WhatsApp ↗</a><button class="button secondary" id="copy-request">Copy request</button></div><p class="fine" id="next-step">Review your message in WhatsApp and tap Send.</p><p id="copy-status" role="status" class="fine" style="margin-top:15px"></p></div><div style="border-top:1px solid var(--border);padding-top:30px;margin-top:35px"><h3>How to pay</h3><ol class="order-steps"><li>Send your order on WhatsApp. Your total already includes delivery.</li><li>Pay the total with the DuitNow QR below, using Touch ’n Go or any banking app.</li><li>Send your receipt in the same WhatsApp chat. We’ll confirm and pack your order.</li></ol><details class="tng-payment"><summary><span class="tng-payment-name"><span class="tng-mark" aria-hidden="true">TNG</span><span>Touch ’n Go / DuitNow QR</span></span><span class="tng-status" id="tng-status">NOT ACTIVE YET</span></summary><div class="tng-content"><p class="fine" id="tng-description">Touch ’n Go eWallet payment is being set up. Please prepare your order request first; the final amount and payment details must be confirmed before paying.</p><div id="tng-ready" class="hidden"><p class="fine">Use your banking or eWallet app to scan the QR. On the same phone, save the QR and choose the image from your app’s scanner. Pay the exact total from your order and check the recipient name before confirming.</p><p id="tng-merchant" class="fine"></p><img id="tng-qr" class="hidden" alt="DuitNow payment QR for LEE AN" width="827" height="1280" loading="lazy"><a id="tng-download" class="button secondary full hidden" download="Teasire-DuitNow-QR.png">Save QR image ↓</a><a id="tng-open" class="button full hidden" target="_blank" rel="noopener noreferrer">Open payment link ↗</a><a id="tng-receipt" class="link hidden" target="_blank" rel="noopener noreferrer">Share your receipt on WhatsApp ↗</a><p class="fine">Payments are checked manually. Preparing a request or viewing this QR does not confirm payment.</p></div></div></details><details class="card-availability"><summary>Card payment availability</summary><div class="payment-option"><span>Credit / debit card</span><small>NOT ACTIVE YET</small></div><p class="fine">Secure hosted card checkout will be available once the payment provider and final prices are connected.</p><button class="button full" disabled>Continue to card payment ↗</button><p class="fine" style="margin-top:15px">No card details are collected on this page.</p></details></div></div><aside class="panel glass"><span class="eyebrow">IN YOUR BAG</span><h3>Your tea selection</h3><div id="checkout-items"></div><div id="checkout-totals"></div></aside></div></div>`;
+}
+// Tea total, delivery for the chosen location (free above RM150) and the total to pay.
+// delivery and total are null until a location is chosen.
+function orderTotals() {
+  const tea = bag.reduce((n, i) => n + itemPrice(i), 0),
+    location = $("#customer-delivery")?.value || "",
+    delivery = tea > freeDeliveryAbove ? 0 : (deliveryFees[location] ?? null);
+  return {
+    tea,
+    location,
+    delivery,
+    total: delivery === null ? null : tea + delivery,
+  };
+}
+function renderTotals() {
+  const { tea, delivery, total } = orderTotals();
+  $("#checkout-totals").innerHTML = bag.length
+    ? `<div class="summary-row"><span>Tea selection</span><span>${rm(tea)}</span></div><div class="summary-row"><span>Delivery</span><span>${delivery === null ? "Choose your location" : delivery === 0 ? "Free" : rm(delivery)}</span></div><div class="summary-row"><strong>Total (MYR)</strong><strong>${total === null ? rm(tea) + " + delivery" : rm(total)}</strong></div><p class="fine" style="margin-top:20px">Free delivery on orders above RM150.</p><a class="link" href="pricing.html">See all prices ↗</a><a class="link" href="policies.html#delivery" style="margin-left:18px">Delivery & returns ↗</a>`
+    : "";
 }
 function renderCart() {
   const items = $("#checkout-items");
@@ -493,11 +527,7 @@ function renderCart() {
         })
         .join("")
     : '<div class="empty"><p>Your bag is waiting for a little ritual.</p><a class="button" href="flower-tea.html">Explore teas ↗</a></div>';
-  const subtotal = bag.reduce((n, i) => n + itemPrice(i), 0),
-    freeDelivery = subtotal > freeDeliveryAbove;
-  $("#checkout-totals").innerHTML = bag.length
-    ? `<div class="summary-row"><span>Tea selection</span><span>${rm(subtotal)}</span></div><div class="summary-row"><span>Delivery</span><span>${freeDelivery ? "Free" : "To be confirmed"}</span></div><div class="summary-row"><strong>Total (MYR)</strong><strong>${rm(subtotal)}${freeDelivery ? "" : " + delivery"}</strong></div><p class="fine" style="margin-top:20px">Free delivery on orders above RM150. Delivery zone, fees and any applicable taxes are confirmed on WhatsApp before you pay.</p><a class="link" href="pricing.html">See all prices ↗</a><a class="link" href="policies.html#delivery" style="margin-left:18px">Delivery & returns ↗</a>`
-    : "";
+  renderTotals();
   $("#prepare").disabled = !bag.length;
   items.querySelectorAll("[data-qty]").forEach(
     (b) =>
@@ -672,32 +702,46 @@ if (page === "discover") {
 }
 if (page === "checkout") {
   renderCart();
+  $("#customer-delivery").addEventListener("change", renderTotals);
   $("#order-form").addEventListener("input", invalidateOrder);
   $("#order-form").addEventListener("change", invalidateOrder);
   $("#order-form").onsubmit = (e) => {
     e.preventDefault();
     if (!bag.length) return;
     const name = $("#customer-name").value.trim(),
-      email = $("#customer-email").value.trim();
-    if (!name || !email) return;
-    const delivery = $("#customer-delivery").value,
+      email = $("#customer-email").value.trim(),
       notes = $("#customer-notes").value.trim(),
-      subtotal = bag.reduce((n, i) => n + itemPrice(i), 0);
+      totals = orderTotals();
+    if (!name || !email || !totals.location || totals.total === null) return;
     $("#request-text").value =
       "Hello Teasire! I would like to order:\n\n" +
       bag
         .map((i) => i.name + " — " + i.qty + " teabags — " + rm(itemPrice(i)))
         .join("\n") +
-      "\n\nTea total: " +
-      rm(subtotal) +
-      (subtotal > freeDeliveryAbove ? " (free delivery)" : " + delivery") +
+      "\n\nTea: " +
+      rm(totals.tea) +
+      "\nDelivery to " +
+      totals.location +
+      ": " +
+      (totals.delivery ? rm(totals.delivery) : "free") +
+      "\nTotal: " +
+      rm(totals.total) +
       "\n\nName: " +
       name +
       "\nEmail: " +
       email +
-      (delivery ? "\nDeliver to: " + delivery : "") +
       (notes ? "\nNotes: " + notes : "") +
-      "\n\nPlease confirm availability, delivery and payment details. Thank you!";
+      (qrReady
+        ? "\n\nI’ll pay " +
+          rm(totals.total) +
+          " by DuitNow QR and send the receipt here. Thank you!"
+        : "\n\nPlease let me know how to pay. Thank you!");
+    $("#next-step").textContent = qrReady
+      ? "Review your message in WhatsApp and tap Send. Then pay " +
+        rm(totals.total) +
+        " with the DuitNow QR below and send your receipt in the same chat."
+      : "Review your message in WhatsApp and tap Send.";
+    if (qrReady) $(".tng-payment").open = true;
     updateOrderWhatsApp();
     $("#copy-status").textContent = "";
     $("#order-review").classList.remove("hidden");
@@ -1137,7 +1181,7 @@ fetch("config/business.json")
           phone +
           "?text=" +
           encodeURIComponent(
-            "Hello Teasire! I would like to share my payment receipt for my confirmed order.",
+            "Hello Teasire! Here is my payment receipt for my order.",
           );
         receipt.classList.remove("hidden");
       }
@@ -1149,10 +1193,9 @@ fetch("config/business.json")
       tng.merchantName &&
       (tng.qrImage || tng.paymentLink)
     ) {
-      document.querySelector("#tng-status").textContent =
-        "AFTER ORDER CONFIRMATION";
+      document.querySelector("#tng-status").textContent = "PAY WHEN YOU ORDER";
       document.querySelector("#tng-description").textContent =
-        "Pay only after Teasire confirms your order total on WhatsApp.";
+        "Pay the total from your order, then send your receipt in the same WhatsApp chat.";
       document.querySelector("#tng-merchant").textContent =
         "Payment recipient: " + tng.merchantName;
       let ready = false;
@@ -1185,8 +1228,10 @@ fetch("config/business.json")
           }
         } catch {}
       }
-      if (ready)
+      if (ready) {
         document.querySelector("#tng-ready").classList.remove("hidden");
+        qrReady = true;
+      }
     }
   })
   .catch(() => {});
