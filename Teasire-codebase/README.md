@@ -9,7 +9,7 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/enhancements.css`: accessibility, mobile and shopping improvements.
 - `dist/*.html`: generated page documents, including individual tea pages.
 - `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
-- `dist/config/business.json`: WhatsApp number and manual DuitNow payment settings.
+- `dist/config/business.json`: WhatsApp number, business details shown in the footer and on the Policies page, and manual DuitNow payment settings.
 - `scripts/prepare-site.mjs`: refreshes initial HTML, sharing metadata and sitemap after content edits.
 - `scripts/make-photo-sizes.py`: creates the smaller copies of any new tea photo.
 
@@ -48,6 +48,11 @@ Prices are in RM per pack of 10 teabags, in `dist/site.js`:
 - `price` on each tea in the `teas` list.
 - `customBlendPrice` for blends made in the Blend Studio.
 - `freeDeliveryAbove` (RM150) decides when the bag shows free delivery. If you change it, also update the "above RM150" wording on the pages.
+
+### Business details and shop policies
+
+- Business details live in `dist/config/business.json` under `business`: `registeredName`, `registrationNumber` (SSM), `email`, `address`, and full `https://` links for `instagram`, `facebook` and `tiktok`. Empty values are hidden, so nothing shows until it is filled in. The WhatsApp number is shown from `whatsappNumber`.
+- The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` just above it. The current text is a draft written as a placeholder: check every point matches how the shop runs.
 
 ### Add a new tea
 

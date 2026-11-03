@@ -185,7 +185,7 @@ function header() {
   return `<div class="progress" aria-hidden="true"></div><header class="site-header glass">${brand()}<nav class="site-nav" aria-label="Main navigation">${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}" ${location.pathname.endsWith(url) ? 'aria-current="page"' : ""}>${label}</a>`).join("")}</nav><div class="header-tools"><a class="pill" href="checkout.html">Bag <span class="bag-count">0</span></a><button class="plain menu-btn" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button></div></header><nav class="mobile-menu" id="mobile-menu" aria-label="Expanded navigation" inert><div class="mobile-menu-top"><span class="mobile-menu-label">Explore Teasire</span><button class="plain" id="menu-close" type="button" aria-label="Close navigation">Close ✕</button></div>${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav>`;
 }
 function footer() {
-  return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;
+  return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-legal"><span id="business-details"></span><nav class="footer-policies" aria-label="Shop policies"><a href="policies.html#delivery">Delivery</a><a href="policies.html#returns">Returns</a><a href="policies.html#terms">Terms</a><a href="policies.html#privacy">Privacy</a><span id="social-links"></span></nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;
 }
 function card(t) {
   return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${t.name} tea with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p>${t.notes}</p><div class="product-foot"><span><strong>${rm(t.price)}</strong> · 10 teabags</span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
@@ -221,7 +221,7 @@ function product() {
   if (!t)
     return `<div class="page">${intro("THE TEASIRE COLLECTION", "Find your cup.", "This blend could not be found. Explore our tea collections to find your next little ritual.")}<a class="button" href="flower-tea.html">Explore Flower Tea ↗</a></div>`;
   document.title = t.name + " — Teasire";
-  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${t.name}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><span class="eyebrow" style="margin-top:30px">${t.notes}</span><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">We confirm availability and delivery on WhatsApp before you pay.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. Free delivery on orders above RM150; other delivery charges are confirmed on WhatsApp before you pay. Card checkout is not active yet.</p></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
+  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${t.name}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><span class="eyebrow" style="margin-top:30px">${t.notes}</span><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">We confirm availability and delivery on WhatsApp before you pay.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. Free delivery on orders above RM150; other delivery charges are confirmed on WhatsApp before you pay. Card checkout is not active yet.</p><a class="link" href="policies.html#delivery">Delivery & returns ↗</a></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
     .filter((x) => x.series === t.series && x.id !== t.id)
     .map(card)
     .join("")}</div></section>`;
@@ -376,6 +376,66 @@ function upcoming(kind) {
   const c = content[kind];
   return `<div class="page">${intro(c[0], c[1], c[2])}<div class="split"><img ${photoAttrs(teas[kind === "gifts" ? 2 : 0], "large")} alt="${kind === "gifts" ? "Rose tea for a thoughtful gift" : "Jasmine tea and botanical flowers"}"><div class="panel glass"><span class="eyebrow">COMING SOON</span><h2>${c[3]}</h2><p>${c[4]}</p><a class="button" href="blend-studio.html">Create a personal blend ↗</a></div></div></div>`;
 }
+// Delivery fees in RM for orders up to RM150 (above that, delivery is free).
+// Draft values: change them to your real courier rates.
+const deliveryFees = [
+  ["Peninsular Malaysia", 8],
+  ["Sabah, Sarawak & Labuan", 15],
+];
+// Shop policies. These are drafts written as placeholders: check every point
+// matches how you actually run the shop before relying on them.
+function policies() {
+  return `<div class="page">${intro("SHOP POLICIES", "The small print.", "How ordering, delivery, returns and your details work at Teasire.")}<div class="policies">
+<section class="policy" id="delivery"><h2>Delivery</h2>
+<p>We deliver within Malaysia by tracked courier and send you the tracking number on WhatsApp.</p>
+<ul>
+<li>Signature teas are packed within 1–2 working days of payment. Custom blends are blended to order and packed within 3–5 working days.</li>
+<li>After dispatch, delivery takes 2–4 working days in Peninsular Malaysia and 4–7 working days to Sabah, Sarawak and Labuan.</li>
+</ul>
+${deliveryFees.map(([zone, fee]) => `<div class="summary-row"><span>${zone}</span><strong>${rm(fee)}</strong></div>`).join("")}
+<div class="summary-row"><span>Orders above RM150</span><strong>Free</strong></div>
+</section>
+<section class="policy" id="returns"><h2>Returns & refunds</h2>
+<ul>
+<li><strong>Damaged, wrong or missing items:</strong> message us on WhatsApp within 7 days of delivery with a photo of the parcel and items. We’ll send a replacement or refund you in full, including delivery.</li>
+<li><strong>Change of mind:</strong> tea is a food product, so we can’t take back opened packs. Unopened signature teas can be returned within 7 days of delivery. You pay the return postage, and we refund the tea once it arrives.</li>
+<li><strong>Custom blends</strong> are made just for you, so they can’t be returned for a change of mind.</li>
+<li>Refunds are paid by bank transfer or DuitNow within 7 working days of approval.</li>
+</ul>
+</section>
+<section class="policy" id="cancellations"><h2>Cancellations</h2>
+<ul>
+<li>Before you pay, there’s nothing to cancel: just let us know.</li>
+<li>After you pay, you can cancel for a full refund until your order is packed. Custom blends can’t be cancelled once blending has started.</li>
+<li>Once your order has been sent, our returns policy applies.</li>
+</ul>
+</section>
+<section class="policy" id="terms"><h2>Terms of sale</h2>
+<ul>
+<li>Prices are in Malaysian Ringgit (RM), per pack of 10 individually packed teabags. Delivery is charged separately unless your order is above RM150.</li>
+<li>You order by sending your bag to us on WhatsApp. We reply to confirm availability, delivery and your total. Your order is confirmed once we receive your payment.</li>
+<li>We accept DuitNow QR, including Touch ’n Go eWallet. Please pay only the total we confirm.</li>
+<li>Our teas are made from natural botanicals, so colour and flavour can vary slightly between batches. If an ingredient is unavailable, we’ll offer a substitute or a refund for that item.</li>
+<li>Green, black and oolong teas contain caffeine. Our teas are not medicines. If you are pregnant, breastfeeding, taking medication or have allergies, check the ingredients and ask your doctor if unsure.</li>
+<li>We may update these policies. The version on this page when you order applies to your order.</li>
+</ul>
+</section>
+<section class="policy" id="privacy"><h2>Privacy</h2>
+<ul>
+<li>When you send an order, we receive what is in your WhatsApp message: your name, email, delivery details, notes and WhatsApp number. We use them only to confirm, deliver and support your order.</li>
+<li>Your bag and saved blends are stored in your own browser. They aren’t sent to us unless you include them in a message.</li>
+<li>We share your name, phone number and address only with our courier, to deliver your order. We never sell your details.</li>
+<li>We keep order records only as long as needed for your order and our accounts.</li>
+<li>This site doesn’t use tracking or advertising cookies. Fonts are loaded from Google Fonts, and WhatsApp messages are covered by WhatsApp’s own privacy policy.</li>
+<li>To see, correct or delete your details, message us on WhatsApp.</li>
+</ul>
+</section>
+<section class="policy" id="contact"><h2>Contact</h2>
+<p id="policy-contact">Message us on WhatsApp using the button at the bottom of any page.</p>
+<p class="fine" id="policy-business"></p>
+</section>
+</div></div>`;
+}
 function subscriptions() {
   return `<div class="page">${intro("GOOD TEA, ON REPEAT", "Your daily ritual.<br>On repeat.", "A little more tea, a lot more joy. Manual renewals are planned for launch.")}<div class="grid three">${[
     ["The Discovery Box", "A rotating selection of signature blends."],
@@ -436,7 +496,7 @@ function renderCart() {
   const subtotal = bag.reduce((n, i) => n + itemPrice(i), 0),
     freeDelivery = subtotal > freeDeliveryAbove;
   $("#checkout-totals").innerHTML = bag.length
-    ? `<div class="summary-row"><span>Tea selection</span><span>${rm(subtotal)}</span></div><div class="summary-row"><span>Delivery</span><span>${freeDelivery ? "Free" : "To be confirmed"}</span></div><div class="summary-row"><strong>Total (MYR)</strong><strong>${rm(subtotal)}${freeDelivery ? "" : " + delivery"}</strong></div><p class="fine" style="margin-top:20px">Free delivery on orders above RM150. Delivery zone, fees and any applicable taxes are confirmed on WhatsApp before you pay.</p><a class="link" href="pricing.html">See all prices ↗</a>`
+    ? `<div class="summary-row"><span>Tea selection</span><span>${rm(subtotal)}</span></div><div class="summary-row"><span>Delivery</span><span>${freeDelivery ? "Free" : "To be confirmed"}</span></div><div class="summary-row"><strong>Total (MYR)</strong><strong>${rm(subtotal)}${freeDelivery ? "" : " + delivery"}</strong></div><p class="fine" style="margin-top:20px">Free delivery on orders above RM150. Delivery zone, fees and any applicable taxes are confirmed on WhatsApp before you pay.</p><a class="link" href="pricing.html">See all prices ↗</a><a class="link" href="policies.html#delivery" style="margin-left:18px">Delivery & returns ↗</a>`
     : "";
   $("#prepare").disabled = !bag.length;
   items.querySelectorAll("[data-qty]").forEach(
@@ -477,6 +537,7 @@ const content = {
   subscriptions,
   about,
   checkout,
+  policies,
 };
 document.body.innerHTML =
   '<a class="skip-link" href="#main-content">Skip to content</a>' +
@@ -904,6 +965,59 @@ function updateOrderWhatsApp() {
     "https://wa.me/" + businessPhone + "?text=" + encodeURIComponent(text);
   link.classList.remove("hidden");
 }
+// Show the business details from config/business.json; empty values stay hidden.
+function renderBusinessDetails(config, phone) {
+  const details = config.business || {},
+    get = (key) =>
+      typeof details[key] === "string" ? details[key].trim() : "",
+    name = get("registeredName"),
+    registration = get("registrationNumber"),
+    address = get("address"),
+    email = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(get("email"))
+      ? get("email")
+      : "",
+    phoneText = phone
+      ? phone
+          .replace(/^60(1\d)(\d{3,4})(\d{4})$/, "+60 $1-$2 $3")
+          .replace(/^(\d+)$/, "+$1")
+      : "";
+  $("#business-details").textContent = [
+    name,
+    registration && "SSM " + registration,
+    phoneText && "WhatsApp " + phoneText,
+    email,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  $("#social-links").innerHTML = [
+    ["Instagram", get("instagram")],
+    ["Facebook", get("facebook")],
+    ["TikTok", get("tiktok")],
+  ]
+    .filter(([, url]) => {
+      try {
+        return new URL(url).protocol === "https:";
+      } catch {
+        return false;
+      }
+    })
+    .map(
+      ([label, url]) =>
+        `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`,
+    )
+    .join("");
+  const contact = $("#policy-contact");
+  if (contact && phoneText)
+    contact.innerHTML = `Message us on WhatsApp at <a class="link" href="https://wa.me/${phone}" target="_blank" rel="noopener noreferrer">${phoneText}</a>${email ? ` or email <a class="link" href="mailto:${esc(email)}">${esc(email)}</a>` : ""}.`;
+  const who = $("#policy-business");
+  if (who)
+    who.textContent =
+      name || registration || address
+        ? [name || "Teasire", registration && "SSM " + registration, address]
+            .filter(Boolean)
+            .join(" · ")
+        : "";
+}
 function invalidateOrder() {
   if (!$("#order-review")) return;
   $("#order-review").classList.add("hidden");
@@ -998,6 +1112,10 @@ fetch("config/business.json")
   })
   .then((config) => {
     const phone = String(config.whatsappNumber || "").replace(/[+\s()-]/g, "");
+    renderBusinessDetails(
+      config,
+      /^[1-9][0-9]{7,14}$/.test(phone) ? phone : "",
+    );
     if (/^[1-9][0-9]{7,14}$/.test(phone)) {
       document.querySelector("#whatsapp-message").textContent =
         "Ask us about your tea blend, gifting ideas or order.";

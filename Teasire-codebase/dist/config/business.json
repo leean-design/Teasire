@@ -1,5 +1,14 @@
 {
   "whatsappNumber": "60126769675",
+  "business": {
+    "registeredName": "",
+    "registrationNumber": "",
+    "email": "",
+    "address": "",
+    "instagram": "",
+    "facebook": "",
+    "tiktok": ""
+  },
   "touchNGo": {
     "enabled": true,
     "merchantName": "LEE AN",
