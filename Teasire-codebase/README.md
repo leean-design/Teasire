@@ -32,6 +32,14 @@ node scripts/prepare-site.mjs
 
 The preparation script requires Node.js 22 or later. When changing domains, update the `origin` value in the script before regenerating pages.
 
+Keep the code formatted so pull request diffs stay readable:
+
+```sh
+npx prettier@3 --write dist/site.js dist/site.css dist/enhancements.css scripts/prepare-site.mjs
+```
+
+The generated `dist/*.html`, `sitemap.xml` and `robots.txt` files are collapsed in pull request diffs (see `.gitattributes` at the repository root).
+
 ## Publish changes
 
 Every change merged into `main` goes live automatically. The `Deploy website` workflow in `.github/workflows/deploy-pages.yml` runs the preparation script and publishes `dist/` to GitHub Pages, usually within a couple of minutes.
