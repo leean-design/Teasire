@@ -1,0 +1,9 @@
+{
+  "whatsappNumber": "60126769675",
+  "touchNGo": {
+    "enabled": true,
+    "merchantName": "LEE AN",
+    "qrImage": "assets/teasire-duitnow-qr.png",
+    "paymentLink": null
+  }
+}

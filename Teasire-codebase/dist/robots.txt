@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://teasire-blend-studio.jeanetteang.chatgpt.site/sitemap.xml
