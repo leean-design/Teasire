@@ -41,6 +41,14 @@ npx prettier@3 --write dist/site.js dist/site.css dist/enhancements.css scripts/
 
 The generated `dist/*.html`, `sitemap.xml` and `robots.txt` files are collapsed in pull request diffs (see `.gitattributes` at the repository root).
 
+### Change prices
+
+Prices are in RM per pack of 10 teabags, in `dist/site.js`:
+
+- `price` on each tea in the `teas` list.
+- `customBlendPrice` for blends made in the Blend Studio.
+- `freeDeliveryAbove` (RM150) decides when the bag shows free delivery. If you change it, also update the "above RM150" wording on the pages.
+
 ### Add a new tea
 
 1. Save its photo as `dist/assets/clean/09_Tea_Name.webp`, 1086 × 1448 pixels.
@@ -68,7 +76,7 @@ One-time setup: in the repository's **Settings → Pages**, set **Source** to **
 
 ## Payments and data
 
-Orders are quote requests shared by the visitor through WhatsApp. DuitNow payments are manually checked after quote confirmation. Card checkout and automatic billing are not connected. The cart and saved blends are held in the visitor's browser, not a server database.
+Visitors send their order, with prices and a total, to Teasire on WhatsApp. DuitNow payments are checked manually after the order is confirmed. Card checkout and automatic billing are not connected. The cart and saved blends are held in the visitor's browser, not a server database.
 
 ## Audit improvements
 

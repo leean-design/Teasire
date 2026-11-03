@@ -885,3 +885,22 @@ textarea {
 .grid > * {
   min-width: 0;
 }
+
+/* Prices */
+.product-foot strong {
+  font-family: Lora, Georgia, serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--night);
+}
+.price-tag {
+  margin: 4px 0 0;
+  font-family: Lora, Georgia, serif;
+  font-size: 26px;
+  color: var(--night);
+}
+.price-tag span {
+  font-family: Montserrat, sans-serif;
+  font-size: 13px;
+  color: var(--green);
+}

@@ -10,12 +10,14 @@ const esc = (s) =>
       ],
   );
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+// `price` is in RM for a pack of 10 individually packed teabags.
 const teas = [
   {
     id: "green-tea-jasmine",
     name: "Green Tea Jasmine",
     zh: "茉莉绿茶",
     series: "flower",
+    price: 25,
     image: "01_Green_Tea_Jasmine",
     notes: "Light · Floral · Fresh",
     ingredients: ["Green tea", "Jasmine"],
@@ -27,6 +29,7 @@ const teas = [
     name: "Oolong Osmanthus",
     zh: "桂花乌龙",
     series: "flower",
+    price: 25,
     image: "02_Oolong_Osmanthus",
     notes: "Golden · Floral · Mellow",
     ingredients: ["Oolong tea", "Osmanthus"],
@@ -38,6 +41,7 @@ const teas = [
     name: "Oolong Rose",
     zh: "玫瑰乌龙",
     series: "flower",
+    price: 25,
     image: "03_Oolong_Rose",
     notes: "Rounded · Rosy · Aromatic",
     ingredients: ["Oolong tea", "Rose"],
@@ -49,6 +53,7 @@ const teas = [
     name: "Green Tea Rose",
     zh: "玫瑰绿茶",
     series: "flower",
+    price: 25,
     image: "04_Green_Tea_Rose",
     notes: "Fresh · Rosy · Delicate",
     ingredients: ["Green tea", "Rose"],
@@ -60,6 +65,7 @@ const teas = [
     name: "Chrysanthemum Orange",
     zh: "菊花香橙",
     series: "fruit",
+    price: 25,
     image: "05_Chrysanthemum_Orange",
     notes: "Bright · Floral · Citrusy",
     ingredients: ["Chrysanthemum", "Orange"],
@@ -71,6 +77,7 @@ const teas = [
     name: "Oolong Orange",
     zh: "香橙乌龙",
     series: "fruit",
+    price: 25,
     image: "06_Oolong_Orange",
     notes: "Rounded · Citrus · Smooth",
     ingredients: ["Oolong tea", "Orange"],
@@ -82,6 +89,7 @@ const teas = [
     name: "Green Tea Orange",
     zh: "香橙绿茶",
     series: "fruit",
+    price: 25,
     image: "07_Green_Tea_Orange",
     notes: "Crisp · Citrus · Fresh",
     ingredients: ["Green tea", "Orange"],
@@ -93,6 +101,7 @@ const teas = [
     name: "Osmanthus Black Tea Red Dates",
     zh: "桂花红枣红茶",
     series: "fruit",
+    price: 25,
     image: "08_Osmanthus_Black_Tea_Red_Dates",
     notes: "Warm · Floral · Rich",
     ingredients: ["Osmanthus", "Black tea", "Red dates"],
@@ -101,6 +110,16 @@ const teas = [
   },
 ];
 const productUrl = (id) => "tea-" + id + ".html";
+// Price in RM for 10 teabags of a blend made in the Blend Studio.
+const customBlendPrice = 25;
+// Orders above this amount (RM) get free delivery, as the site's delivery notes say.
+const freeDeliveryAbove = 150;
+const rm = (amount) => "RM" + amount.toFixed(2);
+// Price of a bag item: signature teas use their own price, custom blends the Blend Studio price.
+const itemPrice = (item) =>
+  ((teas.find((t) => t.name === item.name)?.price ?? customBlendPrice) *
+    item.qty) /
+  10;
 const photo = (t) => "assets/clean/" + t.image + ".webp";
 // Smaller copies of each photo: phones and small spots download far less,
 // while large, sharp screens still get the full-size original.
@@ -169,7 +188,7 @@ function footer() {
   return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;
 }
 function card(t) {
-  return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${t.name} tea with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p>${t.notes}</p><div class="product-foot"><span>10 teabags minimum · Quote on request</span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
+  return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${t.name} tea with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p>${t.notes}</p><div class="product-foot"><span><strong>${rm(t.price)}</strong> · 10 teabags</span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
 }
 function intro(kicker, title, copy) {
   return `<div class="page-intro"><span class="eyebrow">${kicker}</span><h1>${title}</h1><p>${copy}</p></div>`;
@@ -190,7 +209,7 @@ function collection(series) {
     .map(card)
     .join(
       "",
-    )}</div><p class="fine" style="margin-top:30px">Final pricing and ingredient availability are confirmed before ordering.</p>${flower ? '<div class="notice">Also on the original flower tea menu: Oolong Jasmine, Rose Pandan and Osmanthus Rose. Ask us on WhatsApp for availability and pricing for these blends.</div>' : ""}</div>${cta()}`;
+    )}</div><p class="fine" style="margin-top:30px">Prices are for 10 individually packed teabags. Ingredient availability is confirmed before ordering.</p>${flower ? '<div class="notice">Also on the original flower tea menu: Oolong Jasmine, Rose Pandan and Osmanthus Rose. Ask us on WhatsApp for availability and pricing for these blends.</div>' : ""}</div>${cta()}`;
 }
 function product() {
   const t = teas.find(
@@ -202,19 +221,19 @@ function product() {
   if (!t)
     return `<div class="page">${intro("THE TEASIRE COLLECTION", "Find your cup.", "This blend could not be found. Explore our tea collections to find your next little ritual.")}<a class="button" href="flower-tea.html">Explore Flower Tea ↗</a></div>`;
   document.title = t.name + " — Teasire";
-  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${t.name}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p>${t.description}</p><span class="eyebrow" style="margin-top:30px">${t.notes}</span><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">Quote on request. Final price, availability and delivery confirmed before payment.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. Free delivery on orders above RM150, with delivery details confirmed in your quote. Card checkout is not active yet.</p></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
+  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${t.name}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><span class="eyebrow" style="margin-top:30px">${t.notes}</span><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">We confirm availability and delivery on WhatsApp before you pay.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. Free delivery on orders above RM150; other delivery charges are confirmed on WhatsApp before you pay. Card checkout is not active yet.</p></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
     .filter((x) => x.series === t.series && x.id !== t.id)
     .map(card)
     .join("")}</div></section>`;
 }
 const ingredients = [
-  { id: "green", name: "Green tea", cost: 0.22, max: 100, base: true },
-  { id: "black", name: "Black tea", cost: 0.18, max: 100, base: true },
-  { id: "oolong", name: "Oolong tea", cost: 0.28, max: 100, base: true },
-  { id: "jasmine", name: "Jasmine", cost: 0.48, max: 35 },
-  { id: "rose", name: "Rose", cost: 0.5, max: 35 },
-  { id: "chrysanthemum", name: "Chrysanthemum", cost: 0.36, max: 35 },
-  { id: "osmanthus", name: "Osmanthus", cost: 0.65, max: 25 },
+  { id: "green", name: "Green tea", max: 100, base: true },
+  { id: "black", name: "Black tea", max: 100, base: true },
+  { id: "oolong", name: "Oolong tea", max: 100, base: true },
+  { id: "jasmine", name: "Jasmine", max: 35 },
+  { id: "rose", name: "Rose", max: 35 },
+  { id: "chrysanthemum", name: "Chrysanthemum", max: 35 },
+  { id: "osmanthus", name: "Osmanthus", max: 25 },
 ];
 let blend = {
   base: "green",
@@ -244,20 +263,15 @@ function calculate() {
     )
   )
     errors.push("Choose a tea base.");
-  const cost = Object.entries(p).reduce(
-    (n, [id, v]) =>
-      n + (((ingredients.find((i) => i.id === id)?.cost || 0) * v) / 100) * 2.5,
-    0,
-  );
   return {
     p,
     sum,
     errors,
-    price: Math.round(((cost + 0.75) / 0.4) * blend.qty * 100) / 100,
+    price: (customBlendPrice * blend.qty) / 10,
   };
 }
 function builder() {
-  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout"><div><div class="panel glass" id="builder-fields"></div><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section><div class="panel glass"><h3>Make it yours.</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags</option>`).join("")}</select></label></div></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND PREVIEW</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">This estimate uses illustrative ingredient costs. It is not a confirmed price. Recipes and ingredient limits require review before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to bag for a quote ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside></div></div>`;
+  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout"><div><div class="panel glass" id="builder-fields"></div><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section><div class="panel glass"><h3>Make it yours.</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND PREVIEW</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside></div></div>`;
 }
 function renderBuilder() {
   const options = (arr, key, current) =>
@@ -303,13 +317,20 @@ function renderSummary() {
           `<div class="summary-row"><span>${ingredients.find((i) => i.id === id)?.name || id}</span><strong>${v}%</strong></div>`,
       )
       .join("") +
-    `<div class="summary-row"><span>Total</span><strong>${c.sum}%</strong></div><div class="summary-row"><span>${blend.qty} teabags · Preview estimate</span><strong>RM${c.price.toFixed(2)}</strong></div>` +
+    `<div class="summary-row"><span>Total</span><strong>${c.sum}%</strong></div><div class="summary-row"><span>${blend.qty} teabags</span><strong>${rm(c.price)}</strong></div>` +
     (c.errors.length ? `<p class="notice">${c.errors.join("<br>")}</p>` : "");
   $("#blend-save").disabled = !!c.errors.length;
   $("#blend-request").disabled = !!c.errors.length;
 }
 function pricing() {
-  return `<div class="page">${intro("PREVIEW PRICING", "A note on pricing.", "Explore our illustrative signature prices. Final prices and pack specifications will be confirmed before ordering.")}<div class="panel glass"><table class="pricing-table"><thead><tr><th>Original preview listing</th><th>Preview price</th><th>Status</th></tr></thead><tbody><tr><td>Jasmine Dream</td><td>RM28.00</td><td>Pending confirmation</td></tr><tr><td>Rose Harmony</td><td>RM32.00</td><td>Pending confirmation</td></tr><tr><td>Peach Oolong</td><td>RM30.00</td><td>Pending confirmation</td></tr></tbody></table><p class="fine">These original preview listings are separate from the eight flower and fruit tea blends. Their prices have not been assigned to those blends.</p></div><div class="grid two" style="margin-top:35px"><div class="panel glass"><h3>Custom blending</h3><p>Dynamic estimates in the Blend Studio depend on your ingredient selection and quantity. Minimum quantity: 10 individually packed teabags.</p><a class="link" href="blend-studio.html">Explore the Blend Studio ↗</a></div><div class="panel glass"><h3>Delivery</h3><p>Free delivery on orders above RM150. Delivery zone, charges and final order pricing are confirmed before payment.</p><a class="link" href="checkout.html">Review your bag ↗</a></div></div></div>`;
+  return `<div class="page">${intro("PRICING", "Simple pricing.", "Every Teasire blend comes as individually packed teabags, starting from 10.")}<div class="panel glass"><table class="pricing-table"><thead><tr><th>Blend</th><th>Series</th><th>Price</th></tr></thead><tbody>${teas
+    .map(
+      (t) =>
+        `<tr><td><a href="${productUrl(t.id)}">${t.name}</a></td><td>${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</td><td>${rm(t.price)} / 10 teabags</td></tr>`,
+    )
+    .join(
+      "",
+    )}<tr><td><a href="blend-studio.html">Your own blend</a></td><td>Blend Studio</td><td>${rm(customBlendPrice)} / 10 teabags</td></tr></tbody></table></div><div class="grid two" style="margin-top:35px"><div class="panel glass"><h3>Custom blending</h3><p>Choose your tea base and botanical notes in the Blend Studio. Custom blends start at 10 individually packed teabags.</p><a class="link" href="blend-studio.html">Explore the Blend Studio ↗</a></div><div class="panel glass"><h3>Delivery</h3><p>Free delivery on orders above RM150. Other delivery charges are confirmed on WhatsApp before you pay.</p><a class="link" href="checkout.html">Review your bag ↗</a></div></div></div>`;
 }
 function discover() {
   return `<div class="page">${intro("A LITTLE TEA DISCOVERY", "Find your kind<br>of cup.", "What sounds most like your perfect tea? Choose the notes you naturally gravitate towards.")}<div class="panel glass" style="max-width:760px"><h3>Follow your taste.</h3>${[
@@ -373,15 +394,15 @@ function about() {
   return `<div class="page">${intro("OUR STORY", "More than tea.<br>A little ritual.", "Teasire is a place to explore botanical tea your way. Choose your favourite notes, create a blend and make everyday moments feel more personal.")}<div class="split"><img ${photoAttrs(teas[0], "large")} alt="A cup of jasmine green tea surrounded by flowers"><div><h2>Your tea.<br>Your story.</h2><p>Natural botanicals. Custom blends made for you. Small batches, hand packed.</p><p>From a ready-to-love recipe to a blend of your own, we keep the ritual simple. You choose. We blend and pack. You take a moment.</p><a class="button" href="blend-studio.html">Start blending ↗</a></div></div><section style="max-width:850px;margin:100px auto 0" id="faq"><span class="eyebrow">A FEW THINGS TO KNOW</span><h2>Before your first sip.</h2>${[
     [
       "How does custom blending work?",
-      "Choose a tea base, a main botanical note and a finishing note, then give your blend a name. The final recipe, ingredient availability and price are reviewed before packing.",
+      "Choose a tea base, a main botanical note and a finishing note, then give your blend a name. We review the final recipe and ingredient availability before packing.",
     ],
     [
       "What is the minimum quantity?",
       "Custom orders start at 10 individually packed teabags.",
     ],
     [
-      "How are the prices calculated?",
-      "The preview prices and ingredient costs are illustrative. The Blend Studio preserves that estimate model. Final selling prices are confirmed with your order.",
+      "How much does it cost?",
+      'Every blend, including your own from the Blend Studio, is priced per 10 individually packed teabags. You’ll see the price on each tea and in your bag. <a class="link" href="pricing.html">See all prices ↗</a>',
     ],
     [
       "Do you deliver within Malaysia?",
@@ -389,7 +410,7 @@ function about() {
     ],
     [
       "Can I pay by card?",
-      "Card checkout is not active yet. The checkout page prepares an order request. A payment provider and confirmed prices are required before online card payments can launch.",
+      "Card checkout is not active yet. Send your order on WhatsApp from the checkout page, then pay by DuitNow QR once we confirm it.",
     ],
     [
       "Are subscriptions available?",
@@ -400,7 +421,7 @@ function about() {
     .join("")}</section></div>`;
 }
 function checkout() {
-  return `<div class="page">${intro("YOUR NEXT LITTLE RITUAL", "Make it yours.", "Review your tea selection and prepare your order request. We’ll confirm the blend, availability and final price before payment.")}<div class="checkout-layout"><div class="panel glass"><h2 style="font-size:25px">Your details</h2><form id="order-form"><div class="row"><label class="field">Full name *<input name="name" id="customer-name" autocomplete="name" maxlength="100" required></label><label class="field">Email address *<input name="email" id="customer-email" autocomplete="email" type="email" maxlength="150" required></label></div><label class="field">Delivery location<select id="customer-delivery"><option value="">Select a location</option><option>Peninsular Malaysia</option><option>Sabah</option><option>Sarawak</option><option>To be confirmed</option></select></label><label class="field">Anything you’d like us to know?<textarea id="customer-notes" maxlength="1000" rows="3" placeholder="Taste preferences or gifting requests…"></textarea></label><p class="fine">Your details stay on this page until you choose to open WhatsApp or copy your request.</p><button class="button" id="prepare" type="submit">Prepare order request ↗</button></form><div id="order-review" class="hidden" style="margin-top:30px"><h3>Your order request</h3><p class="fine">This is a draft. No request has been sent and no payment has been taken.</p><label class="field">Order details<textarea id="request-text" readonly rows="10"></textarea></label><div class="request-actions"><a id="send-request" class="button hidden" target="_blank" rel="noopener noreferrer">Open request in WhatsApp ↗</a><button class="button secondary" id="copy-request">Copy request</button></div><p class="fine">Review your message in WhatsApp and tap Send. We’ll confirm availability and your total before you pay.</p><p id="copy-status" role="status" class="fine" style="margin-top:15px"></p></div><div style="border-top:1px solid var(--border);padding-top:30px;margin-top:35px"><h3>Payment after confirmation</h3><ol class="order-steps"><li>Send your tea request on WhatsApp.</li><li>Receive your confirmed quote and delivery details.</li><li>Pay the confirmed amount, then share your receipt.</li></ol><details class="tng-payment"><summary><span class="tng-payment-name"><span class="tng-mark" aria-hidden="true">TNG</span><span>Touch ’n Go / DuitNow QR</span></span><span class="tng-status" id="tng-status">NOT ACTIVE YET</span></summary><div class="tng-content"><p class="fine" id="tng-description">Touch ’n Go eWallet payment is being set up. Please prepare your order request first; the final amount and payment details must be confirmed before paying.</p><div id="tng-ready" class="hidden"><p class="fine">Use your banking or eWallet app to scan the QR. On the same phone, save the QR and choose the image from your app’s scanner. Pay only your confirmed quote and check the recipient name before confirming.</p><p id="tng-merchant" class="fine"></p><img id="tng-qr" class="hidden" alt="DuitNow payment QR for LEE AN" width="827" height="1280" loading="lazy"><a id="tng-download" class="button secondary full hidden" download="Teasire-DuitNow-QR.png">Save QR image ↓</a><a id="tng-open" class="button full hidden" target="_blank" rel="noopener noreferrer">Open payment link ↗</a><a id="tng-receipt" class="link hidden" target="_blank" rel="noopener noreferrer">Share your receipt on WhatsApp ↗</a><p class="fine">Payments are checked manually. Preparing a request or viewing this QR does not confirm payment.</p></div></div></details><details class="card-availability"><summary>Card payment availability</summary><div class="payment-option"><span>Credit / debit card</span><small>NOT ACTIVE YET</small></div><p class="fine">Secure hosted card checkout will be available once the payment provider and final prices are connected.</p><button class="button full" disabled>Continue to card payment ↗</button><p class="fine" style="margin-top:15px">No card details are collected on this page.</p></details></div></div><aside class="panel glass"><span class="eyebrow">IN YOUR BAG</span><h3>Your tea selection</h3><div id="checkout-items"></div><div id="checkout-totals"></div></aside></div></div>`;
+  return `<div class="page">${intro("YOUR NEXT LITTLE RITUAL", "Make it yours.", "Review your tea selection and send your order on WhatsApp. We’ll confirm availability and delivery before you pay.")}<div class="checkout-layout"><div class="panel glass"><h2 style="font-size:25px">Your details</h2><form id="order-form"><div class="row"><label class="field">Full name *<input name="name" id="customer-name" autocomplete="name" maxlength="100" required></label><label class="field">Email address *<input name="email" id="customer-email" autocomplete="email" type="email" maxlength="150" required></label></div><label class="field">Delivery location<select id="customer-delivery"><option value="">Select a location</option><option>Peninsular Malaysia</option><option>Sabah</option><option>Sarawak</option><option>To be confirmed</option></select></label><label class="field">Anything you’d like us to know?<textarea id="customer-notes" maxlength="1000" rows="3" placeholder="Taste preferences or gifting requests…"></textarea></label><p class="fine">Your details stay on this page until you choose to open WhatsApp or copy your request.</p><button class="button" id="prepare" type="submit">Prepare order request ↗</button></form><div id="order-review" class="hidden" style="margin-top:30px"><h3>Your order request</h3><p class="fine">This is a draft. No request has been sent and no payment has been taken.</p><label class="field">Order details<textarea id="request-text" readonly rows="10"></textarea></label><div class="request-actions"><a id="send-request" class="button hidden" target="_blank" rel="noopener noreferrer">Open request in WhatsApp ↗</a><button class="button secondary" id="copy-request">Copy request</button></div><p class="fine">Review your message in WhatsApp and tap Send. We’ll confirm availability and your total before you pay.</p><p id="copy-status" role="status" class="fine" style="margin-top:15px"></p></div><div style="border-top:1px solid var(--border);padding-top:30px;margin-top:35px"><h3>Payment after confirmation</h3><ol class="order-steps"><li>Send your tea request on WhatsApp.</li><li>Receive confirmation of availability, delivery and your total.</li><li>Pay the confirmed amount, then share your receipt.</li></ol><details class="tng-payment"><summary><span class="tng-payment-name"><span class="tng-mark" aria-hidden="true">TNG</span><span>Touch ’n Go / DuitNow QR</span></span><span class="tng-status" id="tng-status">NOT ACTIVE YET</span></summary><div class="tng-content"><p class="fine" id="tng-description">Touch ’n Go eWallet payment is being set up. Please prepare your order request first; the final amount and payment details must be confirmed before paying.</p><div id="tng-ready" class="hidden"><p class="fine">Use your banking or eWallet app to scan the QR. On the same phone, save the QR and choose the image from your app’s scanner. Pay only your confirmed total and check the recipient name before confirming.</p><p id="tng-merchant" class="fine"></p><img id="tng-qr" class="hidden" alt="DuitNow payment QR for LEE AN" width="827" height="1280" loading="lazy"><a id="tng-download" class="button secondary full hidden" download="Teasire-DuitNow-QR.png">Save QR image ↓</a><a id="tng-open" class="button full hidden" target="_blank" rel="noopener noreferrer">Open payment link ↗</a><a id="tng-receipt" class="link hidden" target="_blank" rel="noopener noreferrer">Share your receipt on WhatsApp ↗</a><p class="fine">Payments are checked manually. Preparing a request or viewing this QR does not confirm payment.</p></div></div></details><details class="card-availability"><summary>Card payment availability</summary><div class="payment-option"><span>Credit / debit card</span><small>NOT ACTIVE YET</small></div><p class="fine">Secure hosted card checkout will be available once the payment provider and final prices are connected.</p><button class="button full" disabled>Continue to card payment ↗</button><p class="fine" style="margin-top:15px">No card details are collected on this page.</p></details></div></div><aside class="panel glass"><span class="eyebrow">IN YOUR BAG</span><h3>Your tea selection</h3><div id="checkout-items"></div><div id="checkout-totals"></div></aside></div></div>`;
 }
 function renderCart() {
   const items = $("#checkout-items");
@@ -408,12 +429,14 @@ function renderCart() {
     ? bag
         .map((i, index) => {
           const t = teas.find((t) => t.name === i.name);
-          return `<article class="cart-item">${t ? `<img ${photoAttrs(t, "thumb")} alt="${esc(i.name)}">` : '<div class="cart-placeholder">✳</div>'}<div><h3>${esc(i.name)}</h3><p>${i.qty} individually packed teabags</p><p>Quote required</p><div class="cart-actions"><button data-qty="${index}" data-delta="-10" aria-label="Reduce ${esc(i.name)} quantity" ${i.qty <= 10 ? "disabled" : ""}>−</button><span>${i.qty}</span><button data-qty="${index}" data-delta="10" aria-label="Increase ${esc(i.name)} quantity">+</button><button class="cart-remove" data-remove="${index}" aria-label="Remove ${esc(i.name)}">Remove</button></div></div></article>`;
+          return `<article class="cart-item">${t ? `<img ${photoAttrs(t, "thumb")} alt="${esc(i.name)}">` : '<div class="cart-placeholder">✳</div>'}<div><h3>${esc(i.name)}</h3><p>${i.qty} individually packed teabags</p><p>${rm(itemPrice(i))}</p><div class="cart-actions"><button data-qty="${index}" data-delta="-10" aria-label="Reduce ${esc(i.name)} quantity" ${i.qty <= 10 ? "disabled" : ""}>−</button><span>${i.qty}</span><button data-qty="${index}" data-delta="10" aria-label="Increase ${esc(i.name)} quantity">+</button><button class="cart-remove" data-remove="${index}" aria-label="Remove ${esc(i.name)}">Remove</button></div></div></article>`;
         })
         .join("")
     : '<div class="empty"><p>Your bag is waiting for a little ritual.</p><a class="button" href="flower-tea.html">Explore teas ↗</a></div>';
+  const subtotal = bag.reduce((n, i) => n + itemPrice(i), 0),
+    freeDelivery = subtotal > freeDeliveryAbove;
   $("#checkout-totals").innerHTML = bag.length
-    ? '<div class="summary-row"><span>Tea selection</span><span>Quote required</span></div><div class="summary-row"><span>Delivery</span><span>To be confirmed</span></div><div class="summary-row"><strong>Total (MYR)</strong><strong>Pending quote</strong></div><p class="fine" style="margin-top:20px">Free delivery on orders above RM150. Delivery zone, fees and any applicable taxes are confirmed with your quote.</p><a class="link" href="pricing.html">About preview pricing ↗</a>'
+    ? `<div class="summary-row"><span>Tea selection</span><span>${rm(subtotal)}</span></div><div class="summary-row"><span>Delivery</span><span>${freeDelivery ? "Free" : "To be confirmed"}</span></div><div class="summary-row"><strong>Total (MYR)</strong><strong>${rm(subtotal)}${freeDelivery ? "" : " + delivery"}</strong></div><p class="fine" style="margin-top:20px">Free delivery on orders above RM150. Delivery zone, fees and any applicable taxes are confirmed on WhatsApp before you pay.</p><a class="link" href="pricing.html">See all prices ↗</a>`
     : "";
   $("#prepare").disabled = !bag.length;
   items.querySelectorAll("[data-qty]").forEach(
@@ -548,7 +571,6 @@ if (page === "builder") {
         name: blend.name || "My Tea Blend",
         qty: blend.qty,
         recipe: c.p,
-        price: c.price,
         selection: { base: blend.base, main: blend.main, side: blend.side },
       });
       localStorage.setItem("teasire_saved", JSON.stringify(saved));
@@ -570,7 +592,6 @@ if (page === "builder") {
       .join(", ");
     addItem((blend.name || "My Tea Blend") + " — " + description, blend.qty, {
       recipe: c.p,
-      estimate: c.price,
     });
   };
 }
@@ -599,17 +620,23 @@ if (page === "checkout") {
       email = $("#customer-email").value.trim();
     if (!name || !email) return;
     const delivery = $("#customer-delivery").value,
-      notes = $("#customer-notes").value.trim();
+      notes = $("#customer-notes").value.trim(),
+      subtotal = bag.reduce((n, i) => n + itemPrice(i), 0);
     $("#request-text").value =
-      "Hello Teasire! I would like a quote for:\n\n" +
-      bag.map((i) => i.name + " — " + i.qty + " teabags").join("\n") +
+      "Hello Teasire! I would like to order:\n\n" +
+      bag
+        .map((i) => i.name + " — " + i.qty + " teabags — " + rm(itemPrice(i)))
+        .join("\n") +
+      "\n\nTea total: " +
+      rm(subtotal) +
+      (subtotal > freeDeliveryAbove ? " (free delivery)" : " + delivery") +
       "\n\nName: " +
       name +
       "\nEmail: " +
       email +
-      (delivery ? "\nDelivery: " + delivery : "") +
+      (delivery ? "\nDeliver to: " + delivery : "") +
       (notes ? "\nNotes: " + notes : "") +
-      "\n\nPlease confirm availability, final pricing, delivery and payment options. Thank you!";
+      "\n\nPlease confirm availability, delivery and payment details. Thank you!";
     updateOrderWhatsApp();
     $("#copy-status").textContent = "";
     $("#order-review").classList.remove("hidden");
@@ -931,7 +958,7 @@ function renderSavedBlends() {
               )
               .join(
                 " · ",
-              )}</p><p>${item.qty} teabags</p><div class="saved-actions"><button type="button" class="button secondary" data-use-recipe="${index}">Add saved blend to bag</button><button type="button" class="plain" data-delete-recipe="${index}" aria-label="Remove saved blend ${esc(item.name)}">Remove</button></div></article>`,
+              )}</p><p>${item.qty} teabags · ${rm((customBlendPrice * item.qty) / 10)}</p><div class="saved-actions"><button type="button" class="button secondary" data-use-recipe="${index}">Add saved blend to bag</button><button type="button" class="plain" data-delete-recipe="${index}" aria-label="Remove saved blend ${esc(item.name)}">Remove</button></div></article>`,
         )
         .join("")
     : '<p class="fine">Your saved recipes will appear here. Create a blend and choose “Save this blend” to keep it for next time.</p>';
@@ -1005,7 +1032,7 @@ fetch("config/business.json")
       (tng.qrImage || tng.paymentLink)
     ) {
       document.querySelector("#tng-status").textContent =
-        "AFTER QUOTE CONFIRMATION";
+        "AFTER ORDER CONFIRMATION";
       document.querySelector("#tng-description").textContent =
         "Pay only after Teasire confirms your order total on WhatsApp.";
       document.querySelector("#tng-merchant").textContent =

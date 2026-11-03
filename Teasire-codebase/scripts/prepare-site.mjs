@@ -61,6 +61,7 @@ for (const t of teas) {
     );
 }
 const urls = [];
+let pageCount = 0;
 for (const file of fs
   .readdirSync(dist)
   .filter((f) => f.endsWith(".html") && !f.startsWith("__"))) {
@@ -94,9 +95,7 @@ for (const file of fs
     "/assets/clean/" +
     (tea?.image || "01_Green_Tea_Jasmine") +
     ".webp";
-  const noindex = ["checkout.html", "pricing.html", "product.html"].includes(
-    file,
-  );
+  const noindex = ["checkout.html", "product.html"].includes(file);
   let body = markup.replace(
     '<main id="main-content" tabindex="-1">',
     '<noscript><div class="no-script">Explore our <a href="flower-tea.html">flower teas</a> and <a href="fruit-tea.html">fruit teas</a>. Enable JavaScript for blending and your bag, or <a href="https://wa.me/60126769675">contact Teasire on WhatsApp</a>.</div></noscript><main id="main-content" tabindex="-1">',
@@ -112,6 +111,7 @@ for (const file of fs
   // Meaningful initial HTML is served before the interactive script starts.
   html = `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><meta name="theme-color" content="#ffffff"><link rel="canonical" href="${origin}/${file}">${noindex ? '<meta name="robots" content="noindex,follow">' : ""}<meta property="og:type" content="website"><meta property="og:site_name" content="Teasire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${origin}/${file}"><meta property="og:image" content="${image}"><meta name="twitter:card" content="summary_large_image"><link rel="icon" type="image/png" sizes="192x192" href="assets/teasire-icon-192.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="site.css"><link rel="stylesheet" href="enhancements.css"><script src="site.js" defer></script></head><body data-page="${page}"${product ? ' data-product="' + product + '"' : ""}>${body}</body></html>\n`;
   fs.writeFileSync(p, html);
+  pageCount++;
   if (!noindex) urls.push(origin + "/" + file);
 }
 fs.writeFileSync(
@@ -125,5 +125,5 @@ fs.writeFileSync(
   "User-agent: *\nAllow: /\nSitemap: " + origin + "/sitemap.xml\n",
 );
 console.log(
-  `Prepared ${urls.length + 3} pages with initial content, metadata and a sitemap.`,
+  `Prepared ${pageCount} pages with initial content, metadata and a sitemap.`,
 );
