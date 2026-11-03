@@ -1,6 +1,6 @@
 # Teasire website
 
-A multi-page static website built with HTML, CSS and browser JavaScript. Hosted through ChatGPT Sites.
+A multi-page static website built with HTML, CSS and browser JavaScript, hosted on GitHub Pages at https://leean-design.github.io/Teasire/.
 
 ## Main files
 
@@ -11,7 +11,6 @@ A multi-page static website built with HTML, CSS and browser JavaScript. Hosted 
 - `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR.
 - `dist/config/business.json`: WhatsApp number and manual DuitNow payment settings.
 - `scripts/prepare-site.mjs`: refreshes initial HTML, sharing metadata and sitemap after content edits.
-- `.openai/hosting.json`: Sites project identity and static hosting directory.
 
 ## Preview locally
 
@@ -32,6 +31,18 @@ node scripts/prepare-site.mjs
 ```
 
 The preparation script requires Node.js 22 or later. When changing domains, update the `origin` value in the script before regenerating pages.
+
+## Publish changes
+
+Every change merged into `main` goes live automatically. The `Deploy website` workflow in `.github/workflows/deploy-pages.yml` runs the preparation script and publishes `dist/` to GitHub Pages, usually within a couple of minutes.
+
+To make a change:
+
+1. Create a branch, edit the files, and preview locally.
+2. Commit, push the branch, and open a pull request into `main`.
+3. Once the pull request is reviewed and merged, the site updates. Progress shows in the repository's **Actions** tab.
+
+One-time setup: in the repository's **Settings → Pages**, set **Source** to **GitHub Actions**.
 
 ## Payments and data
 

@@ -1,0 +1,45 @@
+# Publishes the Teasire website to GitHub Pages every time a change lands on main.
+# One-time setup: repo Settings → Pages → Source: "GitHub Actions".
+name: Deploy website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish; queue the next one instead of cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Rebuilds each page's starting HTML, sharing tags and sitemap from site.js,
+      # so the published pages are up to date even if someone forgot to run it.
+      - name: Prepare pages
+        run: node Teasire-codebase/scripts/prepare-site.mjs
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: Teasire-codebase/dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v5
