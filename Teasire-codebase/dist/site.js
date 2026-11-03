@@ -243,14 +243,15 @@ function product() {
     .map(card)
     .join("")}</div></section>`;
 }
+// `color` paints each ingredient's layer in the Blend Studio's live jar.
 const ingredients = [
-  { id: "green", name: "Green tea", max: 100, base: true },
-  { id: "black", name: "Black tea", max: 100, base: true },
-  { id: "oolong", name: "Oolong tea", max: 100, base: true },
-  { id: "jasmine", name: "Jasmine", max: 35 },
-  { id: "rose", name: "Rose", max: 35 },
-  { id: "chrysanthemum", name: "Chrysanthemum", max: 35 },
-  { id: "osmanthus", name: "Osmanthus", max: 25 },
+  { id: "green", name: "Green tea", max: 100, base: true, color: "#7f9a4e" },
+  { id: "black", name: "Black tea", max: 100, base: true, color: "#4a3024" },
+  { id: "oolong", name: "Oolong tea", max: 100, base: true, color: "#8b5e2f" },
+  { id: "jasmine", name: "Jasmine", max: 35, color: "#ece5cf" },
+  { id: "rose", name: "Rose", max: 35, color: "#c4506b" },
+  { id: "chrysanthemum", name: "Chrysanthemum", max: 35, color: "#dcb33a" },
+  { id: "osmanthus", name: "Osmanthus", max: 25, color: "#e0912d" },
 ];
 let blend = {
   base: "green",
@@ -287,8 +288,36 @@ function calculate() {
     price: (customBlendPrice * blend.qty) / 10,
   };
 }
+// The blend's ingredients in jar order: the tea base first (bottom layer), then the notes.
+function blendParts() {
+  return Object.entries(calculate().p)
+    .filter(([, v]) => v > 0)
+    .map(([id, v]) => ({ ...ingredients.find((i) => i.id === id), v }));
+}
 function builder() {
-  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout"><div><div class="panel glass" id="builder-fields"></div><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section><div class="panel glass"><h3>Make it yours.</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND PREVIEW</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside></div></div>`;
+  const parts = blendParts();
+  const layers = [0, 1, 2]
+    .map((slot) => {
+      const part = parts[slot];
+      return `<div class="jar-layer" style="--p:${part ? part.v : 0};--c:${part ? part.color : "transparent"}"></div>`;
+    })
+    .join("");
+  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout studio"><div class="builder-steps"><div class="panel glass" id="builder-fields"></div><div class="panel glass"><h3>04 / Name your blend</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section></div><div class="blend-preview"><span class="eyebrow">YOUR BLEND, LIVE</span><div class="blend-stage" aria-hidden="true"><div class="blend-jar"><div class="jar-lid"></div><div class="jar-body">${layers}</div></div><div class="blend-pack" style="--accent:${(parts[1] || parts[0]).color}"><div class="pack-seal"></div><div class="pack-brand"><img src="assets/teasire-magpie-264.png" alt="" width="40" height="24"><span>TEASIRE</span></div><span class="pack-kicker">BLENDED FOR YOU</span><p class="pack-name placeholder" id="pack-name">Your blend</p><p class="pack-recipe" id="pack-recipe">${parts.map((x) => x.name).join(" · ")}</p><div class="pack-foot"><span id="pack-qty">${blend.qty} teabags</span><span>Custom blend</span></div></div></div></div></div></div>`;
+}
+// Update the live jar and pack label to match the current blend.
+function renderBlendPreview() {
+  const parts = blendParts(),
+    name = blend.name.trim();
+  document.querySelectorAll(".jar-layer").forEach((layer, slot) => {
+    const part = parts[slot];
+    layer.style.setProperty("--p", part ? part.v : 0);
+    if (part) layer.style.setProperty("--c", part.color);
+  });
+  $("#pack-name").textContent = name || "Your blend";
+  $("#pack-name").classList.toggle("placeholder", !name);
+  $("#pack-recipe").textContent = parts.map((x) => x.name).join(" · ");
+  $("#pack-qty").textContent = blend.qty + " teabags";
+  $(".blend-pack").style.setProperty("--accent", (parts[1] || parts[0]).color);
 }
 function renderBuilder() {
   const options = (arr, key, current) =>
@@ -331,13 +360,14 @@ function renderSummary() {
       .filter(([, v]) => v > 0)
       .map(
         ([id, v]) =>
-          `<div class="summary-row"><span>${ingredients.find((i) => i.id === id)?.name || id}</span><strong>${v}%</strong></div>`,
+          `<div class="summary-row"><span><i class="swatch" style="--c:${ingredients.find((i) => i.id === id)?.color || "transparent"}" aria-hidden="true"></i>${ingredients.find((i) => i.id === id)?.name || id}</span><strong>${v}%</strong></div>`,
       )
       .join("") +
     `<div class="summary-row"><span>Total</span><strong>${c.sum}%</strong></div><div class="summary-row"><span>${blend.qty} teabags</span><strong>${rm(c.price)}</strong></div>` +
     (c.errors.length ? `<p class="notice">${c.errors.join("<br>")}</p>` : "");
   $("#blend-save").disabled = !!c.errors.length;
   $("#blend-request").disabled = !!c.errors.length;
+  renderBlendPreview();
 }
 function pricing() {
   return `<div class="page">${intro("PRICING", "Simple pricing.", "Every Teasire blend comes as individually packed teabags, starting from 10.")}<div class="panel glass"><table class="pricing-table"><thead><tr><th>Blend</th><th>Series</th><th>Price</th></tr></thead><tbody>${teas
@@ -654,7 +684,10 @@ matchMedia("(min-width: 751px)").addEventListener("change", (e) => {
 if (page === "builder") {
   renderBuilder();
   renderSavedBlends();
-  $("#blend-name").oninput = (e) => (blend.name = e.target.value);
+  $("#blend-name").oninput = (e) => {
+    blend.name = e.target.value;
+    renderBlendPreview();
+  };
   $("#blend-qty").onchange = (e) => {
     blend.qty = Number(e.target.value);
     renderSummary();
