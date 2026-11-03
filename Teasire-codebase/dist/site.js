@@ -362,7 +362,7 @@ function discover() {
   ]
     .map(
       ([id, title, copy]) =>
-        `<button class="quiz-option" data-quiz="${id}" aria-pressed="false"><strong>${title}</strong><p style="margin:8px 0 0;font-size:11px">${copy}</p></button>`,
+        `<button class="quiz-option" data-quiz="${id}" aria-pressed="false"><strong>${title}</strong><p style="margin:8px 0 0">${copy}</p></button>`,
     )
     .join("")}<div id="quiz-result" aria-live="polite"></div></div></div>`;
 }

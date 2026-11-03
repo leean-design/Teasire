@@ -945,3 +945,122 @@ textarea {
   margin: 10px 0;
   line-height: 1.7;
 }
+
+/* Readable type: bigger text, especially on phones.
+   Body text 16px, intros 17px; small print, links, buttons and menus 14px;
+   uppercase labels 12px. Nothing on the site is smaller than 12px. */
+body {
+  font-size: 16px;
+}
+main p,
+main li {
+  font-size: 16px;
+}
+.page-intro p,
+.page-top p,
+.hero-copy p,
+.tea-film-copy p,
+.split p {
+  font-size: 17px;
+}
+.fine,
+.notice {
+  font-size: 14px;
+}
+.eyebrow,
+.hero-labels span,
+.marquee span,
+.tea-film-notes span,
+.facts div,
+th,
+.tng-status {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+.facts strong {
+  font-size: 15px;
+  letter-spacing: normal;
+}
+.link,
+.button,
+.add-button,
+.whatsapp-panel {
+  font-size: 14px;
+}
+.product p,
+.cart-item p,
+.quiz-option p {
+  font-size: 14px;
+}
+.product-foot {
+  font-size: 13px;
+}
+.product-foot strong {
+  font-size: 16px;
+}
+td {
+  font-size: 14px;
+}
+.summary-row,
+.order-steps li,
+details > summary {
+  font-size: 15px;
+}
+.site-nav a,
+.site-nav summary,
+.signature-dropdown a,
+.footer-links a,
+.footer-links summary {
+  font-size: 14px;
+}
+/* An earlier rule pins footer dropdown links with !important. */
+.footer-signature .signature-dropdown > a {
+  font-size: 14px !important;
+}
+.pill,
+.bag-count,
+.footer-legal,
+.footer-policies a,
+.footer-bottom {
+  font-size: 13px;
+}
+.menu-btn {
+  font-size: 22px;
+}
+/* More specific earlier rules that the sizes above don't reach. */
+.header-tools .pill,
+.header-tools .bag-count {
+  font-size: 13px;
+}
+.footer-links .signature-menu > summary {
+  font-size: 14px;
+}
+.page-intro .eyebrow,
+.series-tabs small,
+.tng-mark {
+  font-size: 12px;
+}
+.pricing-table td,
+.pricing-table td a {
+  font-size: 14px;
+}
+.pricing-table th {
+  font-size: 12px;
+}
+.tng-content .fine,
+.card-availability .fine {
+  font-size: 14px;
+}
+.tng-payment-name {
+  font-size: 14px;
+}
+.tng-content .button {
+  font-size: 14px;
+}
+.payment-option span,
+.cart-actions .cart-remove {
+  font-size: 14px;
+}
+.payment-option small {
+  font-size: 12px;
+}
