@@ -1249,15 +1249,21 @@ details > summary {
   );
   border-bottom: 1px dashed rgba(62, 89, 84, 0.3);
 }
-.blend-pack::after {
-  content: "";
+/* The colour band along the bottom of the pack, in the main note's colour. */
+.pack-band {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 12px;
-  background: var(--accent);
-  transition: background-color 0.45s;
+  height: 14px;
+  background: var(--c);
+  box-shadow: inset 0 1px 0 rgba(6, 13, 12, 0.12);
+}
+.pack-band-pour {
+  position: absolute;
+  inset: 0;
+  box-shadow: inherit;
+  clip-path: inset(0 100% 0 0);
 }
 .pack-brand {
   display: flex;
@@ -1319,7 +1325,6 @@ details > summary {
 }
 @media (prefers-reduced-motion: reduce) {
   .jar-layer,
-  .blend-pack::after,
   .option {
     transition: none;
   }
