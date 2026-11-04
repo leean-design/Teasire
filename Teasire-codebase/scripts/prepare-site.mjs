@@ -17,10 +17,11 @@ const unesc = (t) => {
   return t;
 };
 const source = fs.readFileSync(path.join(dist, "site.js"), "utf8");
-// Everything before the line that draws the page defines the content; run only that part here.
-const renderEnd = source.search(/document\.body\.innerHTML\s*=/);
+// Everything above this marker in site.js defines the page content; run only that part here.
+const marker = "/* prepare-site: page content ends here */";
+const renderEnd = source.indexOf(marker);
 if (renderEnd < 0)
-  throw new Error("Could not find `document.body.innerHTML =` in site.js");
+  throw new Error("Could not find the marker `" + marker + "` in site.js");
 const renderSource = source.slice(0, renderEnd);
 const makeContext = (page, file, product) =>
   vm.createContext({
@@ -71,10 +72,7 @@ for (const file of fs
   const product = html.match(/data-product="([^"]+)"/)?.[1];
   const ctx = makeContext(page, file, product);
   vm.runInContext(renderSource, ctx);
-  const markup = vm.runInContext(
-    `'<a class="skip-link" href="#main-content">Skip to content</a>'+header()+'<main id="main-content" tabindex="-1">'+(content[page]||home)()+'</main>'+footer()`,
-    ctx,
-  );
+  const markup = vm.runInContext("pageMarkup()", ctx);
   const tea = teas.find((t) => t.id === product);
   const title = tea
     ? tea.name + " — Teasire"
@@ -109,7 +107,7 @@ for (const file of fs
     body = body.replace(tag, tag.replace(">", attrs + ">"));
   }
   // Meaningful initial HTML is served before the interactive script starts.
-  html = `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><meta name="theme-color" content="#ffffff"><link rel="canonical" href="${origin}/${file}">${noindex ? '<meta name="robots" content="noindex,follow">' : ""}<meta property="og:type" content="website"><meta property="og:site_name" content="Teasire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${origin}/${file}"><meta property="og:image" content="${image}"><meta name="twitter:card" content="summary_large_image"><link rel="icon" type="image/png" sizes="192x192" href="assets/teasire-icon-192.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="site.css"><link rel="stylesheet" href="enhancements.css"><script src="site.js" defer></script></head><body data-page="${page}"${product ? ' data-product="' + product + '"' : ""}>${body}</body></html>\n`;
+  html = `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><meta name="theme-color" content="#ffffff"><link rel="canonical" href="${origin}/${file}">${noindex ? '<meta name="robots" content="noindex,follow">' : ""}<meta property="og:type" content="website"><meta property="og:site_name" content="Teasire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${origin}/${file}"><meta property="og:image" content="${image}"><meta name="twitter:card" content="summary_large_image"><link rel="icon" type="image/png" sizes="192x192" href="assets/teasire-icon-192.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"><style>@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }</style><link rel="stylesheet" href="site.css"><link rel="stylesheet" href="enhancements.css"><script src="site.js" defer></script></head><body data-page="${page}"${product ? ' data-product="' + product + '"' : ""}>${body}</body></html>\n`;
   fs.writeFileSync(p, html);
   pageCount++;
   if (!noindex) urls.push(origin + "/" + file);

@@ -602,11 +602,22 @@ const content = {
   checkout,
   policies,
 };
-document.body.innerHTML =
-  '<a class="skip-link" href="#main-content">Skip to content</a>' +
-  header() +
-  `<main id="main-content" tabindex="-1">${(content[page] || home)()}</main>` +
-  footer();
+// A page's full markup: skip link, header, the page's content and footer.
+function pageMarkup() {
+  return (
+    '<a class="skip-link" href="#main-content">Skip to content</a>' +
+    header() +
+    `<main id="main-content" tabindex="-1">${(content[page] || home)()}</main>` +
+    footer()
+  );
+}
+/* prepare-site: page content ends here */
+// scripts/prepare-site.mjs saves this same markup into every page's HTML, so the
+// browser only draws it when it's missing (a page that hasn't been rebuilt yet).
+// Drawing it a second time would replace the page as it appears, which breaks
+// the page transitions.
+if (!document.getElementById("main-content"))
+  document.body.innerHTML = pageMarkup();
 document.querySelectorAll('img[src*="assets/clean/"]').forEach((img) => {
   img.width = 1086;
   img.height = 1448;
