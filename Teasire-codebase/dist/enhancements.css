@@ -1395,3 +1395,22 @@ details > summary {
     transform: translateY(14px);
   }
 }
+/* Keep the pack label the same size whatever the blend, so its bottom band
+   never jumps: room for two lines of name and three lines of ingredients
+   (a longer name ends in "…" on the label). */
+.blend-pack .pack-name {
+  min-height: 2.3em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.blend-pack .pack-recipe {
+  min-height: 4.5em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
