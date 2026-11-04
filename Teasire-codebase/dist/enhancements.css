@@ -1187,9 +1187,36 @@ details > summary {
     13px 11px,
     10px 12px;
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  transition: flex-basis 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* The new ingredient, revealed from the top down when a layer changes. */
+.jar-pour {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: radial-gradient(
+      circle at 25% 35%,
+      rgba(255, 255, 255, 0.35) 0 1.4px,
+      transparent 1.9px
+    ),
+    radial-gradient(
+      circle at 70% 65%,
+      rgba(0, 0, 0, 0.16) 0 1.4px,
+      transparent 1.9px
+    );
+  background-size:
+    13px 11px,
+    10px 12px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  clip-path: inset(0 0 100% 0);
+}
+/* Chosen options fade to their selected colours instead of switching instantly. */
+.option {
   transition:
-    flex-basis 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
-    background-color 0.45s;
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s;
 }
 .jar-layer:first-child {
   border-radius: 0 0 22px 22px;
@@ -1292,7 +1319,8 @@ details > summary {
 }
 @media (prefers-reduced-motion: reduce) {
   .jar-layer,
-  .blend-pack::after {
+  .blend-pack::after,
+  .option {
     transition: none;
   }
 }

@@ -295,19 +295,35 @@ function builder() {
   const layers = [0, 1, 2]
     .map((slot) => {
       const part = parts[slot];
-      return `<div class="jar-layer" style="--p:${part ? part.v : 0};--c:${part ? part.color : "transparent"}"></div>`;
+      return `<div class="jar-layer" style="--p:${part ? part.v : 0};--c:${part ? part.color : "transparent"}"><span class="jar-pour"></span></div>`;
     })
     .join("");
   return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout studio"><div class="builder-steps"><div class="panel glass" id="builder-fields"></div><div class="panel glass"><h3>04 / Name your blend</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section></div><div class="blend-preview"><span class="eyebrow">YOUR BLEND, LIVE</span><div class="blend-stage" aria-hidden="true"><div class="blend-jar"><div class="jar-lid"></div><div class="jar-body">${layers}</div></div><div class="blend-pack" style="--accent:${(parts[1] || parts[0]).color}"><div class="pack-seal"></div><div class="pack-brand"><img src="assets/teasire-magpie-264.png" alt="" width="40" height="24"><span>TEASIRE</span></div><span class="pack-kicker">BLENDED FOR YOU</span><p class="pack-name placeholder" id="pack-name">Your blend</p><p class="pack-recipe" id="pack-recipe">${parts.map((x) => x.name).join(" · ")}</p><div class="pack-foot"><span id="pack-qty">${blend.qty} teabags</span><span>Custom blend</span></div></div></div></div></div></div>`;
 }
 // Update the live jar and pack label to match the current blend.
+// When a layer changes ingredient, the new one pours in from the top; a layer
+// that appears grows in its own colour. Layer heights slide (see the CSS).
+const pours = new WeakMap();
 function renderBlendPreview() {
   const parts = blendParts(),
     name = blend.name.trim();
   document.querySelectorAll(".jar-layer").forEach((layer, slot) => {
-    const part = parts[slot];
+    const part = parts[slot],
+      wasEmpty = Number(layer.style.getPropertyValue("--p")) === 0;
     layer.style.setProperty("--p", part ? part.v : 0);
-    if (part) layer.style.setProperty("--c", part.color);
+    if (!part) return;
+    const running = pours.get(layer),
+      current = running
+        ? running.color
+        : layer.style.getPropertyValue("--c").trim();
+    if (current === part.color) return;
+    if (wasEmpty || reduced.matches) {
+      if (running) {
+        running.anim.cancel();
+        pours.delete(layer);
+      }
+      layer.style.setProperty("--c", part.color);
+    } else pourInto(layer, part.color);
   });
   $("#pack-name").textContent = name || "Your blend";
   $("#pack-name").classList.toggle("placeholder", !name);
@@ -315,39 +331,70 @@ function renderBlendPreview() {
   $("#pack-qty").textContent = blend.qty + " teabags";
   $(".blend-pack").style.setProperty("--accent", (parts[1] || parts[0]).color);
 }
+function pourInto(layer, color) {
+  const pour = layer.querySelector(".jar-pour"),
+    running = pours.get(layer);
+  // A pour still running finishes instantly, so the next one starts from its colour.
+  if (running) {
+    running.anim.cancel();
+    layer.style.setProperty("--c", running.color);
+  }
+  pour.style.backgroundColor = color;
+  const anim = pour.animate(
+    [{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0 0)" }],
+    {
+      duration: 650,
+      easing: "cubic-bezier(0.3, 0.7, 0.2, 1)",
+      fill: "forwards",
+    },
+  );
+  pours.set(layer, { anim, color });
+  anim.onfinish = () => {
+    if (pours.get(layer)?.anim !== anim) return;
+    layer.style.setProperty("--c", color);
+    anim.cancel();
+    pour.style.backgroundColor = "";
+    pours.delete(layer);
+  };
+}
 function renderBuilder() {
-  const options = (arr, key, current) =>
-    `<div class="options">${arr.map((i) => `<button class="option ${current === i.id ? "selected" : ""}" aria-pressed="${current === i.id}" data-choice="${key}" data-value="${i.id}" ${key === "side" && blend.main === "osmanthus" && i.id === "osmanthus" ? 'disabled title="Osmanthus is already your main note"' : ""}>${i.name}</button>`).join("")}</div>`;
+  const options = (arr, key) =>
+    `<div class="options">${arr.map((i) => `<button class="option" type="button" aria-pressed="false" data-choice="${key}" data-value="${i.id}">${i.name}</button>`).join("")}</div>`;
   $("#builder-fields").innerHTML = `<h3>01 / Choose your tea base</h3>${options(
     ingredients.filter((i) => i.base),
     "base",
-    blend.base,
   )}<h3 style="margin-top:35px">02 / The main note</h3>${options(
     ingredients.filter((i) => !i.base),
     "main",
-    blend.main,
-  )}<h3 style="margin-top:35px">03 / A finishing note</h3>${options([...ingredients.filter((i) => !i.base), { id: "none", name: "No extra note" }], "side", blend.side)}`;
+  )}<h3 style="margin-top:35px">03 / A finishing note</h3>${options([...ingredients.filter((i) => !i.base), { id: "none", name: "No extra note" }], "side")}`;
+  $("#builder-fields").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-choice]");
+    if (!b || b.disabled) return;
+    blend[b.dataset.choice] = b.dataset.value;
+    if (blend.main === "osmanthus" && blend.side === "osmanthus")
+      blend.side = "none";
+    updateChoices();
+    renderSummary();
+  });
+  updateChoices();
+  renderSummary();
+}
+// Mark the chosen options in place (no redrawing), so nothing flickers or jumps.
+function updateChoices() {
   $("#builder-fields")
     .querySelectorAll("[data-choice]")
-    .forEach(
-      (b) =>
-        (b.onclick = () => {
-          blend[b.dataset.choice] = b.dataset.value;
-          if (blend.main === "osmanthus" && blend.side === "osmanthus")
-            blend.side = "none";
-          renderBuilder();
-          document
-            .querySelector(
-              '[data-choice="' +
-                b.dataset.choice +
-                '"][data-value="' +
-                b.dataset.value +
-                '"]',
-            )
-            ?.focus();
-        }),
-    );
-  renderSummary();
+    .forEach((b) => {
+      const chosen = blend[b.dataset.choice] === b.dataset.value,
+        blocked =
+          b.dataset.choice === "side" &&
+          blend.main === "osmanthus" &&
+          b.dataset.value === "osmanthus";
+      b.classList.toggle("selected", chosen);
+      b.setAttribute("aria-pressed", String(chosen));
+      b.disabled = blocked;
+      if (blocked) b.title = "Osmanthus is already your main note";
+      else b.removeAttribute("title");
+    });
 }
 function renderSummary() {
   const c = calculate();
