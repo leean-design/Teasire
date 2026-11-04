@@ -31,7 +31,7 @@ Edit `dist/site.js` and the CSS files. After content edits, run:
 node scripts/prepare-site.mjs
 ```
 
-The preparation script requires Node.js 22 or later. When changing domains, update the `origin` value in the script before regenerating pages.
+Pages show the HTML this script saves, and the browser doesn't redraw them, so always run it after changing `site.js` (the deploy runs it automatically). The preparation script requires Node.js 22 or later. When changing domains, update the `origin` value in the script before regenerating pages.
 
 Keep the code formatted so pull request diffs stay readable:
 
