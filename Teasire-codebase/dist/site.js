@@ -239,15 +239,61 @@ function product() {
     .map(card)
     .join("")}</div></section>`;
 }
-// `color` paints each ingredient's layer in the Blend Studio's live jar.
+// In the Blend Studio's live preview, `photo` is the ingredient's close-up and `color`
+// its share of the label ribbon (and its dot in the summary).
 const ingredients = [
-  { id: "green", name: "Green tea", max: 100, base: true, color: "#7f9a4e" },
-  { id: "black", name: "Black tea", max: 100, base: true, color: "#4a3024" },
-  { id: "oolong", name: "Oolong tea", max: 100, base: true, color: "#8b5e2f" },
-  { id: "jasmine", name: "Jasmine", max: 35, color: "#ece5cf" },
-  { id: "rose", name: "Rose", max: 35, color: "#c4506b" },
-  { id: "chrysanthemum", name: "Chrysanthemum", max: 35, color: "#dcb33a" },
-  { id: "osmanthus", name: "Osmanthus", max: 25, color: "#e0912d" },
+  {
+    id: "green",
+    name: "Green tea",
+    max: 100,
+    base: true,
+    color: "#7f9a4e",
+    photo: "assets/ingredients/green.webp",
+  },
+  {
+    id: "black",
+    name: "Black tea",
+    max: 100,
+    base: true,
+    color: "#4a3024",
+    photo: "assets/ingredients/black.webp",
+  },
+  {
+    id: "oolong",
+    name: "Oolong tea",
+    max: 100,
+    base: true,
+    color: "#8b5e2f",
+    photo: "assets/ingredients/oolong.webp",
+  },
+  {
+    id: "jasmine",
+    name: "Jasmine",
+    max: 35,
+    color: "#ece5cf",
+    photo: "assets/ingredients/jasmine.webp",
+  },
+  {
+    id: "rose",
+    name: "Rose",
+    max: 35,
+    color: "#c4506b",
+    photo: "assets/ingredients/rose.webp",
+  },
+  {
+    id: "chrysanthemum",
+    name: "Chrysanthemum",
+    max: 35,
+    color: "#dcb33a",
+    photo: "assets/ingredients/chrysanthemum.webp",
+  },
+  {
+    id: "osmanthus",
+    name: "Osmanthus",
+    max: 25,
+    color: "#e0912d",
+    photo: "assets/ingredients/osmanthus.webp",
+  },
 ];
 let blend = {
   base: "green",
@@ -292,33 +338,81 @@ function blendParts() {
 }
 function builder() {
   const parts = blendParts();
-  const layers = [0, 1, 2]
+  const trio = [0, 1, 2]
     .map((slot) => {
       const part = parts[slot];
-      return `<div class="jar-layer" style="--p:${part ? part.v : 0};--c:${part ? part.color : "transparent"}"><span class="jar-pour" data-pour></span></div>`;
+      return `<figure class="trio-item${part ? "" : " empty"}" style="--s:${part ? trioSize(part.v) : 0}"><div class="trio-photo">${part ? `<img class="on" src="${part.photo}" alt="" width="320" height="320" data-id="${part.id}">` : ""}</div><figcaption><span class="trio-share">${part ? part.v + "%" : ""}</span><span class="trio-name">${part ? part.name : ""}</span></figcaption></figure>`;
     })
     .join("");
-  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout studio"><div class="builder-steps"><div class="panel glass" id="builder-fields"></div><div class="panel glass"><h3>04 / Name your blend</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section></div><div class="blend-preview"><span class="eyebrow">YOUR BLEND, LIVE</span><div class="blend-stage" aria-hidden="true"><div class="blend-jar"><div class="jar-lid"></div><div class="jar-body">${layers}</div></div><div class="blend-pack"><div class="pack-seal"></div><div class="pack-brand"><img src="assets/teasire-magpie-264.png" alt="" width="40" height="24"><span>TEASIRE</span></div><span class="pack-kicker">BLENDED FOR YOU</span><p class="pack-name placeholder" id="pack-name">Your blend</p><p class="pack-recipe" id="pack-recipe">${parts.map((x) => x.name).join(" · ")}</p><div class="pack-foot"><span id="pack-qty">${blend.qty} teabags</span><span>Custom blend</span></div><div class="pack-band" style="--c:${(parts[1] || parts[0]).color}"><span class="pack-band-pour" data-pour></span></div></div></div></div></div></div>`;
+  const ribbon = [0, 1, 2]
+    .map((slot) => {
+      const part = parts[slot];
+      return `<span class="ribbon-part" style="--p:${part ? part.v : 0};--c:${part ? part.color : "transparent"}"><span class="ribbon-pour" data-pour></span></span>`;
+    })
+    .join("");
+  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout studio"><div class="builder-steps"><div class="panel glass" id="builder-fields"></div><div class="panel glass"><h3>04 / Name your blend</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section></div><div class="blend-preview"><span class="eyebrow">YOUR BLEND, LIVE</span><div class="blend-trio" aria-hidden="true">${trio}</div><div class="blend-label"><div class="label-top"><img src="assets/teasire-magpie-264.png" alt="" width="36" height="22"><span class="label-brand">TEASIRE</span><span class="label-kicker">BLENDED FOR YOU</span></div><p class="label-name placeholder" id="label-name">Your blend</p><p class="label-recipe" id="label-recipe">${parts.map((x) => x.name).join(" · ")}</p><div class="label-ribbon" aria-hidden="true">${ribbon}</div><div class="label-foot"><span id="label-qty">${blend.qty} teabags</span><span>Custom blend</span></div></div></div></div></div>`;
 }
-// Update the live jar and pack label to match the current blend.
-// When a jar layer changes ingredient, the new one pours in from the top; a
-// layer that appears grows in its own colour. Layer heights slide (see the CSS).
-// The pack's colour band takes the main note's colour, sliding in from the left.
+// Update the live preview to match the current blend. Each ingredient's photo
+// is sized by its share; a new ingredient's photo dissolves in, and a slot that
+// appears grows with its own photo. The label ribbon's parts slide to their
+// shares, and a part that changes ingredient slides its new colour in.
+// Sizes and positions are fixed around the largest share, so nothing jumps.
 const pours = new WeakMap();
+const trioSize = (share) => Math.round(64 + share * 1.25);
 function renderBlendPreview() {
   const parts = blendParts(),
     name = blend.name.trim();
-  document.querySelectorAll(".jar-layer").forEach((layer, slot) => {
+  document.querySelectorAll(".trio-item").forEach((item, slot) => {
     const part = parts[slot],
-      wasEmpty = Number(layer.style.getPropertyValue("--p")) === 0;
-    layer.style.setProperty("--p", part ? part.v : 0);
-    if (part) recolor(layer, part.color, "top", wasEmpty);
+      wasEmpty = item.classList.contains("empty");
+    item.classList.toggle("empty", !part);
+    item.style.setProperty("--s", part ? trioSize(part.v) : 0);
+    if (!part) return;
+    item.querySelector(".trio-share").textContent = part.v + "%";
+    item.querySelector(".trio-name").textContent = part.name;
+    showPhoto(item, part, wasEmpty);
   });
-  recolor($(".pack-band"), (parts[1] || parts[0]).color, "left");
-  $("#pack-name").textContent = name || "Your blend";
-  $("#pack-name").classList.toggle("placeholder", !name);
-  $("#pack-recipe").textContent = parts.map((x) => x.name).join(" · ");
-  $("#pack-qty").textContent = blend.qty + " teabags";
+  document.querySelectorAll(".ribbon-part").forEach((seg, slot) => {
+    const part = parts[slot],
+      wasEmpty = Number(seg.style.getPropertyValue("--p")) === 0;
+    seg.style.setProperty("--p", part ? part.v : 0);
+    if (part) recolor(seg, part.color, "left", wasEmpty);
+  });
+  $("#label-name").textContent = name || "Your blend";
+  $("#label-name").classList.toggle("placeholder", !name);
+  $("#label-recipe").textContent = parts.map((x) => x.name).join(" · ");
+  $("#label-qty").textContent = blend.qty + " teabags";
+}
+// Show an ingredient's photo in its circle. Each new photo fades in on top of
+// whatever is showing (even mid-fade), then the photos underneath are removed.
+// An empty circle, or a visitor who prefers reduced motion, switches instantly.
+function showPhoto(item, part, instant) {
+  const box = item.querySelector(".trio-photo");
+  if (box.lastElementChild?.dataset.id === part.id) return;
+  const img = new Image(320, 320);
+  img.alt = "";
+  img.dataset.id = part.id;
+  img.src = part.photo;
+  if (instant || reduced.matches) {
+    img.className = "on";
+    box.replaceChildren(img);
+    return;
+  }
+  box.append(img);
+  img
+    .decode()
+    .catch(() => {})
+    .then(() => {
+      if (box.lastElementChild !== img) return; // a newer photo took over
+      requestAnimationFrame(() => img.classList.add("on"));
+      img.addEventListener(
+        "transitionend",
+        () => {
+          while (box.firstElementChild !== img) box.firstElementChild.remove();
+        },
+        { once: true },
+      );
+    });
 }
 // Change an element's colour (its --c): pour the new colour in, or switch
 // instantly when asked or when the visitor prefers reduced motion.
@@ -741,6 +835,10 @@ matchMedia("(min-width: 751px)").addEventListener("change", (e) => {
 });
 if (page === "builder") {
   renderBuilder();
+  setTimeout(
+    () => ingredients.forEach((i) => (new Image().src = i.photo)),
+    1200,
+  );
   renderSavedBlends();
   $("#blend-name").oninput = (e) => {
     blend.name = e.target.value;
