@@ -189,7 +189,7 @@ function brand() {
   return `<a class="logo" href="index.html" aria-label="Teasire home"><img src="assets/teasire-magpie-264.png" alt="" width="103" height="63"><span>Teasire</span></a>`;
 }
 function signatureMenu(name = "Signature Blend", footer = false) {
-  return `<details class="signature-menu ${footer ? "footer-signature" : ""}"><summary>${name}<span aria-hidden="true">⌄</span></summary><div class="signature-dropdown glass"><a href="flower-tea.html">Flower Tea <span>↗</span></a><a href="fruit-tea.html">Fruit Tea <span>↗</span></a></div></details>`;
+  return `<details class="signature-menu ${footer ? "footer-signature" : ""}"><summary>${name}</summary><div class="signature-dropdown glass"><a href="flower-tea.html">Flower Tea <span>↗</span></a><a href="fruit-tea.html">Fruit Tea <span>↗</span></a></div></details>`;
 }
 function header() {
   return `<div class="progress" aria-hidden="true"></div><header class="site-header glass">${brand()}<nav class="site-nav" aria-label="Main navigation">${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}" ${location.pathname.endsWith(url) ? 'aria-current="page"' : ""}>${label}</a>`).join("")}</nav><div class="header-tools"><a class="pill" href="checkout.html">Bag <span class="bag-count">0</span></a><button class="plain menu-btn" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button></div></header><nav class="mobile-menu" id="mobile-menu" aria-label="Expanded navigation" inert><div class="mobile-menu-top"><span class="mobile-menu-label">Explore Teasire</span><button class="plain" id="menu-close" type="button" aria-label="Close navigation">Close ✕</button></div>${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav>`;
@@ -198,7 +198,7 @@ function footer() {
   return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-legal"><span id="business-details"></span><nav class="footer-policies" aria-label="Shop policies"><a href="policies.html#delivery">Delivery</a><a href="policies.html#returns">Returns</a><a href="policies.html#terms">Terms</a><a href="policies.html#privacy">Privacy</a><span id="social-links"></span></nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;
 }
 function card(t) {
-  return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${t.name} tea with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p>${t.notes}</p><div class="product-foot"><span><strong>${rm(t.price)}</strong> · 10 teabags</span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
+  return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${t.name} tea with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p>${t.notes}</p><div class="product-foot"><span class="card-price"><strong>${rm(t.price)}</strong><small>10 teabags</small></span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
 }
 function intro(kicker, title, copy) {
   return `<div class="page-intro"><span class="eyebrow">${kicker}</span><h1>${title}</h1><p>${copy}</p></div>`;
@@ -206,11 +206,14 @@ function intro(kicker, title, copy) {
 function cta() {
   return `<section class="cta"><span class="eyebrow">YOUR NOTES. YOUR MOOD. YOUR TEA.</span><h2>Make a little room<br>for your own ritual.</h2><a class="button" href="blend-studio.html">Create your blend <span>↗</span></a></section>`;
 }
-function brew() {
-  return `<section class="tea-film-section" id="brew" aria-labelledby="tea-film-title"><div class="tea-film-layout"><div class="tea-film-copy"><span class="eyebrow">THE SIMPLE PLEASURE OF TEA</span><h2 id="tea-film-title">A moment<br>to savour.</h2><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><p>A little invitation to let the day soften, and enjoy something made just for you.</p><a class="button secondary" href="blend-studio.html">Make your own ritual <span>↗</span></a><div class="tea-film-notes"><span>Tea leaves.</span><span>A little care.</span><span>Your own pace.</span></div></div><figure class="tea-film-frame"><div class="tea-film-media"><video id="tea-film" muted playsinline preload="metadata" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light"><source src="assets/teasire-pouring-film.mp4" type="video/mp4"><p>Your browser cannot play this film. <a href="assets/teasire-pouring-film.mp4">Watch the tea film</a>.</p></video><div class="tea-film-controls glass"><button id="film-play" type="button" aria-label="Play tea film"><span id="film-play-icon" aria-hidden="true">▶</span><span id="film-play-label">Play film</span></button><span class="film-control-divider" aria-hidden="true"></span><button id="film-sound" type="button" aria-label="Turn sound on" aria-pressed="false">Sound off</button></div></div><figcaption><span>A LITTLE STILLNESS, POURED.</span><span>TEASIRE</span></figcaption></figure></div></section>`;
-}
 function home() {
-  return `<section class="hero"><div class="hero-labels"><span>A QUIETER KIND OF EVERYDAY</span><span>MALAYSIA · SMALL BATCHES</span></div><div class="liquid-orb orb-one"></div><div class="liquid-orb orb-two"></div><h1><span><b>A little tea.</b></span><span><b>A little stillness.</b></span></h1><div class="hero-visual"><img width="1086" height="1448" fetchpriority="high" decoding="async" id="hero-img" ${photoAttrs(teas[0], "large")} alt="Green Tea Jasmine"><a class="glass" id="hero-link" href="${productUrl(teas[0].id)}"><span id="hero-label">Green Tea Jasmine</span><span>↗</span></a><div class="hero-gallery-controls"><button type="button" id="hero-prev" aria-label="Previous tea photograph">←</button><span id="hero-count" aria-live="polite">1 / 8</span><button type="button" id="hero-next" aria-label="Next tea photograph">→</button><button type="button" id="hero-pause" aria-label="Pause tea slideshow">Pause</button></div></div><div class="hero-copy"><p>Let the day soften, one cup at a time.<br>Familiar tea leaves, fragrant flowers, and a moment just for you.</p><div class="hero-actions"><a class="button" href="flower-tea.html">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div></div><div class="hero-foot"><span>INDIVIDUALLY PACKED · START WITH 10</span><a href="#brew">SCROLL TO FEEL IT ↓</a></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div>${brew()}<section class="section"><div class="page-top"><div><span class="eyebrow">OUR COLLECTIONS</span><h2>Follow your senses.</h2></div><p>Fragrant flowers or sunlit fruit.<br>Two ways to find your next favourite cup.</p></div><div class="grid two"><a class="collection-tile" href="flower-tea.html"><img ${photoAttrs(teas[2], "large")} alt="Rose oolong tea and rose petals" loading="lazy"><div class="glass"><h3>Flower Tea</h3><span>Explore ↗</span></div></a><a class="collection-tile" href="fruit-tea.html"><img ${photoAttrs(teas[6], "large")} alt="Green tea with fresh orange" loading="lazy"><div class="glass"><h3>Fruit Tea</h3><span>Explore ↗</span></div></a></div></section><section class="section quiet-story"><div class="split"><img ${photoAttrs(teas[1], "large")} alt="A warm cup of osmanthus oolong with flowers" loading="lazy"><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
+  const series = (key, title) =>
+    `<div class="shop-series"><div class="shop-series-head"><h3>${title}</h3><a class="link" href="${key}-tea.html">See the series ↗</a></div><div class="grid">${teas
+      .filter((t) => t.series === key)
+      .map(card)
+      .join("")}</div></div>`;
+  const prices = [...new Set(teas.map((t) => t.price))];
+  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" tabindex="0" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light. Select to play or pause."><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video></figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `Eight blends, each ${rm(prices[0])} for 10 individually packed teabags.` : "Eight blends in individually packed teabags."}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Find your tea in one question.</h3><p>Tell us which notes you love, and we’ll match you with a blend.</p></div><a class="button" href="discover.html">Find your tea <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><img ${photoAttrs(teas[1], "large")} alt="A warm cup of osmanthus oolong with flowers" loading="lazy"><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
 }
 function collection(series) {
   const flower = series === "flower";
@@ -236,14 +239,15 @@ function product() {
     .map(card)
     .join("")}</div></section>`;
 }
+// `color` paints each ingredient's layer in the Blend Studio's live jar.
 const ingredients = [
-  { id: "green", name: "Green tea", max: 100, base: true },
-  { id: "black", name: "Black tea", max: 100, base: true },
-  { id: "oolong", name: "Oolong tea", max: 100, base: true },
-  { id: "jasmine", name: "Jasmine", max: 35 },
-  { id: "rose", name: "Rose", max: 35 },
-  { id: "chrysanthemum", name: "Chrysanthemum", max: 35 },
-  { id: "osmanthus", name: "Osmanthus", max: 25 },
+  { id: "green", name: "Green tea", max: 100, base: true, color: "#7f9a4e" },
+  { id: "black", name: "Black tea", max: 100, base: true, color: "#4a3024" },
+  { id: "oolong", name: "Oolong tea", max: 100, base: true, color: "#8b5e2f" },
+  { id: "jasmine", name: "Jasmine", max: 35, color: "#ece5cf" },
+  { id: "rose", name: "Rose", max: 35, color: "#c4506b" },
+  { id: "chrysanthemum", name: "Chrysanthemum", max: 35, color: "#dcb33a" },
+  { id: "osmanthus", name: "Osmanthus", max: 25, color: "#e0912d" },
 ];
 let blend = {
   base: "green",
@@ -280,8 +284,36 @@ function calculate() {
     price: (customBlendPrice * blend.qty) / 10,
   };
 }
+// The blend's ingredients in jar order: the tea base first (bottom layer), then the notes.
+function blendParts() {
+  return Object.entries(calculate().p)
+    .filter(([, v]) => v > 0)
+    .map(([id, v]) => ({ ...ingredients.find((i) => i.id === id), v }));
+}
 function builder() {
-  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout"><div><div class="panel glass" id="builder-fields"></div><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section><div class="panel glass"><h3>Make it yours.</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND PREVIEW</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside></div></div>`;
+  const parts = blendParts();
+  const layers = [0, 1, 2]
+    .map((slot) => {
+      const part = parts[slot];
+      return `<div class="jar-layer" style="--p:${part ? part.v : 0};--c:${part ? part.color : "transparent"}"></div>`;
+    })
+    .join("");
+  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout studio"><div class="builder-steps"><div class="panel glass" id="builder-fields"></div><div class="panel glass"><h3>04 / Name your blend</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section></div><div class="blend-preview"><span class="eyebrow">YOUR BLEND, LIVE</span><div class="blend-stage" aria-hidden="true"><div class="blend-jar"><div class="jar-lid"></div><div class="jar-body">${layers}</div></div><div class="blend-pack" style="--accent:${(parts[1] || parts[0]).color}"><div class="pack-seal"></div><div class="pack-brand"><img src="assets/teasire-magpie-264.png" alt="" width="40" height="24"><span>TEASIRE</span></div><span class="pack-kicker">BLENDED FOR YOU</span><p class="pack-name placeholder" id="pack-name">Your blend</p><p class="pack-recipe" id="pack-recipe">${parts.map((x) => x.name).join(" · ")}</p><div class="pack-foot"><span id="pack-qty">${blend.qty} teabags</span><span>Custom blend</span></div></div></div></div></div></div>`;
+}
+// Update the live jar and pack label to match the current blend.
+function renderBlendPreview() {
+  const parts = blendParts(),
+    name = blend.name.trim();
+  document.querySelectorAll(".jar-layer").forEach((layer, slot) => {
+    const part = parts[slot];
+    layer.style.setProperty("--p", part ? part.v : 0);
+    if (part) layer.style.setProperty("--c", part.color);
+  });
+  $("#pack-name").textContent = name || "Your blend";
+  $("#pack-name").classList.toggle("placeholder", !name);
+  $("#pack-recipe").textContent = parts.map((x) => x.name).join(" · ");
+  $("#pack-qty").textContent = blend.qty + " teabags";
+  $(".blend-pack").style.setProperty("--accent", (parts[1] || parts[0]).color);
 }
 function renderBuilder() {
   const options = (arr, key, current) =>
@@ -324,13 +356,14 @@ function renderSummary() {
       .filter(([, v]) => v > 0)
       .map(
         ([id, v]) =>
-          `<div class="summary-row"><span>${ingredients.find((i) => i.id === id)?.name || id}</span><strong>${v}%</strong></div>`,
+          `<div class="summary-row"><span><i class="swatch" style="--c:${ingredients.find((i) => i.id === id)?.color || "transparent"}" aria-hidden="true"></i>${ingredients.find((i) => i.id === id)?.name || id}</span><strong>${v}%</strong></div>`,
       )
       .join("") +
     `<div class="summary-row"><span>Total</span><strong>${c.sum}%</strong></div><div class="summary-row"><span>${blend.qty} teabags</span><strong>${rm(c.price)}</strong></div>` +
     (c.errors.length ? `<p class="notice">${c.errors.join("<br>")}</p>` : "");
   $("#blend-save").disabled = !!c.errors.length;
   $("#blend-request").disabled = !!c.errors.length;
+  renderBlendPreview();
 }
 function pricing() {
   return `<div class="page">${intro("PRICING", "Simple pricing.", "Every Teasire blend comes as individually packed teabags, starting from 10.")}<div class="panel glass"><table class="pricing-table"><thead><tr><th>Blend</th><th>Series</th><th>Price</th></tr></thead><tbody>${teas
@@ -362,7 +395,7 @@ function discover() {
   ]
     .map(
       ([id, title, copy]) =>
-        `<button class="quiz-option" data-quiz="${id}" aria-pressed="false"><strong>${title}</strong><p style="margin:8px 0 0;font-size:11px">${copy}</p></button>`,
+        `<button class="quiz-option" data-quiz="${id}" aria-pressed="false"><strong>${title}</strong><p style="margin:8px 0 0">${copy}</p></button>`,
     )
     .join("")}<div id="quiz-result" aria-live="polite"></div></div></div>`;
 }
@@ -647,7 +680,10 @@ matchMedia("(min-width: 751px)").addEventListener("change", (e) => {
 if (page === "builder") {
   renderBuilder();
   renderSavedBlends();
-  $("#blend-name").oninput = (e) => (blend.name = e.target.value);
+  $("#blend-name").oninput = (e) => {
+    blend.name = e.target.value;
+    renderBlendPreview();
+  };
   $("#blend-qty").onchange = (e) => {
     blend.qty = Number(e.target.value);
     renderSummary();
@@ -772,14 +808,12 @@ if ("IntersectionObserver" in window && !reduced.matches) {
       }),
     { threshold: 0.05 },
   );
-  document
-    .querySelectorAll(".product,.split>*,.collection-tile,.cta>*")
-    .forEach((el) => {
-      if (el.getBoundingClientRect().top > innerHeight) {
-        el.classList.add("will-reveal");
-        observer.observe(el);
-      }
-    });
+  document.querySelectorAll(".product,.split>*,.cta>*").forEach((el) => {
+    if (el.getBoundingClientRect().top > innerHeight) {
+      el.classList.add("will-reveal");
+      observer.observe(el);
+    }
+  });
 }
 document.querySelectorAll(".glass").forEach((el) =>
   el.addEventListener(
@@ -799,56 +833,6 @@ document.querySelectorAll(".glass").forEach((el) =>
     { passive: true },
   ),
 );
-let heroSlide = 0,
-  heroPaused = reduced.matches,
-  heroTimer;
-function showHero(index) {
-  heroSlide = (index + teas.length) % teas.length;
-  const t = teas[heroSlide],
-    img = $("#hero-img");
-  if (!img) return;
-  img.srcset = photoSet(t);
-  img.src = photo(t);
-  img.alt = t.name;
-  $("#hero-label").textContent = t.name;
-  $("#hero-link").href = productUrl(t.id);
-  $("#hero-count").textContent = heroSlide + 1 + " / " + teas.length;
-}
-function setHeroPaused(paused) {
-  heroPaused = paused;
-  $("#hero-pause").textContent = paused ? "Play" : "Pause";
-  $("#hero-pause").setAttribute(
-    "aria-label",
-    paused ? "Play tea slideshow" : "Pause tea slideshow",
-  );
-}
-if (page === "home") {
-  setHeroPaused(heroPaused);
-  $("#hero-next").onclick = () => {
-    setHeroPaused(true);
-    showHero(heroSlide + 1);
-  };
-  $("#hero-prev").onclick = () => {
-    setHeroPaused(true);
-    showHero(heroSlide - 1);
-  };
-  $("#hero-pause").onclick = () => setHeroPaused(!heroPaused);
-  heroTimer = setInterval(() => {
-    const r = $(".hero-visual").getBoundingClientRect();
-    if (
-      !heroPaused &&
-      !document.hidden &&
-      !reduced.matches &&
-      r.bottom > 0 &&
-      r.top < innerHeight &&
-      !$(".hero-visual").matches(":hover,:focus-within")
-    )
-      showHero(heroSlide + 1);
-  }, 6500);
-  reduced.addEventListener("change", (e) => {
-    if (e.matches) setHeroPaused(true);
-  });
-}
 let frameQueued = false;
 function frame() {
   frameQueued = false;
@@ -894,63 +878,59 @@ document.addEventListener("click", (e) => {
   });
 });
 
-// Play the continuous photographic film at its own pace, without scroll seeking.
+// Home film: plays once while in view and holds on the finished glass.
+// It starts with sound where the browser allows it. Most browsers only allow
+// sound after the visitor's first tap, click or key press, so until then it
+// plays silently and the sound comes on at that first interaction.
+// Tapping the film (or Enter/Space when it has focus) plays or pauses it.
 const teaFilm = document.querySelector("#tea-film");
 if (teaFilm) {
   let manuallyPaused = false,
     visible = false;
-  const playButton = document.querySelector("#film-play"),
-    soundButton = document.querySelector("#film-sound");
-  function updateFilmControls() {
-    const playing = !teaFilm.paused && !teaFilm.ended;
-    document.querySelector("#film-play-icon").textContent = playing
-      ? "Ⅱ"
-      : "▶";
-    document.querySelector("#film-play-label").textContent = playing
-      ? "Pause film"
-      : teaFilm.ended
-        ? "Replay film"
-        : "Play film";
-    playButton.setAttribute(
-      "aria-label",
-      playing
-        ? "Pause tea film"
-        : teaFilm.ended
-          ? "Replay tea film"
-          : "Play tea film",
-    );
-  }
   async function playFilm() {
+    teaFilm.muted = false;
     try {
       await teaFilm.play();
-    } catch {}
-    updateFilmControls();
+    } catch {
+      // Sound isn't allowed yet: play silently instead.
+      teaFilm.muted = true;
+      try {
+        await teaFilm.play();
+      } catch {}
+    }
   }
-  playButton.onclick = () => {
-    if (teaFilm.paused) {
+  function soundOn(e) {
+    if (e.target === teaFilm) return; // the film's own tap is handled below
+    if (!teaFilm.muted || teaFilm.paused || teaFilm.ended) return;
+    if (navigator.userActivation && !navigator.userActivation.isActive) return;
+    teaFilm.muted = false;
+    // A browser that still refuses sound pauses the film; keep it playing silently.
+    setTimeout(() => {
+      if (teaFilm.paused && !teaFilm.ended && !manuallyPaused) {
+        teaFilm.muted = true;
+        teaFilm.play().catch(() => {});
+      }
+    }, 100);
+  }
+  for (const type of ["click", "keydown", "touchend"])
+    document.addEventListener(type, soundOn, { capture: true, passive: true });
+  function tapFilm() {
+    if (!teaFilm.paused && !teaFilm.ended && teaFilm.muted) {
+      teaFilm.muted = false;
+    } else if (teaFilm.paused || teaFilm.ended) {
       manuallyPaused = false;
       playFilm();
     } else {
       manuallyPaused = true;
       teaFilm.pause();
     }
-  };
-  soundButton.onclick = () => {
-    teaFilm.muted = !teaFilm.muted;
-    soundButton.textContent = teaFilm.muted ? "Sound off" : "Sound on";
-    soundButton.setAttribute("aria-pressed", String(!teaFilm.muted));
-    soundButton.setAttribute(
-      "aria-label",
-      teaFilm.muted ? "Turn sound on" : "Turn sound off",
-    );
-  };
-  teaFilm.addEventListener("play", updateFilmControls);
-  teaFilm.addEventListener("pause", updateFilmControls);
-  teaFilm.addEventListener("ended", updateFilmControls);
-  teaFilm.addEventListener("error", () => {
-    document.querySelector("#film-play-label").textContent = "Film unavailable";
-    playButton.disabled = true;
-    soundButton.disabled = true;
+  }
+  teaFilm.addEventListener("click", tapFilm);
+  teaFilm.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      tapFilm();
+    }
   });
   const filmObserver = new IntersectionObserver(
     (entries) => {
@@ -979,7 +959,6 @@ if (teaFilm) {
     if (reduced.matches) teaFilm.pause();
     else if (visible && !manuallyPaused && !teaFilm.ended) playFilm();
   });
-  updateFilmControls();
 }
 
 const waToggle = document.querySelector("#whatsapp-toggle"),
