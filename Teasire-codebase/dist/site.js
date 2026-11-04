@@ -189,7 +189,7 @@ function brand() {
   return `<a class="logo" href="index.html" aria-label="Teasire home"><img src="assets/teasire-magpie-264.png" alt="" width="103" height="63"><span>Teasire</span></a>`;
 }
 function signatureMenu(name = "Signature Blend", footer = false) {
-  return `<details class="signature-menu ${footer ? "footer-signature" : ""}"><summary>${name}<span aria-hidden="true">⌄</span></summary><div class="signature-dropdown glass"><a href="flower-tea.html">Flower Tea <span>↗</span></a><a href="fruit-tea.html">Fruit Tea <span>↗</span></a></div></details>`;
+  return `<details class="signature-menu ${footer ? "footer-signature" : ""}"><summary>${name}</summary><div class="signature-dropdown glass"><a href="flower-tea.html">Flower Tea <span>↗</span></a><a href="fruit-tea.html">Fruit Tea <span>↗</span></a></div></details>`;
 }
 function header() {
   return `<div class="progress" aria-hidden="true"></div><header class="site-header glass">${brand()}<nav class="site-nav" aria-label="Main navigation">${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}" ${location.pathname.endsWith(url) ? 'aria-current="page"' : ""}>${label}</a>`).join("")}</nav><div class="header-tools"><a class="pill" href="checkout.html">Bag <span class="bag-count">0</span></a><button class="plain menu-btn" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button></div></header><nav class="mobile-menu" id="mobile-menu" aria-label="Expanded navigation" inert><div class="mobile-menu-top"><span class="mobile-menu-label">Explore Teasire</span><button class="plain" id="menu-close" type="button" aria-label="Close navigation">Close ✕</button></div>${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav>`;
@@ -206,10 +206,6 @@ function intro(kicker, title, copy) {
 function cta() {
   return `<section class="cta"><span class="eyebrow">YOUR NOTES. YOUR MOOD. YOUR TEA.</span><h2>Make a little room<br>for your own ritual.</h2><a class="button" href="blend-studio.html">Create your blend <span>↗</span></a></section>`;
 }
-// The film controls; the script near the end of this file wires them up.
-function filmControls() {
-  return `<div class="tea-film-controls glass"><button id="film-play" type="button" aria-label="Play tea film"><span id="film-play-icon" aria-hidden="true">▶</span><span id="film-play-label">Play film</span></button><span class="film-control-divider" aria-hidden="true"></span><button id="film-sound" type="button" aria-label="Turn sound on" aria-pressed="false">Sound off</button></div>`;
-}
 function home() {
   const series = (key, title) =>
     `<div class="shop-series"><div class="shop-series-head"><h3>${title}</h3><a class="link" href="${key}-tea.html">See the series ↗</a></div><div class="grid">${teas
@@ -217,7 +213,7 @@ function home() {
       .map(card)
       .join("")}</div></div>`;
   const prices = [...new Set(teas.map((t) => t.price))];
-  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light"><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video>${filmControls()}</figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `Eight blends, each ${rm(prices[0])} for 10 individually packed teabags.` : "Eight blends in individually packed teabags."}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Find your tea in one question.</h3><p>Tell us which notes you love, and we’ll match you with a blend.</p></div><a class="button" href="discover.html">Find your tea <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><img ${photoAttrs(teas[1], "large")} alt="A warm cup of osmanthus oolong with flowers" loading="lazy"><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
+  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" tabindex="0" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light. Select to play or pause."><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video></figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `Eight blends, each ${rm(prices[0])} for 10 individually packed teabags.` : "Eight blends in individually packed teabags."}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Find your tea in one question.</h3><p>Tell us which notes you love, and we’ll match you with a blend.</p></div><a class="button" href="discover.html">Find your tea <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><img ${photoAttrs(teas[1], "large")} alt="A warm cup of osmanthus oolong with flowers" loading="lazy"><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
 }
 function collection(series) {
   const flower = series === "flower";
@@ -882,63 +878,59 @@ document.addEventListener("click", (e) => {
   });
 });
 
-// Play the continuous photographic film at its own pace, without scroll seeking.
+// Home film: plays once while in view and holds on the finished glass.
+// It starts with sound where the browser allows it. Most browsers only allow
+// sound after the visitor's first tap, click or key press, so until then it
+// plays silently and the sound comes on at that first interaction.
+// Tapping the film (or Enter/Space when it has focus) plays or pauses it.
 const teaFilm = document.querySelector("#tea-film");
 if (teaFilm) {
   let manuallyPaused = false,
     visible = false;
-  const playButton = document.querySelector("#film-play"),
-    soundButton = document.querySelector("#film-sound");
-  function updateFilmControls() {
-    const playing = !teaFilm.paused && !teaFilm.ended;
-    document.querySelector("#film-play-icon").textContent = playing
-      ? "Ⅱ"
-      : "▶";
-    document.querySelector("#film-play-label").textContent = playing
-      ? "Pause film"
-      : teaFilm.ended
-        ? "Replay film"
-        : "Play film";
-    playButton.setAttribute(
-      "aria-label",
-      playing
-        ? "Pause tea film"
-        : teaFilm.ended
-          ? "Replay tea film"
-          : "Play tea film",
-    );
-  }
   async function playFilm() {
+    teaFilm.muted = false;
     try {
       await teaFilm.play();
-    } catch {}
-    updateFilmControls();
+    } catch {
+      // Sound isn't allowed yet: play silently instead.
+      teaFilm.muted = true;
+      try {
+        await teaFilm.play();
+      } catch {}
+    }
   }
-  playButton.onclick = () => {
-    if (teaFilm.paused) {
+  function soundOn(e) {
+    if (e.target === teaFilm) return; // the film's own tap is handled below
+    if (!teaFilm.muted || teaFilm.paused || teaFilm.ended) return;
+    if (navigator.userActivation && !navigator.userActivation.isActive) return;
+    teaFilm.muted = false;
+    // A browser that still refuses sound pauses the film; keep it playing silently.
+    setTimeout(() => {
+      if (teaFilm.paused && !teaFilm.ended && !manuallyPaused) {
+        teaFilm.muted = true;
+        teaFilm.play().catch(() => {});
+      }
+    }, 100);
+  }
+  for (const type of ["click", "keydown", "touchend"])
+    document.addEventListener(type, soundOn, { capture: true, passive: true });
+  function tapFilm() {
+    if (!teaFilm.paused && !teaFilm.ended && teaFilm.muted) {
+      teaFilm.muted = false;
+    } else if (teaFilm.paused || teaFilm.ended) {
       manuallyPaused = false;
       playFilm();
     } else {
       manuallyPaused = true;
       teaFilm.pause();
     }
-  };
-  soundButton.onclick = () => {
-    teaFilm.muted = !teaFilm.muted;
-    soundButton.textContent = teaFilm.muted ? "Sound off" : "Sound on";
-    soundButton.setAttribute("aria-pressed", String(!teaFilm.muted));
-    soundButton.setAttribute(
-      "aria-label",
-      teaFilm.muted ? "Turn sound on" : "Turn sound off",
-    );
-  };
-  teaFilm.addEventListener("play", updateFilmControls);
-  teaFilm.addEventListener("pause", updateFilmControls);
-  teaFilm.addEventListener("ended", updateFilmControls);
-  teaFilm.addEventListener("error", () => {
-    document.querySelector("#film-play-label").textContent = "Film unavailable";
-    playButton.disabled = true;
-    soundButton.disabled = true;
+  }
+  teaFilm.addEventListener("click", tapFilm);
+  teaFilm.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      tapFilm();
+    }
   });
   const filmObserver = new IntersectionObserver(
     (entries) => {
@@ -967,7 +959,6 @@ if (teaFilm) {
     if (reduced.matches) teaFilm.pause();
     else if (visible && !manuallyPaused && !teaFilm.ended) playFilm();
   });
-  updateFilmControls();
 }
 
 const waToggle = document.querySelector("#whatsapp-toggle"),

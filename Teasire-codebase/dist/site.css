@@ -899,13 +899,6 @@ body:before {
 .signature-menu > summary::-webkit-details-marker {
   display: none;
 }
-.signature-menu > summary > span {
-  transition: transform 0.25s;
-  font-size: 13px;
-}
-.signature-menu[open] > summary > span {
-  transform: rotate(180deg);
-}
 .signature-dropdown {
   position: absolute;
   top: calc(100% + 12px);
@@ -1111,9 +1104,6 @@ body:before {
   padding: 12px 0;
   border-bottom: 1px solid var(--border);
 }
-.mobile-menu .signature-menu > summary > span {
-  font-size: 22px;
-}
 .mobile-menu .signature-dropdown {
   position: static;
   width: auto;
@@ -1266,54 +1256,6 @@ body:before {
   }
 }
 /* A continuous natural pour replaces the isolated, scroll-transformed objects. */
-.tea-film-controls {
-  position: absolute;
-  bottom: 22px;
-  left: 20px;
-  right: 20px;
-  border-radius: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 7px 12px;
-  background: linear-gradient(120deg, #f0ede5d9, #f0ede5a0);
-  box-shadow:
-    inset 0 1px #fff8,
-    0 6px 25px #060d0c12;
-  backdrop-filter: blur(18px);
-}
-.tea-film-controls button {
-  background: none;
-  border: 0;
-  display: inline-flex;
-  gap: 9px;
-  align-items: center;
-  font:
-    10px Montserrat,
-    sans-serif;
-  color: #060d0c;
-  padding: 10px 8px;
-  border-radius: 25px;
-}
-.tea-film-controls button:hover {
-  background: #ffffff40;
-}
-.film-control-divider {
-  width: 1px;
-  height: 17px;
-  background: #75888655;
-}
-@media (max-width: 750px) {
-  .tea-film-controls {
-    bottom: 18px;
-    left: 15px;
-    right: 15px;
-  }
-  .tea-film-controls button {
-    font-size: 10px;
-    padding: 10px 8px;
-  }
-}
 .whatsapp-float {
   position: fixed;
   right: 25px;
@@ -1720,9 +1662,6 @@ body:before,
 }
 .footer-links {
   gap: 25px;
-}
-.tea-film-controls {
-  border-radius: 2px;
 }
 .product-details h1 {
   font-size: 46px;

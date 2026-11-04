@@ -377,10 +377,6 @@ textarea {
 .payment-option small {
   font-size: 10px;
 }
-.tea-film-controls button {
-  font-size: 11px;
-  min-height: 44px;
-}
 .footer-mood {
   font-size: 14px;
 }
@@ -623,11 +619,6 @@ textarea {
   }
   .tng-content {
     padding: 0 15px 16px;
-  }
-  .tea-film-controls {
-    left: 12px;
-    right: 12px;
-    padding: 5px 9px;
   }
   .footer-links {
     gap: 10px 24px;
@@ -997,19 +988,6 @@ details > summary {
 .film-hero-media::after {
   content: none;
 }
-.film-hero .tea-film-controls {
-  z-index: 2;
-  left: 50%;
-  right: auto;
-  bottom: 16px;
-  transform: translateX(-50%);
-  gap: 6px;
-  border-radius: 40px;
-  white-space: nowrap;
-}
-.film-hero .tea-film-controls button {
-  font-size: 13px;
-}
 @media (max-width: 899px) {
   .film-hero {
     display: flex;
@@ -1049,13 +1027,6 @@ details > summary {
       rgba(6, 13, 12, 0.62) 45%,
       rgba(6, 13, 12, 0) 75%
     );
-  }
-  .film-hero .tea-film-controls {
-    top: 14px;
-    right: 14px;
-    bottom: auto;
-    left: auto;
-    transform: none;
   }
   .film-hero h1 {
     font-size: clamp(40px, 11vw, 54px);
@@ -1351,4 +1322,12 @@ details > summary {
   .blend-pack .pack-name {
     font-size: 22px;
   }
+}
+/* The film has no visible controls: tapping it plays or pauses it. */
+.film-hero-media video {
+  cursor: pointer;
+}
+.film-hero-media video:focus-visible {
+  outline: 3px solid var(--ivory);
+  outline-offset: -6px;
 }
