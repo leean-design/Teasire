@@ -1125,92 +1125,8 @@ details > summary {
   background: radial-gradient(120% 90% at 30% 15%, #ffffff 0%, #f0ede5 75%);
   border: 1px solid var(--border);
 }
-.blend-stage {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 26px;
-  padding-top: 8px;
-}
 /* The jar: layers stack from the bottom, each sized by its share of the recipe. */
-.blend-jar {
-  flex: 0 0 132px;
-}
-.jar-lid {
-  height: 16px;
-  margin: 0 14px -2px;
-  border-radius: 6px 6px 2px 2px;
-  background: linear-gradient(#6b5440, #3f3024);
-}
-.jar-body {
-  position: relative;
-  height: 216px;
-  padding: 6px;
-  display: flex;
-  flex-direction: column-reverse;
-  border: 2px solid rgba(62, 89, 84, 0.35);
-  border-radius: 10px 10px 28px 28px;
-  background: rgba(255, 255, 255, 0.6);
-  box-shadow:
-    inset 0 0 0 4px rgba(255, 255, 255, 0.7),
-    0 18px 30px rgba(6, 13, 12, 0.08);
-  overflow: hidden;
-}
-.jar-body::after {
-  content: "";
-  position: absolute;
-  top: 12px;
-  bottom: 24px;
-  left: 12px;
-  width: 9px;
-  border-radius: 8px;
-  background: linear-gradient(
-    rgba(255, 255, 255, 0.85),
-    rgba(255, 255, 255, 0.1)
-  );
-  pointer-events: none;
-}
-.jar-layer {
-  flex: 0 0 calc(var(--p) * 0.92%);
-  background-color: var(--c);
-  background-image: radial-gradient(
-      circle at 25% 35%,
-      rgba(255, 255, 255, 0.35) 0 1.4px,
-      transparent 1.9px
-    ),
-    radial-gradient(
-      circle at 70% 65%,
-      rgba(0, 0, 0, 0.16) 0 1.4px,
-      transparent 1.9px
-    );
-  background-size:
-    13px 11px,
-    10px 12px;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3);
-  position: relative;
-  transition: flex-basis 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
 /* The new ingredient, revealed from the top down when a layer changes. */
-.jar-pour {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background-image: radial-gradient(
-      circle at 25% 35%,
-      rgba(255, 255, 255, 0.35) 0 1.4px,
-      transparent 1.9px
-    ),
-    radial-gradient(
-      circle at 70% 65%,
-      rgba(0, 0, 0, 0.16) 0 1.4px,
-      transparent 1.9px
-    );
-  background-size:
-    13px 11px,
-    10px 12px;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3);
-  clip-path: inset(0 0 100% 0);
-}
 /* Chosen options fade to their selected colours instead of switching instantly. */
 .option {
   transition:
@@ -1218,101 +1134,8 @@ details > summary {
     color 0.2s,
     border-color 0.2s;
 }
-.jar-layer:first-child {
-  border-radius: 0 0 22px 22px;
-}
 /* The pack label: the customer's blend name on a Teasire sachet. */
-.blend-pack {
-  position: relative;
-  flex: 0 1 200px;
-  min-height: 240px;
-  padding: 28px 18px 28px;
-  display: grid;
-  align-content: start;
-  gap: 8px;
-  background: #fbfaf6;
-  border: 1px solid #e4e0d6;
-  box-shadow: 0 22px 40px rgba(6, 13, 12, 0.14);
-  transform: rotate(-2deg);
-  overflow: hidden;
-}
-.pack-seal {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 14px;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(62, 89, 84, 0.14) 0 2px,
-    transparent 2px 6px
-  );
-  border-bottom: 1px dashed rgba(62, 89, 84, 0.3);
-}
 /* The colour band along the bottom of the pack, in the main note's colour. */
-.pack-band {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 14px;
-  background: var(--c);
-  box-shadow: inset 0 1px 0 rgba(6, 13, 12, 0.12);
-}
-.pack-band-pour {
-  position: absolute;
-  inset: 0;
-  box-shadow: inherit;
-  clip-path: inset(0 100% 0 0);
-}
-.pack-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  letter-spacing: 0.22em;
-  color: var(--night);
-}
-.pack-brand img {
-  width: 40px;
-  height: auto;
-}
-.pack-kicker {
-  margin-top: 10px;
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  color: var(--green);
-}
-.blend-pack .pack-name {
-  margin: 0;
-  font-family: Lora, Georgia, serif;
-  font-style: italic;
-  font-size: 26px;
-  line-height: 1.15;
-  color: var(--night);
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-}
-.blend-pack .pack-name.placeholder {
-  color: #93a09d;
-}
-.blend-pack .pack-recipe {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--green);
-}
-.pack-foot {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 4px 8px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--green);
-}
 /* Summary rows: a colour dot matching each layer in the jar. */
 .swatch {
   display: inline-block;
@@ -1324,7 +1147,6 @@ details > summary {
   box-shadow: inset 0 0 0 1px rgba(6, 13, 12, 0.18);
 }
 @media (prefers-reduced-motion: reduce) {
-  .jar-layer,
   .option {
     transition: none;
   }
@@ -1337,23 +1159,6 @@ details > summary {
     position: static;
     order: -1;
     padding: 20px 16px;
-  }
-  .blend-stage {
-    gap: 16px;
-  }
-  .blend-jar {
-    flex-basis: 112px;
-  }
-  .jar-body {
-    height: 186px;
-  }
-  .blend-pack {
-    flex-basis: 184px;
-    min-height: 214px;
-    padding: 24px 14px 26px;
-  }
-  .blend-pack .pack-name {
-    font-size: 22px;
   }
 }
 /* The film has no visible controls: tapping it plays or pauses it. */
@@ -1398,19 +1203,186 @@ details > summary {
 /* Keep the pack label the same size whatever the blend, so its bottom band
    never jumps: room for two lines of name and three lines of ingredients
    (a longer name ends in "…" on the label). */
-.blend-pack .pack-name {
+
+/* Blend Studio live preview: real photos of the chosen ingredients, each
+   circle sized by its share of the recipe, above the blend's label.
+   Heights are fixed around the largest possible circle so nothing below
+   moves when choices change. */
+.blend-trio {
+  --k: 1;
+  --cap: 104px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  height: calc(164px * var(--k) + 58px);
+}
+.trio-item {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: max(calc(var(--s) * var(--k) * 1px), var(--cap));
+  transition:
+    width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.4s;
+}
+.trio-item.empty {
+  width: 0;
+  opacity: 0;
+}
+.trio-photo {
+  position: relative;
+  width: calc(var(--s) * var(--k) * 1px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--stone);
+  box-shadow:
+    0 0 0 4px #fff,
+    0 16px 30px rgba(6, 13, 12, 0.18);
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.trio-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.trio-photo img.on {
+  opacity: 1;
+}
+.trio-item figcaption {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+.trio-share {
+  font-family: Lora, Georgia, serif;
+  font-size: 18px;
+  color: var(--night);
+}
+.trio-name {
+  font-size: 13px;
+  color: var(--green);
+}
+/* The label: the blend's name, ingredients and a ribbon split by share. */
+.blend-label {
+  display: grid;
+  gap: 10px;
+  padding: 18px 20px 20px;
+  background: #fffdf8;
+  border: 1px solid #e6e1d6;
+  box-shadow: 0 18px 40px rgba(6, 13, 12, 0.08);
+}
+.label-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.label-top img {
+  width: 36px;
+  height: auto;
+}
+.label-brand {
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--night);
+}
+.label-kicker {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--green);
+}
+.blend-label .label-name {
+  margin: 0;
   min-height: 2.3em;
+  font-family: Lora, Georgia, serif;
+  font-style: italic;
+  font-size: 30px;
+  line-height: 1.15;
+  color: var(--night);
+  overflow-wrap: anywhere;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   overflow: hidden;
 }
-.blend-pack .pack-recipe {
-  min-height: 4.5em;
+.blend-label .label-name.placeholder {
+  color: #93a09d;
+}
+.blend-label .label-recipe {
+  margin: 0;
+  min-height: 3em;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--green);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
+}
+.label-ribbon {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ribbon-part {
+  position: relative;
+  flex: var(--p) 1 0;
+  background: var(--c);
+  box-shadow: inset -2px 0 0 #fffdf8;
+  transition: flex-grow 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ribbon-pour {
+  position: absolute;
+  inset: 0;
+  box-shadow: inherit;
+  clip-path: inset(0 100% 0 0);
+}
+.label-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+@media (prefers-reduced-motion: reduce) {
+  .trio-item,
+  .trio-photo,
+  .trio-photo img,
+  .ribbon-part {
+    transition: none;
+  }
+}
+@media (max-width: 899px) {
+  .blend-trio {
+    --k: 0.72;
+    --cap: 88px;
+    gap: 6px;
+  }
+  .trio-name {
+    font-size: 12px;
+  }
+  .blend-label .label-name {
+    font-size: 26px;
+  }
+  .label-brand {
+    letter-spacing: 0.16em;
+  }
+  .label-kicker {
+    letter-spacing: 0.06em;
+  }
 }
