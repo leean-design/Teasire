@@ -341,7 +341,7 @@ function builder() {
   const trio = [0, 1, 2]
     .map((slot) => {
       const part = parts[slot];
-      return `<figure class="trio-item${part ? "" : " empty"}" style="--s:${part ? trioSize(part.v) : 0}"><div class="trio-photo">${part ? `<img class="on" src="${part.photo}" alt="" width="320" height="320" data-id="${part.id}">` : ""}</div><figcaption><span class="trio-share">${part ? part.v + "%" : ""}</span><span class="trio-name">${part ? part.name : ""}</span></figcaption></figure>`;
+      return `<figure class="trio-item${part ? "" : " empty"}" style="--s:${part ? trioSize(part.v) : 0}"><div class="trio-photo">${part ? `<img class="on" src="${part.photo}" alt="" width="400" height="400" data-id="${part.id}">` : ""}</div><figcaption><span class="trio-share">${part ? part.v + "%" : ""}</span><span class="trio-name">${part ? part.name : ""}</span></figcaption></figure>`;
     })
     .join("");
   const ribbon = [0, 1, 2]
@@ -389,7 +389,7 @@ function renderBlendPreview() {
 function showPhoto(item, part, instant) {
   const box = item.querySelector(".trio-photo");
   if (box.lastElementChild?.dataset.id === part.id) return;
-  const img = new Image(320, 320);
+  const img = new Image(400, 400);
   img.alt = "";
   img.dataset.id = part.id;
   img.src = part.photo;

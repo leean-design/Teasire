@@ -9,6 +9,7 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/enhancements.css`: accessibility, mobile and shopping improvements.
 - `dist/*.html`: generated page documents, including individual tea pages.
 - `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
+- `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
 - `dist/config/business.json`: WhatsApp number, business details shown in the footer and on the Policies page, and manual DuitNow payment settings.
 - `scripts/prepare-site.mjs`: refreshes initial HTML, sharing metadata and sitemap after content edits.
 - `scripts/make-photo-sizes.py`: creates the smaller copies of any new tea photo.
