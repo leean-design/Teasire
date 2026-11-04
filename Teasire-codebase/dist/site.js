@@ -295,14 +295,15 @@ function builder() {
   const layers = [0, 1, 2]
     .map((slot) => {
       const part = parts[slot];
-      return `<div class="jar-layer" style="--p:${part ? part.v : 0};--c:${part ? part.color : "transparent"}"><span class="jar-pour"></span></div>`;
+      return `<div class="jar-layer" style="--p:${part ? part.v : 0};--c:${part ? part.color : "transparent"}"><span class="jar-pour" data-pour></span></div>`;
     })
     .join("");
-  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout studio"><div class="builder-steps"><div class="panel glass" id="builder-fields"></div><div class="panel glass"><h3>04 / Name your blend</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section></div><div class="blend-preview"><span class="eyebrow">YOUR BLEND, LIVE</span><div class="blend-stage" aria-hidden="true"><div class="blend-jar"><div class="jar-lid"></div><div class="jar-body">${layers}</div></div><div class="blend-pack" style="--accent:${(parts[1] || parts[0]).color}"><div class="pack-seal"></div><div class="pack-brand"><img src="assets/teasire-magpie-264.png" alt="" width="40" height="24"><span>TEASIRE</span></div><span class="pack-kicker">BLENDED FOR YOU</span><p class="pack-name placeholder" id="pack-name">Your blend</p><p class="pack-recipe" id="pack-recipe">${parts.map((x) => x.name).join(" · ")}</p><div class="pack-foot"><span id="pack-qty">${blend.qty} teabags</span><span>Custom blend</span></div></div></div></div></div></div>`;
+  return `<div class="page">${intro("THE TEASIRE BLEND STUDIO", "Your tea.<br>Your story.", "Choose your botanicals, name your creation and make everyday moments feel more personal.")}<div class="builder-layout studio"><div class="builder-steps"><div class="panel glass" id="builder-fields"></div><div class="panel glass"><h3>04 / Name your blend</h3><label class="field">Name your blend<input id="blend-name" maxlength="50" placeholder="e.g. Sunday Garden"></label><label class="field">Quantity<select id="blend-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((customBlendPrice * n) / 10)}</option>`).join("")}</select></label></div><aside class="panel glass builder-summary"><span class="eyebrow">YOUR BLEND</span><h2>Your creation.</h2><div id="blend-summary"></div><div class="notice">Custom blends are ${rm(customBlendPrice)} per 10 teabags. We review every recipe before packing.</div><button class="button full" id="blend-save">Save this blend ♡</button><button class="button secondary full" id="blend-request" style="margin-top:12px">Add to your bag ↗</button><p class="fine" style="margin:18px 0 0">Saved recipes remain in this browser.</p></aside><section class="panel glass saved-blends"><h3>Your saved blends</h3><div id="saved-blends"></div></section></div><div class="blend-preview"><span class="eyebrow">YOUR BLEND, LIVE</span><div class="blend-stage" aria-hidden="true"><div class="blend-jar"><div class="jar-lid"></div><div class="jar-body">${layers}</div></div><div class="blend-pack"><div class="pack-seal"></div><div class="pack-brand"><img src="assets/teasire-magpie-264.png" alt="" width="40" height="24"><span>TEASIRE</span></div><span class="pack-kicker">BLENDED FOR YOU</span><p class="pack-name placeholder" id="pack-name">Your blend</p><p class="pack-recipe" id="pack-recipe">${parts.map((x) => x.name).join(" · ")}</p><div class="pack-foot"><span id="pack-qty">${blend.qty} teabags</span><span>Custom blend</span></div><div class="pack-band" style="--c:${(parts[1] || parts[0]).color}"><span class="pack-band-pour" data-pour></span></div></div></div></div></div></div>`;
 }
 // Update the live jar and pack label to match the current blend.
-// When a layer changes ingredient, the new one pours in from the top; a layer
-// that appears grows in its own colour. Layer heights slide (see the CSS).
+// When a jar layer changes ingredient, the new one pours in from the top; a
+// layer that appears grows in its own colour. Layer heights slide (see the CSS).
+// The pack's colour band takes the main note's colour, sliding in from the left.
 const pours = new WeakMap();
 function renderBlendPreview() {
   const parts = blendParts(),
@@ -311,50 +312,53 @@ function renderBlendPreview() {
     const part = parts[slot],
       wasEmpty = Number(layer.style.getPropertyValue("--p")) === 0;
     layer.style.setProperty("--p", part ? part.v : 0);
-    if (!part) return;
-    const running = pours.get(layer),
-      current = running
-        ? running.color
-        : layer.style.getPropertyValue("--c").trim();
-    if (current === part.color) return;
-    if (wasEmpty || reduced.matches) {
-      if (running) {
-        running.anim.cancel();
-        pours.delete(layer);
-      }
-      layer.style.setProperty("--c", part.color);
-    } else pourInto(layer, part.color);
+    if (part) recolor(layer, part.color, "top", wasEmpty);
   });
+  recolor($(".pack-band"), (parts[1] || parts[0]).color, "left");
   $("#pack-name").textContent = name || "Your blend";
   $("#pack-name").classList.toggle("placeholder", !name);
   $("#pack-recipe").textContent = parts.map((x) => x.name).join(" · ");
   $("#pack-qty").textContent = blend.qty + " teabags";
-  $(".blend-pack").style.setProperty("--accent", (parts[1] || parts[0]).color);
 }
-function pourInto(layer, color) {
-  const pour = layer.querySelector(".jar-pour"),
-    running = pours.get(layer);
+// Change an element's colour (its --c): pour the new colour in, or switch
+// instantly when asked or when the visitor prefers reduced motion.
+function recolor(el, color, from, instant) {
+  const running = pours.get(el),
+    current = running ? running.color : el.style.getPropertyValue("--c").trim();
+  if (current === color) return;
+  if (instant || reduced.matches) {
+    if (running) {
+      running.anim.cancel();
+      pours.delete(el);
+    }
+    el.style.setProperty("--c", color);
+  } else pourInto(el, color, from);
+}
+function pourInto(el, color, from) {
+  const pour = el.querySelector("[data-pour]"),
+    running = pours.get(el);
   // A pour still running finishes instantly, so the next one starts from its colour.
   if (running) {
     running.anim.cancel();
-    layer.style.setProperty("--c", running.color);
+    el.style.setProperty("--c", running.color);
   }
   pour.style.backgroundColor = color;
+  const hidden = from === "left" ? "inset(0 100% 0 0)" : "inset(0 0 100% 0)";
   const anim = pour.animate(
-    [{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0 0)" }],
+    [{ clipPath: hidden }, { clipPath: "inset(0 0 0 0)" }],
     {
       duration: 650,
       easing: "cubic-bezier(0.3, 0.7, 0.2, 1)",
       fill: "forwards",
     },
   );
-  pours.set(layer, { anim, color });
+  pours.set(el, { anim, color });
   anim.onfinish = () => {
-    if (pours.get(layer)?.anim !== anim) return;
-    layer.style.setProperty("--c", color);
+    if (pours.get(el)?.anim !== anim) return;
+    el.style.setProperty("--c", color);
     anim.cancel();
     pour.style.backgroundColor = "";
-    pours.delete(layer);
+    pours.delete(el);
   };
 }
 function renderBuilder() {
