@@ -1186,6 +1186,37 @@ details > summary {
   outline-offset: -6px;
 }
 
+/* Home: the osmanthus photo comes alive. The photo keeps its place and size;
+   the film covers it exactly and fades in once it plays (site.js). Like the
+   pouring film, tapping it plays or pauses it. */
+.story-film {
+  position: relative;
+  margin: 0;
+}
+.story-film img {
+  display: block;
+  height: auto;
+}
+.story-film video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  cursor: pointer;
+}
+.story-film.is-playing video {
+  opacity: 1;
+}
+/* Before it plays the film is see-through, so its focus ring goes on the photo. */
+.story-film video:focus-visible,
+.story-film:not(.is-playing):has(video:focus-visible) {
+  outline: 3px solid var(--ivory);
+  outline-offset: -6px;
+}
+
 /* Page transitions (transitions.js picks the kind for each change of page):
    the header stays put while the page below it changes. Browsers without view
    transitions, and visitors who prefer reduced motion, load pages normally.
