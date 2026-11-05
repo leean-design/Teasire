@@ -13,12 +13,13 @@ BILLPLZ_API = "https://www.billplz-sandbox.com"
 # Your Billplz collection ID (Billplz → Billing → Collections). Not secret.
 BILLPLZ_COLLECTION_ID = "ukys0roj"
 
-# Every order, keyed by its Billplz bill ID. Create it with:
-#   npx wrangler kv namespace create ORDERS
-# and paste the id it prints here.
-[[kv_namespaces]]
-binding = "ORDERS"
-id = ""
+# Every order is kept in a KV namespace bound as ORDERS. The deploy workflow
+# adds the section below itself. To deploy from your own computer, run
+#   npx wrangler@4 kv namespace create teasire-orders
+# then uncomment these lines and paste the id it prints:
+# [[kv_namespaces]]
+# binding = "ORDERS"
+# id = ""
 
 # Secrets, set with `npx wrangler secret put <NAME>` (never commit them):
 #   BILLPLZ_API_KEY      Billplz → Settings → Keys & Integration → API Secret Key

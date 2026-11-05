@@ -72,10 +72,10 @@ Or set it up from your own computer (Node.js 22 or later, run from `worker/`):
 
 1. Open a Billplz account. Test first with a [Billplz sandbox](https://www.billplz-sandbox.com) account.
 2. In Billplz, create a collection and copy its ID into `BILLPLZ_COLLECTION_ID` in `worker/wrangler.toml`. Under Settings → Keys & Integration, turn on X Signature.
-3. Log in to Cloudflare and create the order store, then paste the `id` it prints into `wrangler.toml`:
+3. Log in to Cloudflare and create the order store, then uncomment the `[[kv_namespaces]]` lines in `wrangler.toml` and paste the `id` it prints:
    ```sh
    npx wrangler@4 login
-   npx wrangler@4 kv namespace create ORDERS
+   npx wrangler@4 kv namespace create teasire-orders
    ```
 4. Add the secrets (each command asks for the value):
    ```sh

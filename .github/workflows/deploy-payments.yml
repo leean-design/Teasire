@@ -61,13 +61,13 @@ jobs:
       - name: Find or create the order store
         run: |
           title=teasire-orders
-          id=$($WRANGLER kv namespace list | jq -r --arg t "$title" '.[] | select(.title == $t) | .id')
+          id=$($WRANGLER kv namespace list | sed -n "/^\[/,\$p" | jq -r --arg t "$title" '.[] | select(.title == $t) | .id')
           if [ -z "$id" ]; then
             $WRANGLER kv namespace create "$title"
-            id=$($WRANGLER kv namespace list | jq -r --arg t "$title" '.[] | select(.title == $t) | .id')
+            id=$($WRANGLER kv namespace list | sed -n "/^\[/,\$p" | jq -r --arg t "$title" '.[] | select(.title == $t) | .id')
           fi
           [ -n "$id" ] || { echo "::error::Could not find or create the KV namespace"; exit 1; }
-          sed -i "s/^id = \"\"/id = \"$id\"/" wrangler.toml
+          printf '\n[[kv_namespaces]]\nbinding = "ORDERS"\nid = "%s"\n' "$id" >> wrangler.toml
 
       - name: Deploy
         run: $WRANGLER deploy | tee deploy.log
