@@ -59,6 +59,20 @@ if (missing.length)
       missing.join("\n  ") +
       "\nRun `python scripts/make-photo-sizes.py` to create the smaller copies.",
   );
+// The payments worker prices orders from this file, so a changed bag can't change what is charged.
+fs.writeFileSync(
+  path.join(dist, "config", "prices.json"),
+  JSON.stringify(
+    {
+      teas: teas.map((t) => ({ name: t.name, price: t.price })),
+      customBlendPrice: vm.runInContext("customBlendPrice", inventory),
+      freeDeliveryAbove: vm.runInContext("freeDeliveryAbove", inventory),
+      deliveryFees: vm.runInContext("deliveryFees", inventory),
+    },
+    null,
+    2,
+  ) + "\n",
+);
 const productTemplate = fs.readFileSync(
   path.join(dist, "product.html"),
   "utf8",

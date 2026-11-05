@@ -1,0 +1,44 @@
+{
+  "teas": [
+    {
+      "name": "Daydreaming Jasmine",
+      "price": 20
+    },
+    {
+      "name": "Flirty Osmanthus",
+      "price": 20
+    },
+    {
+      "name": "Moody Oolong",
+      "price": 20
+    },
+    {
+      "name": "Blushing Rose",
+      "price": 20
+    },
+    {
+      "name": "Emotional Orange",
+      "price": 20
+    },
+    {
+      "name": "Chaotic Oolong",
+      "price": 20
+    },
+    {
+      "name": "Cheeky Orange",
+      "price": 20
+    },
+    {
+      "name": "Nostalgic Dates",
+      "price": 20
+    }
+  ],
+  "customBlendPrice": 20,
+  "freeDeliveryAbove": 150,
+  "deliveryFees": {
+    "Peninsular Malaysia": 8,
+    "Sabah": 15,
+    "Sarawak": 15,
+    "Labuan": 15
+  }
+}

@@ -1703,3 +1703,14 @@ details > summary {
     letter-spacing: 0.06em;
   }
 }
+
+/* Online payment result on the checkout page, focused when it appears. */
+#payment-result {
+  margin-bottom: 30px;
+}
+#payment-result:focus {
+  outline: none;
+}
+#payment-result .button {
+  margin-top: 6px;
+}

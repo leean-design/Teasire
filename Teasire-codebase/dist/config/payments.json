@@ -1,1 +1,6 @@
-{"provider":"stripe","enabled":false,"checkoutUrl":null,"currency":"MYR","pricingStatus":"quote_required"}
+{
+  "provider": "billplz",
+  "enabled": false,
+  "apiUrl": "https://teasire-payments.teasire.workers.dev",
+  "currency": "MYR"
+}

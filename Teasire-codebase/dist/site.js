@@ -1,6 +1,8 @@
 let businessPhone = "";
 // Set once the DuitNow QR is ready to show on the checkout page.
 let qrReady = false;
+// The payments worker's address, set once config/payments.json turns online payment on.
+let onlineApi = "";
 const $ = (s) => document.querySelector(s);
 const page = document.body.dataset.page;
 const esc = (s) =>
@@ -628,7 +630,7 @@ ${Object.entries(deliveryFees)
 <li><strong>Damaged, wrong or missing items:</strong> message us on WhatsApp within 7 days of delivery with a photo of the parcel and items. We’ll send a replacement or refund you in full, including delivery.</li>
 <li><strong>Change of mind:</strong> tea is a food product, so we can’t take back opened packs. Unopened signature teas can be returned within 7 days of delivery. You pay the return postage, and we refund the tea once it arrives.</li>
 <li><strong>Custom blends</strong> are made just for you, so they can’t be returned for a change of mind.</li>
-<li>Refunds are paid by bank transfer or DuitNow within 7 working days of approval.</li>
+<li>Refunds are paid by bank transfer or DuitNow within 7 working days of approval. Online payments can also be refunded to the original payment method.</li>
 </ul>
 </section>
 <section class="policy" id="cancellations"><h2>Cancellations</h2>
@@ -643,6 +645,7 @@ ${Object.entries(deliveryFees)
 <li>Prices are in Malaysian Ringgit (RM), per pack of 10 individually packed teabags. Delivery for your location is added in your bag unless your order is above RM150.</li>
 <li>You order by sending your bag to us on WhatsApp and paying the total shown. We confirm your order once we have checked your payment. If anything is unavailable, we refund it in full.</li>
 <li>We accept DuitNow QR, including Touch ’n Go eWallet. Please pay the exact total shown in your order.</li>
+<li class="online-only hidden">You can also pay online by FPX online banking, credit or debit card or eWallet through Billplz. Your order is confirmed as soon as Billplz confirms your payment.</li>
 <li>Our teas are made from natural botanicals, so colour and flavour can vary slightly between batches. If an ingredient is unavailable, we’ll offer a substitute or a refund for that item.</li>
 <li>Green, black and oolong teas contain caffeine. Our teas are not medicines. If you are pregnant, breastfeeding, taking medication or have allergies, check the ingredients and ask your doctor if unsure.</li>
 <li>We may update these policies. The version on this page when you order applies to your order.</li>
@@ -651,6 +654,7 @@ ${Object.entries(deliveryFees)
 <section class="policy" id="privacy"><h2>Privacy</h2>
 <ul>
 <li>When you send an order, we receive what is in your WhatsApp message: your name, email, delivery details, notes and WhatsApp number. We use them only to confirm, deliver and support your order.</li>
+<li class="online-only hidden">If you pay online, your order, name, email, phone number and delivery address are sent to us and to Billplz, our payment provider, to take your payment. Card and bank details are entered only on Billplz’s page; we never see them.</li>
 <li>Your bag and saved blends are stored in your own browser. They aren’t sent to us unless you include them in a message.</li>
 <li>We share your name, phone number and address only with our courier, to deliver your order. We never sell your details.</li>
 <li>We keep order records only as long as needed for your order and our accounts.</li>
@@ -709,13 +713,13 @@ function about() {
     .join("")}</section></div>`;
 }
 function checkout() {
-  return `<div class="page">${intro("YOUR NEXT LITTLE RITUAL", "Make it yours.", "Review your tea selection, send your order on WhatsApp and pay by DuitNow QR. We’ll confirm once we’ve checked your payment.")}<div class="checkout-layout"><div class="panel glass"><h2 style="font-size:25px">Your details</h2><form id="order-form"><div class="row"><label class="field">Full name *<input name="name" id="customer-name" autocomplete="name" maxlength="100" required></label><label class="field">Email address *<input name="email" id="customer-email" autocomplete="email" type="email" maxlength="150" required></label></div><label class="field">Delivery location *<select id="customer-delivery" required><option value="">Select a location</option>${Object.keys(
+  return `<div class="page">${intro("YOUR NEXT LITTLE RITUAL", "Make it yours.", "Review your tea selection, send your order on WhatsApp and pay by DuitNow QR. We’ll confirm once we’ve checked your payment.")}<div id="payment-result" class="notice hidden" role="status" tabindex="-1"></div><div class="checkout-layout"><div class="panel glass"><h2 style="font-size:25px">Your details</h2><form id="order-form"><div class="row"><label class="field">Full name *<input name="name" id="customer-name" autocomplete="name" maxlength="100" required></label><label class="field">Email address *<input name="email" id="customer-email" autocomplete="email" type="email" maxlength="150" required></label></div><div class="row"><label class="field">Phone (WhatsApp) *<input name="phone" id="customer-phone" autocomplete="tel" type="tel" inputmode="tel" maxlength="20" minlength="9" placeholder="012-345 6789" required></label><label class="field">Delivery location *<select id="customer-delivery" required><option value="">Select a location</option>${Object.keys(
     deliveryFees,
   )
     .map((zone) => `<option>${zone}</option>`)
     .join(
       "",
-    )}</select></label><label class="field">Anything you’d like us to know?<textarea id="customer-notes" maxlength="1000" rows="3" placeholder="Taste preferences or gifting requests…"></textarea></label><p class="fine">Your details stay on this page until you choose to open WhatsApp or copy your request.</p><button class="button" id="prepare" type="submit">Prepare order request ↗</button></form><div id="order-review" class="hidden" style="margin-top:30px"><h3>Your order request</h3><p class="fine">This is a draft. No request has been sent and no payment has been taken.</p><label class="field">Order details<textarea id="request-text" readonly rows="10"></textarea></label><div class="request-actions"><a id="send-request" class="button hidden" target="_blank" rel="noopener noreferrer">Open request in WhatsApp ↗</a><button class="button secondary" id="copy-request">Copy request</button></div><p class="fine" id="next-step">Review your message in WhatsApp and tap Send.</p><p id="copy-status" role="status" class="fine" style="margin-top:15px"></p></div><div style="border-top:1px solid var(--border);padding-top:30px;margin-top:35px"><h3>How to pay</h3><ol class="order-steps"><li>Send your order on WhatsApp. Your total already includes delivery.</li><li>Pay the total with the DuitNow QR below, using Touch ’n Go or any banking app.</li><li>Send your receipt in the same WhatsApp chat. We’ll confirm and pack your order.</li></ol><details class="tng-payment"><summary><span class="tng-payment-name"><span class="tng-mark" aria-hidden="true">TNG</span><span>Touch ’n Go / DuitNow QR</span></span><span class="tng-status" id="tng-status">NOT ACTIVE YET</span></summary><div class="tng-content"><p class="fine" id="tng-description">Touch ’n Go eWallet payment is being set up. Please prepare your order request first; the final amount and payment details must be confirmed before paying.</p><div id="tng-ready" class="hidden"><p class="fine">Use your banking or eWallet app to scan the QR. On the same phone, save the QR and choose the image from your app’s scanner. Pay the exact total from your order and check the recipient name before confirming.</p><p id="tng-merchant" class="fine"></p><img id="tng-qr" class="hidden" alt="DuitNow payment QR for LEE AN" width="827" height="1280" loading="lazy"><a id="tng-download" class="button secondary full hidden" download="Teasire-DuitNow-QR.png">Save QR image ↓</a><a id="tng-open" class="button full hidden" target="_blank" rel="noopener noreferrer">Open payment link ↗</a><a id="tng-receipt" class="link hidden" target="_blank" rel="noopener noreferrer">Share your receipt on WhatsApp ↗</a><p class="fine">Payments are checked manually. Preparing a request or viewing this QR does not confirm payment.</p></div></div></details><details class="card-availability"><summary>Card payment availability</summary><div class="payment-option"><span>Credit / debit card</span><small>NOT ACTIVE YET</small></div><p class="fine">Secure hosted card checkout will be available once the payment provider and final prices are connected.</p><button class="button full" disabled>Continue to card payment ↗</button><p class="fine" style="margin-top:15px">No card details are collected on this page.</p></details></div></div><aside class="panel glass"><span class="eyebrow">IN YOUR BAG</span><h3>Your tea selection</h3><div id="checkout-items"></div><div id="checkout-totals"></div></aside></div></div>`;
+    )}</select></label></div><label class="field">Delivery address *<textarea id="customer-address" autocomplete="street-address" maxlength="300" rows="3" required></textarea></label><label class="field">Anything you’d like us to know?<textarea id="customer-notes" maxlength="1000" rows="3" placeholder="Taste preferences or gifting requests…"></textarea></label><p class="fine">Your details stay on this page until you choose to pay online, open WhatsApp or copy your request.</p><button class="button" id="prepare" type="submit">Prepare order request ↗</button></form><div id="order-review" class="hidden" style="margin-top:30px"><h3>Your order request</h3><p class="fine">This is a draft. No request has been sent and no payment has been taken.</p><label class="field">Order details<textarea id="request-text" readonly rows="10"></textarea></label><div class="request-actions"><button class="button hidden" id="pay-online" type="button">Pay online ↗</button><a id="send-request" class="button hidden" target="_blank" rel="noopener noreferrer">Open request in WhatsApp ↗</a><button class="button secondary" id="copy-request">Copy request</button></div><p class="fine" id="next-step">Review your message in WhatsApp and tap Send.</p><p id="pay-status" role="status" class="fine"></p><p id="copy-status" role="status" class="fine" style="margin-top:15px"></p></div><div style="border-top:1px solid var(--border);padding-top:30px;margin-top:35px"><h3>How to pay</h3><p class="fine online-only hidden">Pay online by FPX online banking, card or eWallet in one step. Or pay by DuitNow QR:</p><ol class="order-steps"><li>Send your order on WhatsApp. Your total already includes delivery.</li><li>Pay the total with the DuitNow QR below, using Touch ’n Go or any banking app.</li><li>Send your receipt in the same WhatsApp chat. We’ll confirm and pack your order.</li></ol><details class="tng-payment"><summary><span class="tng-payment-name"><span class="tng-mark" aria-hidden="true">TNG</span><span>Touch ’n Go / DuitNow QR</span></span><span class="tng-status" id="tng-status">NOT ACTIVE YET</span></summary><div class="tng-content"><p class="fine" id="tng-description">Touch ’n Go eWallet payment is being set up. Please prepare your order request first; the final amount and payment details must be confirmed before paying.</p><div id="tng-ready" class="hidden"><p class="fine">Use your banking or eWallet app to scan the QR. On the same phone, save the QR and choose the image from your app’s scanner. Pay the exact total from your order and check the recipient name before confirming.</p><p id="tng-merchant" class="fine"></p><img id="tng-qr" class="hidden" alt="DuitNow payment QR for LEE AN" width="827" height="1280" loading="lazy"><a id="tng-download" class="button secondary full hidden" download="Teasire-DuitNow-QR.png">Save QR image ↓</a><a id="tng-open" class="button full hidden" target="_blank" rel="noopener noreferrer">Open payment link ↗</a><a id="tng-receipt" class="link hidden" target="_blank" rel="noopener noreferrer">Share your receipt on WhatsApp ↗</a><p class="fine">Payments are checked manually. Preparing a request or viewing this QR does not confirm payment.</p></div></div></details><details class="card-availability"><summary>Online banking, card & eWallet</summary><div class="payment-option"><span>FPX · Credit / debit card · eWallet</span><small id="online-status">NOT ACTIVE YET</small></div><p class="fine" id="online-description">Online payment is being set up. Please pay by DuitNow QR for now.</p><p class="fine">Online payments are made on Billplz’s secure page. No card or bank details are entered on this site.</p></details></div></div><aside class="panel glass"><span class="eyebrow">IN YOUR BAG</span><h3>Your tea selection</h3><div id="checkout-items"></div><div id="checkout-totals"></div></aside></div></div>`;
 }
 // Tea total, delivery for the chosen location (free above RM150) and the total to pay.
 // delivery and total are null until a location is chosen.
@@ -947,9 +951,19 @@ if (page === "checkout") {
     if (!bag.length) return;
     const name = $("#customer-name").value.trim(),
       email = $("#customer-email").value.trim(),
+      phone = $("#customer-phone").value.trim(),
+      address = $("#customer-address").value.trim(),
       notes = $("#customer-notes").value.trim(),
       totals = orderTotals();
-    if (!name || !email || !totals.location || totals.total === null) return;
+    if (
+      !name ||
+      !email ||
+      !phone ||
+      !address ||
+      !totals.location ||
+      totals.total === null
+    )
+      return;
     $("#request-text").value =
       "Hello Teasire! I would like to order:\n\n" +
       bag
@@ -977,19 +991,28 @@ if (page === "checkout") {
       name +
       "\nEmail: " +
       email +
+      "\nPhone: " +
+      phone +
+      "\nAddress: " +
+      address +
       (notes ? "\nNotes: " + notes : "") +
       (qrReady
         ? "\n\nI’ll pay " +
           rm(totals.total) +
           " by DuitNow QR and send the receipt here. Thank you!"
         : "\n\nPlease let me know how to pay. Thank you!");
-    $("#next-step").textContent = qrReady
-      ? "Review your message in WhatsApp and tap Send. Then pay " +
+    $("#next-step").textContent = onlineApi
+      ? "Pay " +
         rm(totals.total) +
-        " with the DuitNow QR below and send your receipt in the same chat."
-      : "Review your message in WhatsApp and tap Send.";
+        " online now, or send your order on WhatsApp and pay by DuitNow QR."
+      : qrReady
+        ? "Review your message in WhatsApp and tap Send. Then pay " +
+          rm(totals.total) +
+          " with the DuitNow QR below and send your receipt in the same chat."
+        : "Review your message in WhatsApp and tap Send.";
     if (qrReady) $(".tng-payment").open = true;
     updateOrderWhatsApp();
+    updatePayOnline(totals.total);
     $("#copy-status").textContent = "";
     $("#order-review").classList.remove("hidden");
     $("#order-review").scrollIntoView({
@@ -997,6 +1020,7 @@ if (page === "checkout") {
       block: "center",
     });
   };
+  $("#pay-online").onclick = payOnline;
   $("#copy-request").onclick = async () => {
     try {
       await navigator.clipboard.writeText($("#request-text").value);
@@ -1259,6 +1283,155 @@ function updateOrderWhatsApp() {
     "https://wa.me/" + businessPhone + "?text=" + encodeURIComponent(text);
   link.classList.remove("hidden");
 }
+// Online payment (Billplz, through the payments worker in ../worker).
+function updatePayOnline(total) {
+  const button = $("#pay-online");
+  if (!button) return;
+  button.classList.toggle("hidden", !onlineApi || !$("#request-text").value);
+  if (total != null) button.textContent = "Pay " + rm(total) + " online ↗";
+}
+async function payOnline() {
+  const button = $("#pay-online"),
+    status = $("#pay-status");
+  button.disabled = true;
+  status.textContent = "Taking you to Billplz’s secure payment page…";
+  try {
+    const r = await fetch(onlineApi + "/bills", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          items: bag.map((i) => ({ name: i.name, qty: i.qty })),
+          customer: {
+            name: $("#customer-name").value,
+            email: $("#customer-email").value,
+            phone: $("#customer-phone").value,
+            address: $("#customer-address").value,
+            location: $("#customer-delivery").value,
+            notes: $("#customer-notes").value,
+          },
+        }),
+      }),
+      bill = await r.json().catch(() => ({}));
+    if (!r.ok || !bill.url)
+      throw new Error(
+        bill.error ||
+          "Online payment is unavailable right now. Please pay by DuitNow QR.",
+      );
+    // The total must match the bag; if not, the price list changed since this page loaded.
+    if (Math.abs(bill.total - orderTotals().total) > 0.001)
+      throw new Error(
+        "Prices have changed. Please reload the page to see the latest total.",
+      );
+    try {
+      localStorage.setItem(
+        "teasire-pending-order",
+        JSON.stringify({
+          billId: bill.billId,
+          ref: bill.ref,
+          // Without the closing "how I'll pay" line: this order is paid online.
+          text: $("#request-text").value.replace(/\n\n[^\n]*$/, ""),
+        }),
+      );
+    } catch {}
+    location.href = bill.url;
+  } catch (e) {
+    status.textContent = e.message;
+    button.disabled = false;
+  }
+}
+// Billplz sends the customer back to checkout.html?billplz[id]=…; ask the worker what happened.
+let paidMessage = "";
+async function showPaymentResult(billId) {
+  const box = $("#payment-result");
+  let pending = null;
+  try {
+    pending = JSON.parse(localStorage.getItem("teasire-pending-order"));
+  } catch {}
+  const mine = pending?.billId === billId;
+  box.innerHTML = "<p>Checking your payment…</p>";
+  box.classList.remove("hidden");
+  try {
+    const r = await fetch(onlineApi + "/bills/" + encodeURIComponent(billId)),
+      order = await r.json();
+    if (!r.ok) throw new Error(order.error);
+    if (order.paid) {
+      paidMessage =
+        "Hello Teasire! I’ve paid " +
+        rm(order.total) +
+        " online for order " +
+        order.ref +
+        "." +
+        (mine && pending.text ? "\n\n" + pending.text : "");
+      box.innerHTML = `<span class="eyebrow">PAYMENT RECEIVED</span><h3>Thank you, your order ${esc(order.ref)} is paid.</h3><p>We’ve received ${rm(order.total)} and will pack your order soon. Billplz has emailed your receipt. We’ll send your tracking number on WhatsApp.</p><a id="paid-whatsapp" class="button hidden" target="_blank" rel="noopener noreferrer">Message us about your order ↗</a>`;
+      updatePaidWhatsApp();
+      if (mine) {
+        bag = [];
+        saveBag();
+        renderCart();
+        invalidateOrder();
+        try {
+          localStorage.removeItem("teasire-pending-order");
+        } catch {}
+      }
+    } else
+      box.innerHTML = `<span class="eyebrow">PAYMENT NOT COMPLETED</span><h3>Your order ${esc(order.ref)} hasn’t been paid.</h3><p>No money has been taken. Your bag is still here: prepare your order again to retry, or pay by DuitNow QR.</p>`;
+  } catch {
+    box.innerHTML =
+      "<p>We couldn’t check your payment just now. If you paid, Billplz has emailed your receipt: please send it to us on WhatsApp.</p>";
+  }
+  box.focus();
+}
+function updatePaidWhatsApp() {
+  const link = $("#paid-whatsapp");
+  if (!link || !businessPhone || !paidMessage) return;
+  link.href =
+    "https://wa.me/" +
+    businessPhone +
+    "?text=" +
+    encodeURIComponent(paidMessage);
+  link.classList.remove("hidden");
+}
+if (page === "checkout" || page === "policies")
+  fetch("config/payments.json")
+    .then((r) => (r.ok ? r.json() : {}))
+    .then((config) => {
+      let api;
+      try {
+        api = new URL(config.apiUrl);
+      } catch {
+        return;
+      }
+      // While testing with the Billplz sandbox, online payment shows only to
+      // whoever opens checkout.html?testpay=1 (until ?testpay=0 or the tab closes).
+      let testing = false;
+      try {
+        const flag = new URLSearchParams(location.search).get("testpay");
+        if (flag === "1") sessionStorage.setItem("teasire-testpay", "1");
+        if (flag === "0") sessionStorage.removeItem("teasire-testpay");
+        testing = sessionStorage.getItem("teasire-testpay") === "1";
+      } catch {}
+      if (
+        !(config.enabled || testing) ||
+        config.provider !== "billplz" ||
+        api.protocol !== "https:"
+      )
+        return;
+      onlineApi = api.href.replace(/\/$/, "");
+      document
+        .querySelectorAll(".online-only")
+        .forEach((el) => el.classList.remove("hidden"));
+      if (page !== "checkout") return;
+      $("#online-status").textContent = config.enabled
+        ? "AVAILABLE"
+        : "TEST MODE";
+      $("#online-description").textContent =
+        "Prepare your order request, then choose Pay online. You’ll pay on Billplz’s secure page and come back here once it’s done.";
+      if ($("#request-text").value) updatePayOnline(orderTotals().total);
+      const billId = new URLSearchParams(location.search).get("billplz[id]");
+      if (billId && /^[A-Za-z0-9_-]{1,40}$/.test(billId))
+        showPaymentResult(billId);
+    })
+    .catch(() => {});
 // Show the business details from config/business.json; empty values stay hidden.
 function renderBusinessDetails(config, phone) {
   const details = config.business || {},
@@ -1318,6 +1491,8 @@ function invalidateOrder() {
   $("#request-text").value = "";
   $("#send-request").removeAttribute("href");
   $("#send-request").classList.add("hidden");
+  $("#pay-online").classList.add("hidden");
+  $("#pay-status").textContent = "";
   $("#copy-status").textContent = "";
 }
 function savedBlends() {
@@ -1424,6 +1599,7 @@ fetch("config/business.json")
       link.classList.remove("hidden");
       businessPhone = phone;
       updateOrderWhatsApp();
+      updatePaidWhatsApp();
       const receipt = $("#tng-receipt");
       if (receipt) {
         receipt.href =
