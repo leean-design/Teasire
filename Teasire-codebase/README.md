@@ -84,7 +84,7 @@ Or set it up from your own computer (Node.js 22 or later, run from `worker/`):
    npx wrangler@4 secret put ADMIN_TOKEN
    ```
 5. Deploy with `npm run deploy`. Put the `https://….workers.dev` address it prints in `apiUrl` in `dist/config/payments.json`, and set `enabled` to `true`.
-6. Pay a test order with the sandbox. When it works, change `BILLPLZ_API` in `wrangler.toml` to `https://www.billplz.com`, replace the secrets and collection ID with the live ones, and deploy again.
+6. Pay a test order with the sandbox. While `enabled` is `false`, online payment shows only to you: open `checkout.html?testpay=1` (it stays on until the tab is closed or you open `?testpay=0`). When it works, change `BILLPLZ_API` in `wrangler.toml` to `https://www.billplz.com`, replace the secrets and collection ID with the live ones, and deploy again.
 
 To see recent orders with names, addresses and payment status:
 

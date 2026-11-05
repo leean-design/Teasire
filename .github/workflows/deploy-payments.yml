@@ -10,10 +10,6 @@ name: Deploy payments worker
 
 on:
   workflow_dispatch:
-  # Temporary: first deploy from the feature branch, before it is merged.
-  push:
-    branches: [claude/inspiring-wozniak-1m3f4f]
-    paths: [.github/workflows/deploy-payments.yml]
 
 permissions:
   contents: read

@@ -1317,8 +1317,17 @@ if (page === "checkout" || page === "policies")
       } catch {
         return;
       }
+      // While testing with the Billplz sandbox, online payment shows only to
+      // whoever opens checkout.html?testpay=1 (until ?testpay=0 or the tab closes).
+      let testing = false;
+      try {
+        const flag = new URLSearchParams(location.search).get("testpay");
+        if (flag === "1") sessionStorage.setItem("teasire-testpay", "1");
+        if (flag === "0") sessionStorage.removeItem("teasire-testpay");
+        testing = sessionStorage.getItem("teasire-testpay") === "1";
+      } catch {}
       if (
-        !config.enabled ||
+        !(config.enabled || testing) ||
         config.provider !== "billplz" ||
         api.protocol !== "https:"
       )
@@ -1328,7 +1337,9 @@ if (page === "checkout" || page === "policies")
         .querySelectorAll(".online-only")
         .forEach((el) => el.classList.remove("hidden"));
       if (page !== "checkout") return;
-      $("#online-status").textContent = "AVAILABLE";
+      $("#online-status").textContent = config.enabled
+        ? "AVAILABLE"
+        : "TEST MODE";
       $("#online-description").textContent =
         "Prepare your order request, then choose Pay online. You’ll pay on Billplz’s secure page and come back here once it’s done.";
       if ($("#request-text").value) updatePayOnline(orderTotals().total);
