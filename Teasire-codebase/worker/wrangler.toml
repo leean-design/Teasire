@@ -1,0 +1,26 @@
+# Teasire payments: creates Billplz bills for the bag and records paid orders.
+# Setup steps are in ../README.md under "Online payments (Billplz)".
+name = "teasire-payments"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+# The published website. Prices are read from its config/prices.json, customers
+# come back to its checkout page after paying, and only it may call this worker.
+SITE_URL = "https://leean-design.github.io/Teasire"
+# Sandbox while testing. For real payments: "https://www.billplz.com"
+BILLPLZ_API = "https://www.billplz-sandbox.com"
+# Your Billplz collection ID (Billplz → Billing → Collections). Not secret.
+BILLPLZ_COLLECTION_ID = ""
+
+# Every order, keyed by its Billplz bill ID. Create it with:
+#   npx wrangler kv namespace create ORDERS
+# and paste the id it prints here.
+[[kv_namespaces]]
+binding = "ORDERS"
+id = ""
+
+# Secrets, set with `npx wrangler secret put <NAME>` (never commit them):
+#   BILLPLZ_API_KEY      Billplz → Settings → Keys & Integration → API Secret Key
+#   BILLPLZ_X_SIGNATURE  Billplz → Settings → Keys & Integration → X Signature Key
+#   ADMIN_TOKEN          any long random string; lets you list orders at /orders

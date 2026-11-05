@@ -11,6 +11,9 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/*.html`: generated page documents, including individual tea pages.
 - `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
+- `dist/config/payments.json`: turns online payment (Billplz) on or off and holds the payments worker's address. See "Online payments (Billplz)" below.
+- `dist/config/prices.json`: generated from `site.js` by the preparation script. The payments worker charges from it.
+- `worker/`: the small Cloudflare Worker that creates Billplz bills and records paid orders.
 - `dist/config/business.json`: WhatsApp number, business details shown in the footer and on the Policies page, and manual DuitNow payment settings.
 - `scripts/prepare-site.mjs`: refreshes initial HTML, sharing metadata and sitemap after content edits.
 - `scripts/make-photo-sizes.py`: creates the smaller copies of any new tea photo.
@@ -56,6 +59,40 @@ Prices are in RM per pack of 10 teabags, in `dist/site.js`:
 
 - Business details live in `dist/config/business.json` under `business`: `registeredName`, `registrationNumber` (SSM), `email`, `address`, and full `https://` links for `instagram`, `facebook` and `tiktok`. Empty values are hidden, so nothing shows until it is filled in. The WhatsApp number is shown from `whatsappNumber`.
 - The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` near the prices. The current text is a draft written as a placeholder: check every point matches how the shop runs.
+
+### Online payments (Billplz)
+
+Customers can pay by FPX online banking, card or eWallet through [Billplz](https://www.billplz.com). DuitNow QR and WhatsApp keep working alongside it. Online payment stays hidden until `enabled` is `true` in `dist/config/payments.json`.
+
+How it works: the checkout page sends the bag and delivery details to the worker in `worker/`. The worker prices the order from `config/prices.json` (never from the browser), creates a Billplz bill with an order reference such as `TS-261105-K7QM`, and sends the customer to Billplz to pay. Billplz then tells the worker the bill is paid (the message is checked with the X Signature key) and brings the customer back to the checkout page, which shows the result, empties the bag and offers a WhatsApp message with the full order. Every order is kept in Cloudflare KV for about 13 months.
+
+One-time setup (Node.js 22 or later, run from `worker/`):
+
+1. Open a Billplz account. Test first with a [Billplz sandbox](https://www.billplz-sandbox.com) account.
+2. In Billplz, create a collection and copy its ID into `BILLPLZ_COLLECTION_ID` in `worker/wrangler.toml`. Under Settings → Keys & Integration, turn on X Signature.
+3. Log in to Cloudflare and create the order store, then paste the `id` it prints into `wrangler.toml`:
+   ```sh
+   npx wrangler@4 login
+   npx wrangler@4 kv namespace create ORDERS
+   ```
+4. Add the secrets (each command asks for the value):
+   ```sh
+   npx wrangler@4 secret put BILLPLZ_API_KEY
+   npx wrangler@4 secret put BILLPLZ_X_SIGNATURE
+   npx wrangler@4 secret put ADMIN_TOKEN
+   ```
+5. Deploy with `npm run deploy`. Put the `https://….workers.dev` address it prints in `apiUrl` in `dist/config/payments.json`, and set `enabled` to `true`.
+6. Pay a test order with the sandbox. When it works, change `BILLPLZ_API` in `wrangler.toml` to `https://www.billplz.com`, replace the secrets and collection ID with the live ones, and deploy again.
+
+To see recent orders with names, addresses and payment status:
+
+```sh
+curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" https://YOUR-WORKER.workers.dev/orders
+```
+
+Paid bills also appear in the Billplz dashboard, with the order reference and delivery address on each one. If you move the site to another domain, update `SITE_URL` in `wrangler.toml` too. Once online payment is on, also update the two "Card checkout is not active yet" lines in `site.js` (the product page's "Delivery & payment" and the FAQ).
+
+Run the worker's tests with `npm test` in `worker/`.
 
 ### Add a new tea
 

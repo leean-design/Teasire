@@ -1,0 +1,44 @@
+{
+  "teas": [
+    {
+      "name": "Green Tea Jasmine",
+      "price": 25
+    },
+    {
+      "name": "Oolong Osmanthus",
+      "price": 25
+    },
+    {
+      "name": "Oolong Rose",
+      "price": 25
+    },
+    {
+      "name": "Green Tea Rose",
+      "price": 25
+    },
+    {
+      "name": "Chrysanthemum Orange",
+      "price": 25
+    },
+    {
+      "name": "Oolong Orange",
+      "price": 25
+    },
+    {
+      "name": "Green Tea Orange",
+      "price": 25
+    },
+    {
+      "name": "Osmanthus Black Tea Red Dates",
+      "price": 25
+    }
+  ],
+  "customBlendPrice": 25,
+  "freeDeliveryAbove": 150,
+  "deliveryFees": {
+    "Peninsular Malaysia": 8,
+    "Sabah": 15,
+    "Sarawak": 15,
+    "Labuan": 15
+  }
+}
