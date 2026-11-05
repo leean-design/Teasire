@@ -9,12 +9,12 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions.
 - `dist/transitions.js`: the page transitions. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. Moving along the menu, the line under it glides to the new item and the page sweeps in from that side; leaving the phone menu, the page rises in. Each new page's opening lines arrive one after another. It runs in Chrome, Edge and Safari; other browsers change page normally.
 - `dist/*.html`: generated page documents, including individual tea pages.
-- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film and its poster at the top of the home page, and the osmanthus film further down), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
+- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film and its poster at the top of the home page, and the osmanthus film and its still further down), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
 - `dist/config/business.json`: WhatsApp number, business details shown in the footer and on the Policies page, and manual DuitNow payment settings.
 - `scripts/prepare-site.mjs`: refreshes initial HTML, sharing metadata and sitemap after content edits.
 - `scripts/make-photo-sizes.py`: creates the smaller copies of any new tea photo.
-- `scripts/make-story-film.py`: makes the osmanthus film on the home page from the osmanthus oolong photo.
+- `scripts/prepare-story-film.py`: puts a new osmanthus film (and its still) on the home page.
 
 ## Preview locally
 
@@ -73,15 +73,15 @@ The preparation script stops with an error if a photo's smaller copies are missi
 
 ### The osmanthus film
 
-On the home page, the osmanthus photo beside "Nothing to rush" comes alive: the steam rises and the branch sways, in a silent 10-second loop (`dist/assets/teasire-osmanthus-film.mp4`, about 0.7 MB). It plays while it is on screen and only downloads then; tapping it plays or pauses it. Visitors who prefer less motion see the still photo. The film starts on the photo itself, so the change from photo to film can't be seen.
+On the home page, beside "Nothing to rush", osmanthus blossoms drift down into a glass of tea in a silent 9-second loop (`dist/assets/teasire-osmanthus-film.mp4`, about 0.7 MB, made with Runway from the osmanthus oolong photo). It plays while it is on screen and only downloads then; tapping it plays or pauses it. Until it plays, and for visitors who prefer less motion, a still of its first frame shows instead (`dist/assets/teasire-osmanthus-still.webp`, with a `-480` copy for phones), so the change from still to film can't be seen.
 
-To make it again, for example after editing the photo (needs Python with numpy, scipy and Pillow: `pip install numpy scipy Pillow`, and ffmpeg):
+To use a new film, for example another one from Runway (portrait, with a still camera), run this with the path of the video (needs Python with Pillow: `pip install Pillow`, and ffmpeg):
 
 ```sh
-python scripts/make-story-film.py
+python scripts/prepare-story-film.py path/to/video.mp4
 ```
 
-To use a film made elsewhere instead (for example with an image-to-video tool), save it over `dist/assets/teasire-osmanthus-film.mp4`: an MP4 (H.264), 3:4 portrait like the photo, silent, ideally starting on the photo and ending where it starts so the loop doesn't jump.
+It replaces the film and the still together. It makes the film loop smoothly by fading its last second into its first, crops it to 3:4, and compresses it for the web.
 
 ## Publish changes
 
