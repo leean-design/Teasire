@@ -66,7 +66,9 @@ Customers can pay by FPX online banking, card or eWallet through [Billplz](https
 
 How it works: the checkout page sends the bag and delivery details to the worker in `worker/`. The worker prices the order from `config/prices.json` (never from the browser), creates a Billplz bill with an order reference such as `TS-261105-K7QM`, and sends the customer to Billplz to pay. Billplz then tells the worker the bill is paid (the message is checked with the X Signature key) and brings the customer back to the checkout page, which shows the result, empties the bag and offers a WhatsApp message with the full order. Every order is kept in Cloudflare KV for about 13 months.
 
-One-time setup (Node.js 22 or later, run from `worker/`):
+Easiest setup, no terminal: add the repository secrets listed at the top of `.github/workflows/deploy-payments.yml`, then go to Actions → "Deploy payments worker" → Run workflow. It creates the order store, deploys the worker, sets its secrets and shows the worker address in the run summary. Then do step 5 and step 6 below. A new Cloudflare account must first pick its `workers.dev` subdomain: open Workers & Pages in the Cloudflare dashboard once.
+
+Or set it up from your own computer (Node.js 22 or later, run from `worker/`):
 
 1. Open a Billplz account. Test first with a [Billplz sandbox](https://www.billplz-sandbox.com) account.
 2. In Billplz, create a collection and copy its ID into `BILLPLZ_COLLECTION_ID` in `worker/wrangler.toml`. Under Settings → Keys & Integration, turn on X Signature.

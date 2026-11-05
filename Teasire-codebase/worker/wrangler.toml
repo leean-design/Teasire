@@ -11,7 +11,7 @@ SITE_URL = "https://leean-design.github.io/Teasire"
 # Sandbox while testing. For real payments: "https://www.billplz.com"
 BILLPLZ_API = "https://www.billplz-sandbox.com"
 # Your Billplz collection ID (Billplz → Billing → Collections). Not secret.
-BILLPLZ_COLLECTION_ID = ""
+BILLPLZ_COLLECTION_ID = "ukys0roj"
 
 # Every order, keyed by its Billplz bill ID. Create it with:
 #   npx wrangler kv namespace create ORDERS
