@@ -1200,6 +1200,73 @@ details > summary {
     transform: translateY(14px);
   }
 }
+/* Tea photo morph (transitions.js names the pair): a tea's photo and name fly
+   between its card and its own page, over the page fade above. */
+[data-morph="photo"] {
+  view-transition-class: tea-photo;
+}
+[data-morph="title"] {
+  view-transition-class: tea-title;
+}
+/* Names hug their text, so the small name scales neatly into the big one. */
+.product h3,
+.product-details h1 {
+  width: fit-content;
+}
+::view-transition-group(*.tea-photo),
+::view-transition-group(*.tea-title) {
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  z-index: 1; /* above the pages, header and WhatsApp button */
+}
+::view-transition-group(*.tea-title) {
+  z-index: 2; /* the name passes over the photo, not behind it */
+}
+/* Both views of the photo fill the flying frame as it changes shape. The one
+   leaving stays solid underneath while the arriving one fades in on top, so
+   there's never a see-through moment, even if the new photo is still loading. */
+::view-transition-old(*.tea-photo),
+::view-transition-new(*.tea-photo) {
+  height: 100%;
+  object-fit: cover;
+}
+::view-transition-old(*.tea-photo) {
+  animation: none;
+}
+::view-transition-new(*.tea-photo) {
+  mix-blend-mode: normal;
+  animation: teasire-fade-in 260ms ease-out both;
+}
+/* Landing in a card: the card's smaller photo takes over as it lands. */
+:root[data-morph="to-card"]::view-transition-new(*.tea-photo) {
+  animation-delay: 300ms;
+}
+/* The old name fades as it moves; the new one appears as it settles. */
+::view-transition-old(*.tea-title) {
+  animation: teasire-fade-out 150ms ease-out both;
+}
+::view-transition-new(*.tea-title) {
+  animation: teasire-fade-in 280ms ease-out 200ms both;
+}
+/* A photo or name with no partner on the other page moves with the page. */
+::view-transition-old(*.tea-photo):only-child,
+::view-transition-old(*.tea-title):only-child {
+  animation: teasire-page-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(*.tea-photo):only-child,
+::view-transition-new(*.tea-title):only-child {
+  animation: teasire-page-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes teasire-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes teasire-fade-out {
+  to {
+    opacity: 0;
+  }
+}
 /* Keep the pack label the same size whatever the blend, so its bottom band
    never jumps: room for two lines of name and three lines of ingredients
    (a longer name ends in "…" on the label). */

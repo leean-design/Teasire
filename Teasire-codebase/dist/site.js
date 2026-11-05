@@ -969,12 +969,30 @@ if ("IntersectionObserver" in window && !reduced.matches) {
     { threshold: 0.05 },
   );
   document.querySelectorAll(".product,.split>*,.cta>*").forEach((el) => {
+    // A card catching a tea photo from the last page (transitions.js) stays put.
+    if (el.querySelector("[data-morph]")) return;
     if (el.getBoundingClientRect().top > innerHeight) {
       el.classList.add("will-reveal");
       observer.observe(el);
     }
   });
 }
+// Start fetching a tea's big photo as soon as its card is pointed at, touched or
+// focused, so it's ready when the photo flies into the tea's page.
+const warmed = new Set();
+function warmPhoto(e) {
+  const href = e.target.closest?.(".product a[href]")?.getAttribute("href");
+  const t = href && teas.find((tea) => productUrl(tea.id) === href);
+  if (!t || warmed.has(t.id)) return;
+  warmed.add(t.id);
+  const img = new Image();
+  img.sizes = photoSizes.large;
+  img.srcset = photoSet(t);
+  img.src = photo(t);
+}
+["pointerover", "touchstart", "focusin"].forEach((type) =>
+  document.addEventListener(type, warmPhoto, { passive: true }),
+);
 document.querySelectorAll(".glass").forEach((el) =>
   el.addEventListener(
     "pointermove",
@@ -1389,14 +1407,21 @@ function refreshBag() {
       );
   } catch {}
 }
-addEventListener("storage", (e) => {
-  if (e.key === "teasire-bag") {
-    refreshBag();
-    updateBag();
-    if (page === "checkout") {
-      renderCart();
-      invalidateOrder();
-    }
+// Redraw what shows the bag if it changed since this page last looked.
+function syncBag() {
+  const before = JSON.stringify(bag);
+  refreshBag();
+  if (JSON.stringify(bag) === before) return;
+  updateBag();
+  if (page === "checkout") {
+    renderCart();
+    invalidateOrder();
   }
+}
+addEventListener("storage", (e) => {
+  if (e.key === "teasire-bag") syncBag();
   if (e.key === "teasire_saved" && page === "builder") renderSavedBlends();
 });
+// Going back can show a page exactly as it was left, before the bag changed on
+// another page.
+addEventListener("pageshow", (e) => e.persisted && syncBag());

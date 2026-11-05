@@ -6,7 +6,8 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 
 - `dist/site.js`: page content, tea catalogue, blend builder, cart and interactions.
 - `dist/site.css`: base design and styles.
-- `dist/enhancements.css`: accessibility, mobile and shopping improvements.
+- `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions.
+- `dist/transitions.js`: the tea photo morph between pages. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. It runs in Chrome, Edge and Safari; other browsers change page normally.
 - `dist/*.html`: generated page documents, including individual tea pages.
 - `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
@@ -37,7 +38,7 @@ Pages show the HTML this script saves, and the browser doesn't redraw them, so a
 Keep the code formatted so pull request diffs stay readable:
 
 ```sh
-npx prettier@3 --write dist/site.js dist/site.css dist/enhancements.css scripts/prepare-site.mjs
+npx prettier@3 --write dist/site.js dist/transitions.js dist/site.css dist/enhancements.css scripts/prepare-site.mjs
 ```
 
 The generated `dist/*.html`, `sitemap.xml` and `robots.txt` files are collapsed in pull request diffs (see `.gitattributes` at the repository root).
