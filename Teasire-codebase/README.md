@@ -9,7 +9,7 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions.
 - `dist/transitions.js`: the page transitions. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. Moving along the menu, the line under it glides to the new item and the page sweeps in from that side; leaving the phone menu, the page rises in. Each new page's opening lines arrive one after another. It runs in Chrome, Edge and Safari; other browsers change page normally.
 - `dist/*.html`: generated page documents, including individual tea pages.
-- `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
+- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film and its poster at the top of the home page, and the osmanthus film and its still further down), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
 - `dist/config/payments.json`: turns online payment (Billplz) on or off and holds the payments worker's address. See "Online payments (Billplz)" below.
 - `dist/config/prices.json`: generated from `site.js` by the preparation script. The payments worker charges from it.
@@ -17,6 +17,7 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/config/business.json`: WhatsApp number, business details shown in the footer and on the Policies page, and manual DuitNow payment settings.
 - `scripts/prepare-site.mjs`: refreshes initial HTML, sharing metadata and sitemap after content edits.
 - `scripts/make-photo-sizes.py`: creates the smaller copies of any new tea photo.
+- `scripts/prepare-story-film.py`: puts a new osmanthus film (and its still) on the home page.
 
 ## Preview locally
 
@@ -108,6 +109,18 @@ Run the worker's tests with `npm test` in `worker/`.
 3. Add the tea to the `teas` list in `dist/site.js`, then run `node scripts/prepare-site.mjs` to create its page.
 
 The preparation script stops with an error if a photo's smaller copies are missing, so a deploy never publishes broken images.
+
+### The osmanthus film
+
+On the home page, beside "Nothing to rush", osmanthus blossoms drift down into a glass of tea in a silent 9-second loop (`dist/assets/teasire-osmanthus-film.mp4`, about 0.7 MB, made with Runway from the osmanthus oolong photo). It plays while it is on screen and only downloads then; tapping it plays or pauses it. Until it plays, and for visitors who prefer less motion, a still of its first frame shows instead (`dist/assets/teasire-osmanthus-still.webp`, with a `-480` copy for phones), so the change from still to film can't be seen.
+
+To use a new film, for example another one from Runway (portrait, with a still camera), run this with the path of the video (needs Python with Pillow: `pip install Pillow`, and ffmpeg):
+
+```sh
+python scripts/prepare-story-film.py path/to/video.mp4
+```
+
+It replaces the film and the still together. It makes the film loop smoothly by fading its last second into its first, crops it to 3:4, and compresses it for the web.
 
 ## Publish changes
 

@@ -1121,6 +1121,57 @@ details > summary {
   font-size: 13px;
   color: var(--green);
 }
+/* A tea's name comes first, in bold, then what's in it, then its notes in a
+   small, fancier italic (Lora's own italic, loaded with the fonts). */
+.tea-blend {
+  letter-spacing: 0.02em;
+  color: var(--green);
+}
+.tea-notes {
+  font-family: Lora, Georgia, serif;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: #5f706a;
+}
+.product h3 {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.product .tea-blend {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 3px;
+}
+.product .tea-notes {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+.product-details h1 {
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.product-details .tea-blend {
+  font-size: 15px;
+  margin: 0 0 4px;
+}
+.product-details .tea-notes {
+  font-size: 14px;
+  margin: 0 0 22px;
+}
+.cart-item .tea-blend {
+  font-size: 13px;
+  margin: 2px 0 4px;
+}
+.notice .tea-blend {
+  font-size: 14px;
+  margin: -4px 0 12px;
+}
+.pricing-table .tea-blend {
+  display: block;
+  font-size: 13px;
+  margin-top: 2px;
+}
 
 /* Blend Studio: the steps (choose, name, review, add) run down the left;
    the live jar and pack label stay in view on the right. On phones the
@@ -1182,6 +1233,37 @@ details > summary {
   cursor: pointer;
 }
 .film-hero-media video:focus-visible {
+  outline: 3px solid var(--ivory);
+  outline-offset: -6px;
+}
+
+/* Home: the osmanthus film. Its still keeps the place and size of a photo;
+   the film covers it exactly and fades in once it plays (site.js). Like the
+   pouring film, tapping it plays or pauses it. */
+.story-film {
+  position: relative;
+  margin: 0;
+}
+.story-film img {
+  display: block;
+  height: auto;
+}
+.story-film video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  cursor: pointer;
+}
+.story-film.is-playing video {
+  opacity: 1;
+}
+/* Before it plays the film is see-through, so its focus ring goes on the photo. */
+.story-film video:focus-visible,
+.story-film:not(.is-playing):has(video:focus-visible) {
   outline: 3px solid var(--ivory);
   outline-offset: -6px;
 }

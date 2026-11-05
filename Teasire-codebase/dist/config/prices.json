@@ -1,39 +1,39 @@
 {
   "teas": [
     {
-      "name": "Green Tea Jasmine",
-      "price": 25
+      "name": "Daydreaming Jasmine",
+      "price": 20
     },
     {
-      "name": "Oolong Osmanthus",
-      "price": 25
+      "name": "Flirty Osmanthus",
+      "price": 20
     },
     {
-      "name": "Oolong Rose",
-      "price": 25
+      "name": "Moody Oolong",
+      "price": 20
     },
     {
-      "name": "Green Tea Rose",
-      "price": 25
+      "name": "Blushing Rose",
+      "price": 20
     },
     {
-      "name": "Chrysanthemum Orange",
-      "price": 25
+      "name": "Emotional Orange",
+      "price": 20
     },
     {
-      "name": "Oolong Orange",
-      "price": 25
+      "name": "Chaotic Oolong",
+      "price": 20
     },
     {
-      "name": "Green Tea Orange",
-      "price": 25
+      "name": "Cheeky Orange",
+      "price": 20
     },
     {
-      "name": "Osmanthus Black Tea Red Dates",
-      "price": 25
+      "name": "Nostalgic Dates",
+      "price": 20
     }
   ],
-  "customBlendPrice": 25,
+  "customBlendPrice": 20,
   "freeDeliveryAbove": 150,
   "deliveryFees": {
     "Peninsular Malaysia": 8,

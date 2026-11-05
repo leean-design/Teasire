@@ -11,6 +11,12 @@ const prices = JSON.parse(
   fs.readFileSync(new URL("../../dist/config/prices.json", import.meta.url)),
 );
 const site = "https://leean-design.github.io/Teasire";
+// Tests follow whatever site.js charges, so a price change doesn't break them.
+const tea = prices.teas[0].name,
+  per10 = prices.teas[0].price,
+  fee = prices.deliveryFees["Peninsular Malaysia"],
+  oneBag = per10 + fee,
+  cents = (rm) => String(Math.round(rm * 100));
 const customer = {
   name: "Aina",
   email: "aina@example.com",
@@ -60,17 +66,25 @@ const post = (path, body, origin = "https://leean-design.github.io") =>
 
 test("prices come from the price list, not the browser", () => {
   const o = priceOrder(
-    { items: [{ name: "Green Tea Jasmine", qty: 20, price: 1 }], customer },
+    { items: [{ name: tea, qty: 20, price: 1 }], customer },
     prices,
   );
-  assert.equal(o.tea, 50);
-  assert.equal(o.delivery, 8);
-  assert.equal(o.total, 58);
+  assert.equal(o.tea, per10 * 2);
+  assert.equal(o.delivery, fee);
+  assert.equal(o.total, per10 * 2 + fee);
   assert.equal(o.customer.phone, "60123456789");
 });
 test("free delivery above the threshold", () => {
   const o = priceOrder(
-    { items: [{ name: "Green Tea Jasmine", qty: 70 }], customer },
+    {
+      items: [
+        {
+          name: tea,
+          qty: (Math.floor(prices.freeDeliveryAbove / per10) + 1) * 10,
+        },
+      ],
+      customer,
+    },
     prices,
   );
   assert.equal(o.delivery, 0);
@@ -104,7 +118,7 @@ test("creates a bill, takes the callback and reports paid", async () => {
   const { env, store, calls, setBill } = setup();
   const r = await worker.fetch(
     post("/bills", {
-      items: [{ name: "Green Tea Jasmine", qty: 10 }],
+      items: [{ name: tea, qty: 10 }],
       customer,
     }),
     env,
@@ -112,12 +126,12 @@ test("creates a bill, takes the callback and reports paid", async () => {
   assert.equal(r.status, 200);
   const bill = await r.json();
   assert.equal(bill.url, "https://billplz/bills/abc123");
-  assert.equal(bill.total, 33);
+  assert.equal(bill.total, oneBag);
   assert.match(bill.ref, /^TS-\d{6}-[A-Z2-9]{4}$/);
   const sent = new URLSearchParams(
     calls.find((c) => c.init.method === "POST").init.body,
   );
-  assert.equal(sent.get("amount"), "3300");
+  assert.equal(sent.get("amount"), cents(oneBag));
   assert.equal(sent.get("redirect_url"), site + "/checkout.html");
   assert.equal(
     sent.get("callback_url"),
@@ -128,7 +142,7 @@ test("creates a bill, takes the callback and reports paid", async () => {
   const forged = {
     id: "abc123",
     paid: "true",
-    paid_amount: "3300",
+    paid_amount: cents(oneBag),
     x_signature: "nope",
   };
   let cb = await worker.fetch(
@@ -144,8 +158,8 @@ test("creates a bill, takes the callback and reports paid", async () => {
   const fields = {
     id: "abc123",
     paid: "true",
-    paid_amount: "3300",
-    amount: "3300",
+    paid_amount: cents(oneBag),
+    amount: cents(oneBag),
     paid_at: "2026-11-05 10:00:00 +0800",
   };
   fields.x_signature = await signature(fields, "sigkey");
@@ -163,7 +177,11 @@ test("creates a bill, takes the callback and reports paid", async () => {
     new Request("https://pay.example.workers.dev/bills/abc123"),
     env,
   );
-  assert.deepEqual(await s.json(), { ref: bill.ref, paid: true, total: 33 });
+  assert.deepEqual(await s.json(), {
+    ref: bill.ref,
+    paid: true,
+    total: oneBag,
+  });
 
   const unauth = await worker.fetch(
     new Request("https://pay.example.workers.dev/orders"),
@@ -185,7 +203,7 @@ test("status checks Billplz when the callback hasn't arrived", async () => {
   const bill = await (
     await worker.fetch(
       post("/bills", {
-        items: [{ name: "Green Tea Jasmine", qty: 10 }],
+        items: [{ name: tea, qty: 10 }],
         customer,
       }),
       env,
@@ -200,7 +218,7 @@ test("status checks Billplz when the callback hasn't arrived", async () => {
     await worker.fetch(new Request("https://x/bills/abc123"), env)
   ).json();
   assert.equal(s.paid, false);
-  setBill({ paid: true, amount: 3300, paid_at: "now" });
+  setBill({ paid: true, amount: Number(cents(oneBag)), paid_at: "now" });
   s = await (
     await worker.fetch(new Request("https://x/bills/abc123"), env)
   ).json();
@@ -214,7 +232,7 @@ test("only the website may create bills", async () => {
   const r = await worker.fetch(
     post(
       "/bills",
-      { items: [{ name: "Green Tea Jasmine", qty: 10 }], customer },
+      { items: [{ name: tea, qty: 10 }], customer },
       "https://evil.example",
     ),
     env,
