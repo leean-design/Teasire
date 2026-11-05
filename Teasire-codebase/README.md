@@ -7,7 +7,7 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/site.js`: page content, tea catalogue, blend builder, cart and interactions.
 - `dist/site.css`: base design and styles.
 - `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions.
-- `dist/transitions.js`: the tea photo morph between pages. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. It runs in Chrome, Edge and Safari; other browsers change page normally.
+- `dist/transitions.js`: the page transitions. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. Moving along the menu, the line under it glides to the new item and the page sweeps in from that side; leaving the phone menu, the page rises in. Each new page's opening lines arrive one after another. It runs in Chrome, Edge and Safari; other browsers change page normally.
 - `dist/*.html`: generated page documents, including individual tea pages.
 - `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
