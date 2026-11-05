@@ -12,14 +12,16 @@ const esc = (s) =>
       ],
   );
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+// `name` is the tea's own name and `blend` what's in it, shown under the name.
 // `price` is in RM for a pack of 10 individually packed teabags.
 const teas = [
   {
     id: "green-tea-jasmine",
-    name: "Green Tea Jasmine",
+    name: "Daydreaming Jasmine",
+    blend: "Green Tea · Jasmine",
     zh: "茉莉绿茶",
     series: "flower",
-    price: 25,
+    price: 20,
     image: "01_Green_Tea_Jasmine",
     notes: "Light · Floral · Fresh",
     ingredients: ["Green tea", "Jasmine"],
@@ -28,10 +30,11 @@ const teas = [
   },
   {
     id: "oolong-osmanthus",
-    name: "Oolong Osmanthus",
+    name: "Flirty Osmanthus",
+    blend: "Oolong · Osmanthus",
     zh: "桂花乌龙",
     series: "flower",
-    price: 25,
+    price: 20,
     image: "02_Oolong_Osmanthus",
     notes: "Golden · Floral · Mellow",
     ingredients: ["Oolong tea", "Osmanthus"],
@@ -40,10 +43,11 @@ const teas = [
   },
   {
     id: "oolong-rose",
-    name: "Oolong Rose",
+    name: "Moody Oolong",
+    blend: "Oolong · Rose",
     zh: "玫瑰乌龙",
     series: "flower",
-    price: 25,
+    price: 20,
     image: "03_Oolong_Rose",
     notes: "Rounded · Rosy · Aromatic",
     ingredients: ["Oolong tea", "Rose"],
@@ -52,10 +56,11 @@ const teas = [
   },
   {
     id: "green-tea-rose",
-    name: "Green Tea Rose",
+    name: "Blushing Rose",
+    blend: "Green Tea · Rose",
     zh: "玫瑰绿茶",
     series: "flower",
-    price: 25,
+    price: 20,
     image: "04_Green_Tea_Rose",
     notes: "Fresh · Rosy · Delicate",
     ingredients: ["Green tea", "Rose"],
@@ -64,10 +69,11 @@ const teas = [
   },
   {
     id: "chrysanthemum-orange",
-    name: "Chrysanthemum Orange",
+    name: "Emotional Orange",
+    blend: "Chrysanthemum · Orange",
     zh: "菊花香橙",
     series: "fruit",
-    price: 25,
+    price: 20,
     image: "05_Chrysanthemum_Orange",
     notes: "Bright · Floral · Citrusy",
     ingredients: ["Chrysanthemum", "Orange"],
@@ -76,10 +82,11 @@ const teas = [
   },
   {
     id: "oolong-orange",
-    name: "Oolong Orange",
+    name: "Chaotic Oolong",
+    blend: "Oolong · Orange",
     zh: "香橙乌龙",
     series: "fruit",
-    price: 25,
+    price: 20,
     image: "06_Oolong_Orange",
     notes: "Rounded · Citrus · Smooth",
     ingredients: ["Oolong tea", "Orange"],
@@ -88,10 +95,11 @@ const teas = [
   },
   {
     id: "green-tea-orange",
-    name: "Green Tea Orange",
+    name: "Cheeky Orange",
+    blend: "Green Tea · Orange",
     zh: "香橙绿茶",
     series: "fruit",
-    price: 25,
+    price: 20,
     image: "07_Green_Tea_Orange",
     notes: "Crisp · Citrus · Fresh",
     ingredients: ["Green tea", "Orange"],
@@ -100,10 +108,11 @@ const teas = [
   },
   {
     id: "osmanthus-black-tea-red-dates",
-    name: "Osmanthus Black Tea Red Dates",
+    name: "Nostalgic Dates",
+    blend: "Osmanthus · Black Tea · Red Dates",
     zh: "桂花红枣红茶",
     series: "fruit",
-    price: 25,
+    price: 20,
     image: "08_Osmanthus_Black_Tea_Red_Dates",
     notes: "Warm · Floral · Rich",
     ingredients: ["Osmanthus", "Black tea", "Red dates"],
@@ -113,7 +122,7 @@ const teas = [
 ];
 const productUrl = (id) => "tea-" + id + ".html";
 // Price in RM for 10 teabags of a blend made in the Blend Studio.
-const customBlendPrice = 25;
+const customBlendPrice = 20;
 // Orders above this amount (RM) get free delivery, as the site's delivery notes say.
 const freeDeliveryAbove = 150;
 // Delivery fee in RM for each delivery location, for orders up to RM150.
@@ -141,20 +150,43 @@ const photoSizes = {
   large: "(max-width: 750px) 92vw, (max-width: 1100px) 45vw, 500px",
   thumb: "66px",
 };
+// "Daydreaming Jasmine (Green Tea, Jasmine)": the tea's name with what's in it.
+const teaAlt = (t) => `${t.name} (${t.blend.replaceAll(" · ", ", ")})`;
 const photoAttrs = (t, spot) =>
   `src="${photo(t)}" srcset="${photoSet(t)}" sizes="${photoSizes[spot]}"`;
-let bag = [];
-try {
-  const b = JSON.parse(localStorage.getItem("teasire-bag") || "[]");
-  if (Array.isArray(b))
-    bag = b.filter(
-      (i) =>
-        i &&
-        typeof i.name === "string" &&
-        Number.isInteger(i.qty) &&
-        i.qty >= 10,
-    );
-} catch {}
+// The teas' earlier names, which bags saved before they were renamed still hold.
+const formerNames = {
+  "Green Tea Jasmine": "green-tea-jasmine",
+  "Oolong Osmanthus": "oolong-osmanthus",
+  "Oolong Rose": "oolong-rose",
+  "Green Tea Rose": "green-tea-rose",
+  "Chrysanthemum Orange": "chrysanthemum-orange",
+  "Oolong Orange": "oolong-orange",
+  "Green Tea Orange": "green-tea-orange",
+  "Osmanthus Black Tea Red Dates": "osmanthus-black-tea-red-dates",
+};
+// The bag saved in this browser (packs of 10 or more), with any tea under an
+// earlier name given its current one; null if it can't be read.
+function readBag() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("teasire-bag") || "[]");
+    if (Array.isArray(saved))
+      return saved
+        .filter(
+          (i) =>
+            i &&
+            typeof i.name === "string" &&
+            Number.isInteger(i.qty) &&
+            i.qty >= 10,
+        )
+        .map((i) => {
+          const t = !i.recipe && teas.find((t) => t.id === formerNames[i.name]);
+          return t ? { ...i, name: t.name } : i;
+        });
+  } catch {}
+  return null;
+}
+let bag = readBag() || [];
 function saveBag() {
   try {
     localStorage.setItem("teasire-bag", JSON.stringify(bag));
@@ -207,7 +239,7 @@ function footer() {
   return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-legal"><span id="business-details"></span><nav class="footer-policies" aria-label="Shop policies"><a href="policies.html#delivery">Delivery</a><a href="policies.html#returns">Returns</a><a href="policies.html#terms">Terms</a><a href="policies.html#privacy">Privacy</a><span id="social-links"></span></nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;
 }
 function card(t) {
-  return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${t.name} tea with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p>${t.notes}</p><div class="product-foot"><span class="card-price"><strong>${rm(t.price)}</strong><small>10 teabags</small></span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
+  return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${teaAlt(t)} with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p><div class="product-foot"><span class="card-price"><strong>${rm(t.price)}</strong><small>10 teabags</small></span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
 }
 function intro(kicker, title, copy) {
   return `<div class="page-intro"><span class="eyebrow">${kicker}</span><h1>${title}</h1><p>${copy}</p></div>`;
@@ -242,8 +274,8 @@ function product() {
   );
   if (!t)
     return `<div class="page">${intro("THE TEASIRE COLLECTION", "Find your cup.", "This blend could not be found. Explore our tea collections to find your next little ritual.")}<a class="button" href="flower-tea.html">Explore Flower Tea ↗</a></div>`;
-  document.title = t.name + " — Teasire";
-  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${t.name}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><span class="eyebrow" style="margin-top:30px">${t.notes}</span><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">Delivery for your location is added in your bag.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. Free delivery on orders above RM150; otherwise the delivery fee for your location is added in your bag. Card checkout is not active yet.</p><a class="link" href="policies.html#delivery">Delivery & returns ↗</a></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
+  document.title = t.name + " (" + t.blend + ") — Teasire";
+  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${teaAlt(t)}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">Delivery for your location is added in your bag.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. Free delivery on orders above RM150; otherwise the delivery fee for your location is added in your bag. Card checkout is not active yet.</p><a class="link" href="policies.html#delivery">Delivery & returns ↗</a></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
     .filter((x) => x.series === t.series && x.id !== t.id)
     .map(card)
     .join("")}</div></section>`;
@@ -523,7 +555,7 @@ function pricing() {
   return `<div class="page">${intro("PRICING", "Simple pricing.", "Every Teasire blend comes as individually packed teabags, starting from 10.")}<div class="panel glass"><table class="pricing-table"><thead><tr><th>Blend</th><th>Series</th><th>Price</th></tr></thead><tbody>${teas
     .map(
       (t) =>
-        `<tr><td><a href="${productUrl(t.id)}">${t.name}</a></td><td>${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</td><td>${rm(t.price)} / 10 teabags</td></tr>`,
+        `<tr><td><a href="${productUrl(t.id)}">${t.name}</a><small class="tea-blend">${t.blend}</small></td><td>${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</td><td>${rm(t.price)} / 10 teabags</td></tr>`,
     )
     .join(
       "",
@@ -710,7 +742,7 @@ function renderCart() {
     ? bag
         .map((i, index) => {
           const t = teas.find((t) => t.name === i.name);
-          return `<article class="cart-item">${t ? `<img ${photoAttrs(t, "thumb")} alt="${esc(i.name)}">` : '<div class="cart-placeholder">✳</div>'}<div><h3>${esc(i.name)}</h3><p>${i.qty} individually packed teabags</p><p>${rm(itemPrice(i))}</p><div class="cart-actions"><button data-qty="${index}" data-delta="-10" aria-label="Reduce ${esc(i.name)} quantity" ${i.qty <= 10 ? "disabled" : ""}>−</button><span>${i.qty}</span><button data-qty="${index}" data-delta="10" aria-label="Increase ${esc(i.name)} quantity">+</button><button class="cart-remove" data-remove="${index}" aria-label="Remove ${esc(i.name)}">Remove</button></div></div></article>`;
+          return `<article class="cart-item">${t ? `<img ${photoAttrs(t, "thumb")} alt="${esc(i.name)}">` : '<div class="cart-placeholder">✳</div>'}<div><h3>${esc(i.name)}</h3>${t ? `<p class="tea-blend">${t.blend}</p>` : ""}<p>${i.qty} individually packed teabags</p><p>${rm(itemPrice(i))}</p><div class="cart-actions"><button data-qty="${index}" data-delta="-10" aria-label="Reduce ${esc(i.name)} quantity" ${i.qty <= 10 ? "disabled" : ""}>−</button><span>${i.qty}</span><button data-qty="${index}" data-delta="10" aria-label="Increase ${esc(i.name)} quantity">+</button><button class="cart-remove" data-remove="${index}" aria-label="Remove ${esc(i.name)}">Remove</button></div></div></article>`;
         })
         .join("")
     : '<div class="empty"><p>Your bag is waiting for a little ritual.</p><a class="button" href="flower-tea.html">Explore teas ↗</a></div>';
@@ -901,7 +933,7 @@ if (page === "discover") {
         const choice = b.dataset.quiz;
         const t = teas[choice === "rose" ? 2 : choice === "fruit" ? 6 : 0];
         $("#quiz-result").innerHTML =
-          `<div class="notice"><span class="eyebrow">YOUR TASTE MATCH</span><h3>${t.name}</h3><p>${t.description}</p><a class="button" href="${productUrl(t.id)}">Meet your blend ↗</a><p class="fine" style="margin:15px 0 0">Taste-based suggestion only, not a health assessment.</p></div>`;
+          `<div class="notice"><span class="eyebrow">YOUR TASTE MATCH</span><h3>${t.name}</h3><p class="tea-blend">${t.blend}</p><p>${t.description}</p><a class="button" href="${productUrl(t.id)}">Meet your blend ↗</a><p class="fine" style="margin:15px 0 0">Taste-based suggestion only, not a health assessment.</p></div>`;
       }),
   );
 }
@@ -921,7 +953,17 @@ if (page === "checkout") {
     $("#request-text").value =
       "Hello Teasire! I would like to order:\n\n" +
       bag
-        .map((i) => i.name + " — " + i.qty + " teabags — " + rm(itemPrice(i)))
+        .map((i) => {
+          const t = teas.find((t) => t.name === i.name);
+          return (
+            i.name +
+            (t ? " (" + t.blend + ")" : "") +
+            " — " +
+            i.qty +
+            " teabags — " +
+            rm(itemPrice(i))
+          );
+        })
         .join("\n") +
       "\n\nTea: " +
       rm(totals.tea) +
@@ -1404,17 +1446,7 @@ fetch("config/business.json")
 
 // Keep an open tab from replacing newer selections made in another tab.
 function refreshBag() {
-  try {
-    const current = JSON.parse(localStorage.getItem("teasire-bag") || "[]");
-    if (Array.isArray(current))
-      bag = current.filter(
-        (i) =>
-          i &&
-          typeof i.name === "string" &&
-          Number.isInteger(i.qty) &&
-          i.qty >= 10,
-      );
-  } catch {}
+  bag = readBag() || bag;
 }
 // Redraw what shows the bag if it changed since this page last looked.
 function syncBag() {
