@@ -254,7 +254,7 @@ function home() {
       .map(card)
       .join("")}</div></div>`;
   const prices = [...new Set(teas.map((t) => t.price))];
-  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" tabindex="0" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light. Select to play or pause."><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video></figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `Eight blends, each ${rm(prices[0])} for 10 individually packed teabags.` : "Eight blends in individually packed teabags."}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Find your tea in one question.</h3><p>Tell us which notes you love, and we’ll match you with a blend.</p></div><a class="button" href="discover.html">Find your tea <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><img ${photoAttrs(teas[1], "large")} alt="A warm cup of osmanthus oolong with flowers" loading="lazy"><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
+  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" tabindex="0" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light. Select to play or pause."><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video></figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `Eight blends, each ${rm(prices[0])} for 10 individually packed teabags.` : "Eight blends in individually packed teabags."}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Find your tea in one question.</h3><p>Tell us which notes you love, and we’ll match you with a blend.</p></div><a class="button" href="discover.html">Find your tea <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><figure class="story-film"><img ${photoAttrs(teas[1], "large")} alt="" loading="lazy"><video id="story-film" muted loop playsinline preload="none" tabindex="0" aria-label="A warm cup of osmanthus oolong with flowers, steam rising gently. Select to play or pause."><source src="assets/teasire-osmanthus-film.mp4" type="video/mp4"></video></figure><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
 }
 function collection(series) {
   const flower = series === "flower";
@@ -1188,6 +1188,48 @@ if (teaFilm) {
     if (reduced.matches) teaFilm.pause();
     else if (visible && !manuallyPaused && !teaFilm.ended) playFilm();
   });
+}
+
+// Home story film: the osmanthus photo comes alive (steam rising, the branch
+// stirring) in a silent loop while it is on screen. The photo stays underneath
+// and the film fades in over it once it plays; the film starts on that same
+// photo, so the change can't be seen. It only downloads once it plays. Visitors
+// who prefer less motion keep the still photo unless they choose to play it.
+// Tapping the film (or Enter/Space when it has focus) plays or pauses it.
+const storyFilm = document.querySelector("#story-film");
+if (storyFilm) {
+  let manuallyPaused = false,
+    visible = false;
+  const playStory = () => storyFilm.play().catch(() => {});
+  function updateStory() {
+    if (visible && !document.hidden && !reduced.matches && !manuallyPaused)
+      playStory();
+    else storyFilm.pause();
+  }
+  storyFilm.addEventListener("playing", () =>
+    storyFilm.parentElement.classList.add("is-playing"),
+  );
+  function tapStory() {
+    manuallyPaused = !storyFilm.paused;
+    if (manuallyPaused) storyFilm.pause();
+    else playStory();
+  }
+  storyFilm.addEventListener("click", tapStory);
+  storyFilm.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      tapStory();
+    }
+  });
+  new IntersectionObserver(
+    (entries) => {
+      visible = entries[entries.length - 1].isIntersecting;
+      updateStory();
+    },
+    { threshold: 0.25 },
+  ).observe(storyFilm);
+  document.addEventListener("visibilitychange", updateStory);
+  reduced.addEventListener("change", updateStory);
 }
 
 const waToggle = document.querySelector("#whatsapp-toggle"),

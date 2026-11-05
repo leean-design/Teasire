@@ -9,11 +9,12 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions.
 - `dist/transitions.js`: the page transitions. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. Moving along the menu, the line under it glides to the new item and the page sweeps in from that side; leaving the phone menu, the page rises in. Each new page's opening lines arrive one after another. It runs in Chrome, Edge and Safari; other browsers change page normally.
 - `dist/*.html`: generated page documents, including individual tea pages.
-- `dist/assets/`: all photos, the magpie logo, tea video, poster and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
+- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film and its poster at the top of the home page, and the osmanthus film further down), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
 - `dist/config/business.json`: WhatsApp number, business details shown in the footer and on the Policies page, and manual DuitNow payment settings.
 - `scripts/prepare-site.mjs`: refreshes initial HTML, sharing metadata and sitemap after content edits.
 - `scripts/make-photo-sizes.py`: creates the smaller copies of any new tea photo.
+- `scripts/make-story-film.py`: makes the osmanthus film on the home page from the osmanthus oolong photo.
 
 ## Preview locally
 
@@ -69,6 +70,18 @@ Prices are in RM per pack of 10 teabags, in `dist/site.js`:
 3. Add the tea to the `teas` list in `dist/site.js`, then run `node scripts/prepare-site.mjs` to create its page.
 
 The preparation script stops with an error if a photo's smaller copies are missing, so a deploy never publishes broken images.
+
+### The osmanthus film
+
+On the home page, the osmanthus photo beside "Nothing to rush" comes alive: the steam rises and the branch sways, in a silent 10-second loop (`dist/assets/teasire-osmanthus-film.mp4`, about 0.7 MB). It plays while it is on screen and only downloads then; tapping it plays or pauses it. Visitors who prefer less motion see the still photo. The film starts on the photo itself, so the change from photo to film can't be seen.
+
+To make it again, for example after editing the photo (needs Python with numpy, scipy and Pillow: `pip install numpy scipy Pillow`, and ffmpeg):
+
+```sh
+python scripts/make-story-film.py
+```
+
+To use a film made elsewhere instead (for example with an image-to-video tool), save it over `dist/assets/teasire-osmanthus-film.mp4`: an MP4 (H.264), 3:4 portrait like the photo, silent, ideally starting on the photo and ending where it starts so the loop doesn't jump.
 
 ## Publish changes
 
