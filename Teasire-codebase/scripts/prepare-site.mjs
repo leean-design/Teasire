@@ -88,7 +88,7 @@ for (const file of fs
   const markup = vm.runInContext("pageMarkup()", ctx);
   const tea = teas.find((t) => t.id === product);
   const title = tea
-    ? tea.name + " — Teasire"
+    ? tea.name + " (" + tea.blend + ") — Teasire"
     : unesc(html.match(/<title>(.*?)<\/title>/s)[1]);
   const desc = tea
     ? tea.description + " Individually packed teabags, available in Malaysia."
