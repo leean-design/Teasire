@@ -88,9 +88,25 @@ h4 {
 .signature-dropdown {
   border: 1px solid #dfe3df;
 }
-.site-nav a[aria-current="page"] {
+.site-nav a[aria-current="page"],
+.signature-menu.is-current > summary {
+  position: relative;
   color: #283f36;
-  border-bottom: 2px solid #3e5954;
+}
+/* The line under the current menu item is an element of its own (.nav-marker),
+   so it can glide to the next page's item when you change page. The link keeps
+   its 2px border, unseen, so nothing shifts. */
+.site-nav a[aria-current="page"] {
+  border-bottom: 2px solid transparent;
+}
+.nav-marker {
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: #3e5954;
+}
+.site-nav a[aria-current="page"] > .nav-marker {
+  bottom: -2px;
 }
 .logo {
   color: #17201d;
@@ -1170,8 +1186,8 @@ details > summary {
   outline-offset: -6px;
 }
 
-/* Page transitions: moving between pages, the header stays put while the
-   old page fades up and out and the new one rises in. Browsers without view
+/* Page transitions (transitions.js picks the kind for each change of page):
+   the header stays put while the page below it changes. Browsers without view
    transitions, and visitors who prefer reduced motion, load pages normally.
    The switch that turns transitions on is a small <style> in every page's head
    (written by scripts/prepare-site.mjs): from this file it would sometimes load
@@ -1182,6 +1198,10 @@ details > summary {
 .whatsapp-float {
   view-transition-name: whatsapp-button;
 }
+.nav-marker {
+  view-transition-name: nav-marker;
+}
+/* The plain change: the old page fades up and out and the new one rises in. */
 ::view-transition-old(root) {
   animation: teasire-page-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
 }
@@ -1200,12 +1220,22 @@ details > summary {
     transform: translateY(14px);
   }
 }
+@keyframes teasire-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes teasire-fade-out {
+  to {
+    opacity: 0;
+  }
+}
 /* Tea photo morph (transitions.js names the pair): a tea's photo and name fly
    between its card and its own page, over the page fade above. */
-[data-morph="photo"] {
+[data-vt="photo"] {
   view-transition-class: tea-photo;
 }
-[data-morph="title"] {
+[data-vt="title"] {
   view-transition-class: tea-title;
 }
 /* Names hug their text, so the small name scales neatly into the big one. */
@@ -1238,7 +1268,7 @@ details > summary {
   animation: teasire-fade-in 260ms ease-out both;
 }
 /* Landing in a card: the card's smaller photo takes over as it lands. */
-:root[data-morph="to-card"]::view-transition-new(*.tea-photo) {
+:root[data-turn="to-card"]::view-transition-new(*.tea-photo) {
   animation-delay: 300ms;
 }
 /* The old name fades as it moves; the new one appears as it settles. */
@@ -1257,14 +1287,152 @@ details > summary {
 ::view-transition-new(*.tea-title):only-child {
   animation: teasire-page-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
-@keyframes teasire-fade-in {
+/* Moving along the menu (data-turn "forward" or "back"): the line under the
+   menu glides to the new page's item while the page sweeps in from the side
+   you're heading to, from the right going along the menu and from the left
+   coming back. Anything that flew off the old page goes with it. */
+::view-transition-group(nav-marker) {
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-old(nav-marker),
+::view-transition-new(nav-marker) {
+  height: 100%;
+}
+/* From a page without the line (Home) it draws out from the middle of the new
+   item; going to one, it shrinks away. */
+::view-transition-new(nav-marker):only-child {
+  animation: teasire-marker-in 460ms cubic-bezier(0.2, 0, 0, 1) 120ms both;
+}
+::view-transition-old(nav-marker):only-child {
+  animation: teasire-marker-out 220ms ease-in both;
+}
+@keyframes teasire-marker-in {
   from {
-    opacity: 0;
+    transform: scaleX(0);
   }
 }
-@keyframes teasire-fade-out {
+@keyframes teasire-marker-out {
   to {
-    opacity: 0;
+    transform: scaleX(0);
+  }
+}
+:root[data-turn="forward"]::view-transition-old(root),
+:root[data-turn="forward"]::view-transition-old(*.tea-photo):only-child,
+:root[data-turn="forward"]::view-transition-old(*.tea-title):only-child {
+  animation:
+    teasire-fade-out 160ms ease-out both,
+    teasire-out-left 240ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+:root[data-turn="back"]::view-transition-old(root),
+:root[data-turn="back"]::view-transition-old(*.tea-photo):only-child,
+:root[data-turn="back"]::view-transition-old(*.tea-title):only-child {
+  animation:
+    teasire-fade-out 160ms ease-out both,
+    teasire-out-right 240ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+:root[data-turn="forward"]::view-transition-new(root) {
+  animation:
+    teasire-fade-in 360ms ease-out 100ms both,
+    teasire-in-right 600ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+}
+:root[data-turn="back"]::view-transition-new(root) {
+  animation:
+    teasire-fade-in 360ms ease-out 100ms both,
+    teasire-in-left 600ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+}
+@keyframes teasire-out-left {
+  to {
+    transform: translateX(calc(-1 * clamp(24px, 6vw, 88px)));
+  }
+}
+@keyframes teasire-out-right {
+  to {
+    transform: translateX(clamp(24px, 6vw, 88px));
+  }
+}
+@keyframes teasire-in-right {
+  from {
+    transform: translateX(clamp(24px, 5vw, 72px));
+  }
+}
+@keyframes teasire-in-left {
+  from {
+    transform: translateX(calc(-1 * clamp(24px, 5vw, 72px)));
+  }
+}
+/* Leaving the phone menu (data-turn "menu"): the menu lifts away, the page
+   rises in, and the header and WhatsApp button, hidden under the menu until
+   now, fade in where they stand. */
+:root[data-turn="menu"]::view-transition-old(root) {
+  animation:
+    teasire-fade-out 200ms ease-out both,
+    teasire-lift 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+:root[data-turn="menu"]::view-transition-new(root) {
+  animation:
+    teasire-fade-in 360ms ease-out 100ms both,
+    teasire-rise 600ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+}
+::view-transition-new(site-header):only-child,
+::view-transition-new(whatsapp-button):only-child {
+  animation: teasire-fade-in 360ms ease-out 140ms both;
+}
+@keyframes teasire-lift {
+  to {
+    transform: translateY(-16px);
+  }
+}
+@keyframes teasire-rise {
+  from {
+    transform: translateY(28px);
+  }
+}
+/* Whatever the turn, the new page's opening lines (named by transitions.js)
+   arrive one after another, travelling a little further than the page so they
+   lead it in. */
+[data-vt="intro"] {
+  view-transition-class: intro;
+}
+::view-transition-new(*.intro) {
+  animation:
+    teasire-fade-in 400ms ease-out both,
+    teasire-intro-rise 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+:root[data-turn="forward"]::view-transition-new(*.intro) {
+  animation-name: teasire-fade-in, teasire-intro-from-right;
+}
+:root[data-turn="back"]::view-transition-new(*.intro) {
+  animation-name: teasire-fade-in, teasire-intro-from-left;
+}
+:root::view-transition-new(teasire-intro-1) {
+  animation-delay: 130ms;
+}
+:root::view-transition-new(teasire-intro-2) {
+  animation-delay: 180ms;
+}
+:root::view-transition-new(teasire-intro-3) {
+  animation-delay: 230ms;
+}
+:root::view-transition-new(teasire-intro-4) {
+  animation-delay: 280ms;
+}
+:root::view-transition-new(teasire-intro-5) {
+  animation-delay: 330ms;
+}
+@keyframes teasire-intro-rise {
+  from {
+    transform: translateY(clamp(24px, 3vw, 36px));
+  }
+}
+@keyframes teasire-intro-from-right {
+  from {
+    transform: translateX(clamp(32px, 8vw, 112px));
+  }
+}
+@keyframes teasire-intro-from-left {
+  from {
+    transform: translateX(calc(-1 * clamp(32px, 8vw, 112px)));
   }
 }
 /* Keep the pack label the same size whatever the blend, so its bottom band

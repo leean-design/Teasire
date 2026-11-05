@@ -188,11 +188,20 @@ const navItems = [
 function brand() {
   return `<a class="logo" href="index.html" aria-label="Teasire home"><img src="assets/teasire-magpie-264.png" alt="" width="103" height="63"><span>Teasire</span></a>`;
 }
-function signatureMenu(name = "Signature Blend", footer = false) {
-  return `<details class="signature-menu ${footer ? "footer-signature" : ""}"><summary>${name}</summary><div class="signature-dropdown glass"><a href="flower-tea.html">Flower Tea <span>↗</span></a><a href="fruit-tea.html">Fruit Tea <span>↗</span></a></div></details>`;
+// The line under the header's menu item for the page you're on. It's an element
+// of its own so it can glide to the next page's item (transitions.js).
+const navMarker = '<span class="nav-marker" aria-hidden="true"></span>';
+function signatureMenu(
+  name = "Signature Blend",
+  footer = false,
+  current = false,
+) {
+  return `<details class="signature-menu ${footer ? "footer-signature" : ""}${current ? "is-current" : ""}"><summary>${name}${current ? navMarker : ""}</summary><div class="signature-dropdown glass"><a href="flower-tea.html">Flower Tea <span>↗</span></a><a href="fruit-tea.html">Fruit Tea <span>↗</span></a></div></details>`;
 }
 function header() {
-  return `<div class="progress" aria-hidden="true"></div><header class="site-header glass">${brand()}<nav class="site-nav" aria-label="Main navigation">${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}" ${location.pathname.endsWith(url) ? 'aria-current="page"' : ""}>${label}</a>`).join("")}</nav><div class="header-tools"><a class="pill" href="checkout.html">Bag <span class="bag-count">0</span></a><button class="plain menu-btn" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button></div></header><nav class="mobile-menu" id="mobile-menu" aria-label="Expanded navigation" inert><div class="mobile-menu-top"><span class="mobile-menu-label">Explore Teasire</span><button class="plain" id="menu-close" type="button" aria-label="Close navigation">Close ✕</button></div>${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav>`;
+  // The series pages and each tea's own page sit under Signature Blend.
+  const inSignature = ["flower", "fruit", "product"].includes(page);
+  return `<div class="progress" aria-hidden="true"></div><header class="site-header glass">${brand()}<nav class="site-nav" aria-label="Main navigation">${signatureMenu("Signature Blend", false, inSignature)}${navItems.map(([url, label]) => (location.pathname.endsWith(url) ? `<a href="${url}" aria-current="page">${label}${navMarker}</a>` : `<a href="${url}">${label}</a>`)).join("")}</nav><div class="header-tools"><a class="pill" href="checkout.html">Bag <span class="bag-count">0</span></a><button class="plain menu-btn" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button></div></header><nav class="mobile-menu" id="mobile-menu" aria-label="Expanded navigation" inert><div class="mobile-menu-top"><span class="mobile-menu-label">Explore Teasire</span><button class="plain" id="menu-close" type="button" aria-label="Close navigation">Close ✕</button></div>${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav>`;
 }
 function footer() {
   return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-legal"><span id="business-details"></span><nav class="footer-policies" aria-label="Shop policies"><a href="policies.html#delivery">Delivery</a><a href="policies.html#returns">Returns</a><a href="policies.html#terms">Terms</a><a href="policies.html#privacy">Privacy</a><span id="social-links"></span></nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;
@@ -783,7 +792,7 @@ if ($("#product-add"))
   };
 const menu = $("#menu"),
   menuPanel = $("#mobile-menu");
-function toggleMenu(open) {
+function toggleMenu(open, refocus = true) {
   menuPanel.classList.toggle("open", open);
   menuPanel.inert = !open;
   menu.setAttribute("aria-expanded", String(open));
@@ -801,7 +810,7 @@ function toggleMenu(open) {
     if (!$("#whatsapp-panel").classList.contains("hidden"))
       toggleWhatsApp(false);
     requestAnimationFrame(() => $("#menu-close").focus());
-  } else menu.focus();
+  } else if (refocus) menu.focus();
 }
 menu.onclick = () => toggleMenu(true);
 $("#menu-close").onclick = () => toggleMenu(false);
@@ -970,7 +979,7 @@ if ("IntersectionObserver" in window && !reduced.matches) {
   );
   document.querySelectorAll(".product,.split>*,.cta>*").forEach((el) => {
     // A card catching a tea photo from the last page (transitions.js) stays put.
-    if (el.querySelector("[data-morph]")) return;
+    if (el.querySelector("[data-vt]")) return;
     if (el.getBoundingClientRect().top > innerHeight) {
       el.classList.add("will-reveal");
       observer.observe(el);
@@ -1422,6 +1431,19 @@ addEventListener("storage", (e) => {
   if (e.key === "teasire-bag") syncBag();
   if (e.key === "teasire_saved" && page === "builder") renderSavedBlends();
 });
-// Going back can show a page exactly as it was left, before the bag changed on
-// another page.
-addEventListener("pageshow", (e) => e.persisted && syncBag());
+// Going back can show a page exactly as it was left: with the bag as it was
+// then, and with the menu that led away still open. Close menus at once, before
+// the page transition shows the page.
+addEventListener("pageshow", (e) => {
+  if (!e.persisted) return;
+  syncBag();
+  document
+    .querySelectorAll(".signature-menu[open]")
+    .forEach((m) => (m.open = false));
+  if (menuPanel.classList.contains("open")) {
+    menuPanel.style.transition = "none";
+    toggleMenu(false, false);
+    void menuPanel.offsetWidth;
+    menuPanel.style.transition = "";
+  }
+});
