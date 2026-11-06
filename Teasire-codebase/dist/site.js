@@ -70,6 +70,32 @@ const teas = [
       "Fresh tea notes and gentle rose fragrance come together in a delicate everyday cup.",
   },
   {
+    id: "osmanthus-rose",
+    name: "Dreamy Osmanthus",
+    blend: "Osmanthus · Rose",
+    zh: "桂花玫瑰",
+    series: "flower",
+    price: 20,
+    image: "09_Osmanthus_Rose",
+    notes: "Rosy · Honeyed · Soft",
+    ingredients: ["Osmanthus", "Rose"],
+    description:
+      "Gentle rose with a touch of golden osmanthus. A softly sweet floral cup for letting your thoughts wander.",
+  },
+  {
+    id: "rose-pandan",
+    name: "Sweet Talk Pandan",
+    blend: "Rose · Pandan",
+    zh: "玫瑰班兰",
+    series: "flower",
+    price: 20,
+    image: "10_Rose_Pandan",
+    notes: "Rosy · Sweet · Fragrant",
+    ingredients: ["Rose", "Pandan"],
+    description:
+      "Rose meets the warm, sweet fragrance of pandan. A gentle floral cup with a familiar Malaysian twist.",
+  },
+  {
     id: "chrysanthemum-orange",
     name: "Emotional Orange",
     blend: "Chrysanthemum · Orange",
@@ -256,7 +282,23 @@ function home() {
       .map(card)
       .join("")}</div></div>`;
   const prices = [...new Set(teas.map((t) => t.price))];
-  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" tabindex="0" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light. Select to play or pause."><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video></figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `Eight blends, each ${rm(prices[0])} for 10 individually packed teabags.` : "Eight blends in individually packed teabags."}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Find your tea in one question.</h3><p>Tell us which notes you love, and we’ll match you with a blend.</p></div><a class="button" href="discover.html">Find your tea <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><figure class="story-film"><img src="assets/teasire-osmanthus-still.webp" srcset="assets/teasire-osmanthus-still-480.webp 480w, assets/teasire-osmanthus-still.webp 834w" sizes="${photoSizes.large}" alt="" loading="lazy" decoding="async" width="834" height="1112"><video id="story-film" muted loop playsinline preload="none" tabindex="0" aria-label="A glass cup of osmanthus tea on a stone ledge, with blossoms drifting down from the branch above into the cup. Select to play or pause."><source src="assets/teasire-osmanthus-film.mp4" type="video/mp4"></video></figure><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
+  // How many teas there are, in words, so "Ten blends" stays right as teas are added.
+  const count =
+    [
+      "One",
+      "Two",
+      "Three",
+      "Four",
+      "Five",
+      "Six",
+      "Seven",
+      "Eight",
+      "Nine",
+      "Ten",
+      "Eleven",
+      "Twelve",
+    ][teas.length - 1] ?? teas.length;
+  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" tabindex="0" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light. Select to play or pause."><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video></figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `${count} blends, each ${rm(prices[0])} for 10 individually packed teabags.` : `${count} blends in individually packed teabags.`}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Find your tea in one question.</h3><p>Tell us which notes you love, and we’ll match you with a blend.</p></div><a class="button" href="discover.html">Find your tea <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><figure class="story-film"><img src="assets/teasire-osmanthus-still.webp" srcset="assets/teasire-osmanthus-still-480.webp 480w, assets/teasire-osmanthus-still.webp 834w" sizes="${photoSizes.large}" alt="" loading="lazy" decoding="async" width="834" height="1112"><video id="story-film" muted loop playsinline preload="none" tabindex="0" aria-label="A glass cup of osmanthus tea on a stone ledge, with blossoms drifting down from the branch above into the cup. Select to play or pause."><source src="assets/teasire-osmanthus-film.mp4" type="video/mp4"></video></figure><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
 }
 function collection(series) {
   const flower = series === "flower";
@@ -265,7 +307,7 @@ function collection(series) {
     .map(card)
     .join(
       "",
-    )}</div><p class="fine" style="margin-top:30px">Prices are for 10 individually packed teabags. Ingredient availability is confirmed before ordering.</p>${flower ? '<div class="notice">Also on the original flower tea menu: Oolong Jasmine, Rose Pandan and Osmanthus Rose. Ask us on WhatsApp for availability and pricing for these blends.</div>' : ""}</div>${cta()}`;
+    )}</div><p class="fine" style="margin-top:30px">Prices are for 10 individually packed teabags. Ingredient availability is confirmed before ordering.</p>${flower ? '<div class="notice">Also on the original flower tea menu: Oolong Jasmine. Ask us on WhatsApp for availability and pricing for this blend.</div>' : ""}</div>${cta()}`;
 }
 function product() {
   const t = teas.find(
@@ -935,7 +977,10 @@ if (page === "discover") {
           .querySelectorAll("[data-quiz]")
           .forEach((t) => t.setAttribute("aria-pressed", t === b));
         const choice = b.dataset.quiz;
-        const t = teas[choice === "rose" ? 2 : choice === "fruit" ? 6 : 0];
+        const id =
+          { rose: "oolong-rose", fruit: "green-tea-orange" }[choice] ||
+          "green-tea-jasmine";
+        const t = teas.find((t) => t.id === id);
         $("#quiz-result").innerHTML =
           `<div class="notice"><span class="eyebrow">YOUR TASTE MATCH</span><h3>${t.name}</h3><p class="tea-blend">${t.blend}</p><p>${t.description}</p><a class="button" href="${productUrl(t.id)}">Meet your blend ↗</a><p class="fine" style="margin:15px 0 0">Taste-based suggestion only, not a health assessment.</p></div>`;
       }),
