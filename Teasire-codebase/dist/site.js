@@ -307,7 +307,7 @@ function collection(series) {
     .map(card)
     .join(
       "",
-    )}</div><p class="fine" style="margin-top:30px">Prices are for 10 individually packed teabags. Ingredient availability is confirmed before ordering.</p>${flower ? '<div class="notice">Also on the original flower tea menu: Oolong Jasmine. Ask us on WhatsApp for availability and pricing for this blend.</div>' : ""}</div>${cta()}`;
+    )}</div><p class="fine" style="margin-top:30px">Prices are for 10 individually packed teabags. Ingredient availability is confirmed before ordering.</p></div>${cta()}`;
 }
 function product() {
   const t = teas.find(
