@@ -37,9 +37,15 @@ jobs:
 
       - uses: actions/configure-pages@v6
 
+      # Each attempt gets its own artifact name. "Re-run jobs" uploads the site
+      # again into the same run, and the deploy step refuses to pick between
+      # two artifacts with the same name.
       - uses: actions/upload-pages-artifact@v5
         with:
           path: Teasire-codebase/dist
+          name: github-pages-${{ github.run_attempt }}
 
       - id: deployment
         uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
