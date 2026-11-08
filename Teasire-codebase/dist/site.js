@@ -16,7 +16,6 @@ const esc = (s) =>
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 // `name` is the tea's own name and `blend` what's in it, shown under the name.
 // `price` is in RM for a pack of 10 individually packed teabags.
-// `color` is the colour of the tea's slice on the Discover page's tea wheel.
 const teas = [
   {
     id: "green-tea-jasmine",
@@ -27,7 +26,6 @@ const teas = [
     price: 20,
     image: "01_Green_Tea_Jasmine",
     notes: "Light · Floral · Fresh",
-    color: "#f3e6b5",
     ingredients: ["Green tea", "Jasmine"],
     description:
       "Fresh green tea meets the soft, unmistakable fragrance of jasmine. A light floral cup for your everyday pause.",
@@ -41,7 +39,6 @@ const teas = [
     price: 20,
     image: "02_Oolong_Osmanthus",
     notes: "Golden · Floral · Mellow",
-    color: "#f7c870",
     ingredients: ["Oolong tea", "Osmanthus"],
     description:
       "A rounded oolong base with delicate golden osmanthus. Fragrant, mellow and easy to return to.",
@@ -55,7 +52,6 @@ const teas = [
     price: 20,
     image: "03_Oolong_Rose",
     notes: "Rounded · Rosy · Aromatic",
-    color: "#e8a0ab",
     ingredients: ["Oolong tea", "Rose"],
     description:
       "The deeper character of oolong, softened by rose. An expressive floral blend for a slower moment.",
@@ -69,7 +65,6 @@ const teas = [
     price: 20,
     image: "04_Green_Tea_Rose",
     notes: "Fresh · Rosy · Delicate",
-    color: "#f9cad3",
     ingredients: ["Green tea", "Rose"],
     description:
       "Fresh tea notes and gentle rose fragrance come together in a delicate everyday cup.",
@@ -83,7 +78,6 @@ const teas = [
     price: 20,
     image: "09_Osmanthus_Rose",
     notes: "Rosy · Honeyed · Soft",
-    color: "#f9c39c",
     ingredients: ["Osmanthus", "Rose"],
     description:
       "Gentle rose with a touch of golden osmanthus. A softly sweet floral cup for letting your thoughts wander.",
@@ -97,7 +91,6 @@ const teas = [
     price: 20,
     image: "10_Rose_Pandan",
     notes: "Rosy · Sweet · Fragrant",
-    color: "#bfe0a9",
     ingredients: ["Rose", "Pandan"],
     description:
       "Rose meets the warm, sweet fragrance of pandan. A gentle floral cup with a familiar Malaysian twist.",
@@ -111,7 +104,6 @@ const teas = [
     price: 20,
     image: "05_Chrysanthemum_Orange",
     notes: "Bright · Floral · Citrusy",
-    color: "#fbdc72",
     ingredients: ["Chrysanthemum", "Orange"],
     description:
       "Soft chrysanthemum and bright orange make a sunny, fragrant pairing.",
@@ -125,7 +117,6 @@ const teas = [
     price: 20,
     image: "06_Oolong_Orange",
     notes: "Rounded · Citrus · Smooth",
-    color: "#f6aa72",
     ingredients: ["Oolong tea", "Orange"],
     description:
       "Rounded oolong with the lively character of orange. A little brightness for your daily ritual.",
@@ -139,7 +130,6 @@ const teas = [
     price: 20,
     image: "07_Green_Tea_Orange",
     notes: "Crisp · Citrus · Fresh",
-    color: "#dbe896",
     ingredients: ["Green tea", "Orange"],
     description:
       "A fresh green tea base with a citrus finish. Bright, simple and full of everyday possibility.",
@@ -153,7 +143,6 @@ const teas = [
     price: 20,
     image: "08_Osmanthus_Black_Tea_Red_Dates",
     notes: "Warm · Floral · Rich",
-    color: "#eaa098",
     ingredients: ["Osmanthus", "Black tea", "Red dates"],
     description:
       "Black tea, golden osmanthus and red dates create a warm, fragrant blend with a richer character.",
@@ -713,44 +702,40 @@ const moodLine = (mood) =>
 // list still makes a full wheel.
 const wheelSlices = (list) =>
   Array.from({ length: Math.ceil(6 / list.length) }, () => list).flat();
-// The wheel itself, which turns: a slice in each tea's colour, softly lit from
-// within, with its name near the rim. White lines part the slices, and a ring
-// marks the slice where the wheel stops. The first slice is centred under the
-// pointer. Names are drawn bigger when there are fewer slices.
+// The wheel itself, which turns: each tea's photo fills its slice, and its name
+// sits on a white ring round the edge. White lines part the slices. Where the
+// wheel stops, that tea's part of the ring turns deep green. The first slice is
+// centred under the pointer. Names are drawn bigger when there are fewer slices.
 function wheelDisc(list) {
   const slices = wheelSlices(list),
     n = slices.length,
     a = 360 / n,
-    size = n <= 6 ? 16.5 : n <= 8 ? 15 : 13,
-    outer = 154,
-    inner = outer - size - 4.5,
+    size = n <= 6 ? 17.5 : n <= 8 ? 16 : 15,
+    outer = 166,
+    inner = outer - size - 2.5,
+    ring = 144, // where the photos end and the ring of names begins
+    rim = 184,
+    // Each photo is wide enough to fill its slice, with the cup near the middle.
+    pw = Math.max(150, 3 * ring * Math.sin((a * Math.PI) / 360)),
     at = (deg, r) => {
       const t = (deg * Math.PI) / 180;
       return (r * Math.sin(t)).toFixed(2) + " " + (-r * Math.cos(t)).toFixed(2);
     },
-    wedge = (r) => `M0 0L${at(-a / 2, r)}A${r} ${r} 0 0 1 ${at(a / 2, r)}Z`,
-    turn = (deg) => `rotate(${deg.toFixed(2)})`;
+    turn = (deg) => `rotate(${deg.toFixed(2)})`,
+    each = (draw) => slices.map(draw).join("");
   const label = [...new Set(slices.map((t) => t.name))].join(", ");
-  return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-195 -195 390 390" style="font-size:${size}px" aria-hidden="true" focusable="false"><defs><radialGradient id="wheel-glow"><stop offset="0.25" stop-color="#fff" stop-opacity="0.55"/><stop offset="0.95" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>${slices
-    .map((t, i) => {
-      const words = t.name.split(" "),
-        last = words.pop(),
-        lines = words.length ? [words.join(" "), last] : [last];
-      return `<g class="wheel-slice" data-slice="${i}" transform="${turn(i * a)}"><path d="${wedge(182)}" fill="${t.color}"/><path d="${wedge(182)}" fill="url(#wheel-glow)"/>${lines.map((line, l) => `<text class="wheel-name" y="${-(l ? inner : outer)}">${line}</text>`).join("")}</g>`;
-    })
-    .join("")}${slices
-    .map(
-      (_, i) =>
-        `<line class="wheel-line" transform="${turn((i + 0.5) * a)}" y1="-46" y2="-182"/>`,
-    )
-    .join(
-      "",
-    )}<path class="wheel-mark" d="${wedge(180)}"/><circle class="wheel-rim" r="188"/>${slices
-    .map(
-      (_, i) =>
-        `<circle class="wheel-dot" transform="${turn((i + 0.5) * a)}" cy="-188" r="3.2"/>`,
-    )
-    .join("")}</svg></div>`;
+  return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-195 -195 390 390" style="font-size:${size}px" aria-hidden="true" focusable="false"><defs><clipPath id="wheel-slice"><path d="M0 0L${at(-a / 2, ring)}A${ring} ${ring} 0 0 1 ${at(a / 2, ring)}Z"/></clipPath></defs>${each(
+    (t, i) =>
+      `<g transform="${turn(i * a)}" clip-path="url(#wheel-slice)"><image href="assets/clean/${t.image}-480.webp" x="${(-pw / 2).toFixed(1)}" y="${(-98 - pw * 0.72).toFixed(1)}" width="${pw.toFixed(1)}" height="${((pw * 4) / 3).toFixed(1)}" preserveAspectRatio="xMidYMid slice"/></g>`,
+  )}<circle class="wheel-veil" r="${ring}"/><circle class="wheel-ring" r="${(ring + rim) / 2}" stroke-width="${rim - ring}"/><path class="wheel-mark" d="M${at(-a / 2, rim)}A${rim} ${rim} 0 0 1 ${at(a / 2, rim)}L${at(a / 2, ring)}A${ring} ${ring} 0 0 0 ${at(-a / 2, ring)}Z"/>${each(
+    (_, i) =>
+      `<line class="wheel-line" transform="${turn((i + 0.5) * a)}" y1="-40" y2="-${ring}"/><line class="wheel-tick" transform="${turn((i + 0.5) * a)}" y1="-${ring + 7}" y2="-${rim - 7}"/>`,
+  )}<circle class="wheel-inner" r="${ring}"/>${each((t, i) => {
+    const words = t.name.split(" "),
+      last = words.pop(),
+      lines = words.length ? [words.join(" "), last] : [last];
+    return `<g class="wheel-label" data-slice="${i}" transform="${turn(i * a)}">${lines.map((line, l) => `<text class="wheel-name" y="${-(l ? inner : outer)}">${line}</text>`).join("")}</g>`;
+  })}<circle class="wheel-rim" r="188"/></svg></div>`;
 }
 function discover() {
   const prices = [...new Set(teas.map((t) => t.price))];
@@ -761,7 +746,7 @@ function discover() {
     )
     .join(
       "",
-    )}</div><p class="mood-line" id="mood-line">${moodLine(moods[0])}</p><div class="wheel">${wheelDisc(moodTeas(moods[0]))}<svg class="wheel-pointer" viewBox="0 0 40 50" aria-hidden="true" focusable="false"><path d="M20 48 7.5 17a13.5 13.5 0 1 1 25 0Z"/><circle cx="20" cy="13.5" r="4.5"/></svg><span class="wheel-hub" aria-hidden="true">SPIN</span></div><button class="button wheel-spin" id="wheel-spin" type="button">Spin the wheel <span aria-hidden="true">↻</span></button><p class="fine">Each spin adds 10 teabags${prices.length === 1 ? " (" + rm(prices[0]) + ")" : ""} of the tea it lands on to your bag. You can change or remove it in your bag.</p><p class="visually-hidden" id="wheel-status" role="status"></p></div><dialog class="spin-dialog" id="spin-dialog" aria-labelledby="spin-name"></dialog></div>`;
+    )}</div><p class="mood-line" id="mood-line">${moodLine(moods[0])}</p><div class="wheel">${wheelDisc(moodTeas(moods[0]))}<svg class="wheel-pointer" viewBox="0 0 30 40" aria-hidden="true" focusable="false"><path d="M15 38 4 7.5Q3 3 7.5 3h15Q27 3 26 7.5Z"/></svg><span class="wheel-hub" aria-hidden="true"><img src="assets/teasire-magpie-264.png" alt="" width="264" height="161"><span>SPIN</span></span></div><button class="button wheel-spin" id="wheel-spin" type="button">Spin the wheel <span aria-hidden="true">↻</span></button><p class="fine">Each spin adds 10 teabags${prices.length === 1 ? " (" + rm(prices[0]) + ")" : ""} of the tea it lands on to your bag. You can change or remove it in your bag.</p><p class="visually-hidden" id="wheel-status" role="status"></p></div><dialog class="spin-dialog" id="spin-dialog" aria-labelledby="spin-name"></dialog></div>`;
 }
 function upcoming(kind) {
   const content = {
@@ -1151,6 +1136,7 @@ if (page === "discover") {
     spinButton.textContent = "Spinning…";
     $("#wheel-status").textContent = "Spinning…";
     mark.classList.remove("on");
+    disc.querySelector(".wheel-label.won")?.classList.remove("won");
     disc.style.willChange = "transform";
     requestAnimationFrame(function turn(now) {
       const t = duration ? Math.min(1, (now - start) / duration) : 1;
@@ -1166,15 +1152,18 @@ if (page === "discover") {
           );
       }
       if (t < 1) requestAnimationFrame(turn);
-      else land(slices[pick], pick * a, mark);
+      else land(slices[pick], pick, a, mark);
     });
   }
-  function land(t, at, mark) {
+  function land(t, pick, a, mark) {
     angle %= 360;
     disc.style.transform = `rotate(${angle}deg)`;
     disc.style.willChange = "";
-    mark.setAttribute("transform", `rotate(${at})`);
+    mark.setAttribute("transform", `rotate(${pick * a})`);
     mark.classList.add("on");
+    disc
+      .querySelector(`.wheel-label[data-slice="${pick}"]`)
+      .classList.add("won");
     addItem(t.name, 10, {}, "");
     chosen = { t, inBag: true };
     spinButton.innerHTML = spinLabel("Spin again");

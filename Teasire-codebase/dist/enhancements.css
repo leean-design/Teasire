@@ -1785,55 +1785,65 @@ details > summary {
   width: 100%;
   height: 100%;
 }
-.wheel-name {
-  font-family: Montserrat, sans-serif;
-  font-weight: 600;
-  text-anchor: middle;
-  fill: #26342f;
+.wheel-veil {
+  fill: #fff;
+  fill-opacity: 0.06;
 }
-.wheel-line {
-  stroke: #fff;
-  stroke-width: 3;
-}
-.wheel-mark {
+.wheel-ring {
   fill: none;
-  stroke: var(--green);
-  stroke-width: 4;
-  stroke-linejoin: round;
+  stroke: #fffdf8;
+}
+.wheel-line,
+.wheel-inner {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+}
+.wheel-tick {
+  stroke: #e9e3d6;
+  stroke-width: 1;
+}
+.wheel-name {
+  font-family: Lora, Georgia, serif;
+  font-weight: 500;
+  text-anchor: middle;
+  fill: #24332f;
+  transition: fill 0.3s;
+}
+/* Where the wheel stopped: that tea's part of the ring turns deep green. */
+.wheel-mark {
+  fill: var(--green);
   opacity: 0;
   transition: opacity 0.3s;
 }
 .wheel-mark.on {
   opacity: 1;
 }
+.wheel-label.won .wheel-name {
+  fill: #fff;
+}
 .wheel-rim {
   fill: none;
   stroke: #fff;
-  stroke-width: 12;
-}
-.wheel-dot {
-  fill: #e3d6b8;
+  stroke-width: 9;
 }
 /* The pointer grows with the wheel; its tip reaches just past the rim. */
 .wheel-pointer {
   position: absolute;
   top: -5.5%;
-  left: 45%;
+  left: 46.25%;
   z-index: 2;
-  width: 10%;
+  width: 7.5%;
   height: auto;
-  aspect-ratio: 40 / 50;
-  transform-origin: 50% 27%;
-  filter: drop-shadow(0 4px 4px #17201d40);
+  aspect-ratio: 30 / 40;
+  transform-origin: 50% 8%;
+  filter: drop-shadow(0 3px 4px #17201d38);
 }
 .wheel-pointer path {
   fill: var(--green);
   stroke: #fff;
-  stroke-width: 3;
+  stroke-width: 2.5;
   stroke-linejoin: round;
-}
-.wheel-pointer circle {
-  fill: #fff;
 }
 .wheel-hub {
   position: absolute;
@@ -1842,19 +1852,27 @@ details > summary {
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 24%;
+  align-content: center;
+  gap: 2px;
+  width: 23%;
   aspect-ratio: 1;
-  padding-left: 0.16em;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 28%, #638179, #3e5954 58%, #2d423e);
+  background: #fff;
   box-shadow:
-    0 0 0 6px #fff,
-    0 6px 16px #17201d4d;
-  color: #fff;
-  font-size: clamp(12px, 3.4vw, 16px);
-  font-weight: 700;
-  letter-spacing: 0.16em;
+    0 0 0 2px var(--green),
+    0 4px 14px #17201d24;
   transform: translate(-50%, -50%);
+}
+.wheel-hub img {
+  width: 58%;
+  height: auto;
+}
+.wheel-hub span {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: var(--green);
+  transform: translateX(0.12em);
 }
 .wheel-spin {
   min-width: 240px;
@@ -1955,7 +1973,8 @@ details > summary {
 }
 @media (prefers-reduced-motion: reduce) {
   .mood,
-  .wheel-mark {
+  .wheel-mark,
+  .wheel-name {
     transition: none;
   }
 }
