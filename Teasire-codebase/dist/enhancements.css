@@ -822,8 +822,7 @@ th,
   font-size: 14px;
 }
 .product p,
-.cart-item p,
-.quiz-option p {
+.cart-item p {
   font-size: 14px;
 }
 .product-foot {
@@ -1713,4 +1712,327 @@ details > summary {
 }
 #payment-result .button {
   margin-top: 6px;
+}
+
+/* Discover: the tea wheel. The moods and the result run down the left; the
+   wheel stays in view on the right. On phones it goes moods, wheel, result. */
+.discover-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 500px);
+  grid-template-areas:
+    "moods wheel"
+    "result wheel";
+  grid-template-rows: auto 1fr;
+  gap: 24px 32px;
+  align-items: start;
+}
+.discover-layout .panel {
+  padding: 32px;
+}
+.discover-layout .panel h3 {
+  margin-bottom: 20px;
+  font-size: 23px;
+  line-height: 1.4;
+}
+.discover-moods {
+  grid-area: moods;
+}
+.discover-result {
+  grid-area: result;
+}
+.discover-result .fine {
+  margin: 0;
+}
+.moods {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.mood {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 14px 16px;
+  border: 1px solid #75888655;
+  background: #f0ede570;
+  color: var(--green);
+  text-align: left;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    opacity 0.2s;
+}
+.mood strong {
+  font-family: Lora, Georgia, serif;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--night);
+}
+.mood small {
+  font-size: 12px;
+  line-height: 1.5;
+  color: inherit;
+}
+.mood:hover {
+  border-color: var(--green);
+}
+.mood[aria-pressed="true"] {
+  background: var(--green);
+  border-color: var(--green);
+  color: #e4ebe6;
+}
+.mood[aria-pressed="true"] strong {
+  color: #fff;
+}
+.is-spinning .mood:not([aria-pressed="true"]) {
+  opacity: 0.5;
+}
+.is-spinning .mood,
+.is-spinning #spin-again,
+.wheel-spin[aria-disabled="true"] {
+  cursor: default;
+}
+.discover-wheel {
+  grid-area: wheel;
+  position: sticky;
+  top: 24px;
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+  padding: 24px 24px 30px;
+  background: radial-gradient(120% 90% at 30% 15%, #ffffff 0%, #f0ede5 75%);
+  border: 1px solid var(--border);
+}
+.discover-wheel .eyebrow {
+  justify-self: start;
+}
+/* The wheel: the disc turns; its shadow, the pointer and the hub stay still. */
+.wheel {
+  position: relative;
+  width: min(100%, 440px);
+  aspect-ratio: 1;
+  margin-top: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 18px 40px #17201d1c;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.is-spinning .wheel {
+  cursor: default;
+}
+.wheel-disc,
+.wheel-disc svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.wheel-slice path {
+  stroke: #fff;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.wheel-slice {
+  transition: opacity 0.4s;
+}
+.has-winner .wheel-slice:not(.won) {
+  opacity: 0.42;
+}
+.wheel-photo-ring {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+}
+.wheel-name {
+  font-family: Lora, Georgia, serif;
+  font-weight: 500;
+  text-anchor: middle;
+  fill: #1f2b28;
+}
+.wheel-rim {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 8;
+}
+.wheel-edge {
+  fill: none;
+  stroke: #dfe5dd;
+}
+.wheel-peg {
+  fill: #c3cbc4;
+}
+/* The pointer grows with the wheel; its tip just reaches past the rim. */
+.wheel-pointer {
+  position: absolute;
+  top: -6.3%;
+  left: 46.25%;
+  z-index: 2;
+  width: 7.5%;
+  height: auto;
+  aspect-ratio: 34 / 44;
+  transform-origin: 50% 36%;
+  filter: drop-shadow(0 3px 4px #17201d38);
+}
+.wheel-pointer path {
+  fill: var(--green);
+  stroke: #fff;
+  stroke-width: 2.5;
+}
+.wheel-pointer circle {
+  fill: #f0ede5;
+}
+.wheel-hub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  width: 23%;
+  aspect-ratio: 1;
+  border: 1px solid #dfe5dd;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4px 14px #17201d24;
+  transform: translate(-50%, -50%);
+}
+.wheel-hub img {
+  width: 58%;
+  height: auto;
+}
+.wheel-hub span {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: var(--green);
+  transform: translateX(0.12em);
+}
+.wheel-spin {
+  min-width: 220px;
+}
+.wheel-spin[aria-disabled="true"] {
+  opacity: 0.6;
+  transform: none;
+}
+/* What the wheel chose: the tea's photo beside its name and notes, then its
+   intro, the bag and what to do next. */
+.spin-result {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 0 22px;
+  align-items: center;
+}
+.spin-result > :not(img, .spin-head) {
+  grid-column: 1 / -1;
+}
+.spin-result img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  padding: 5px;
+  border: 1px solid #e8ebe6;
+  background: #fff;
+}
+.spin-result h4 {
+  margin: 0 0 6px;
+  font-family: Lora, Georgia, serif;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+.spin-result .tea-blend,
+.spin-result .tea-notes {
+  margin: 0 0 2px;
+}
+.spin-result .spin-intro {
+  margin: 20px 0 12px;
+}
+.spin-bag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 6px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--night);
+}
+.spin-undo {
+  padding: 8px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.spin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+.spin-result > .link {
+  justify-self: start;
+}
+/* Beside the wheel there's already a spin button in view. */
+@media (min-width: 900px) {
+  #spin-again {
+    display: none;
+  }
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mood,
+  .wheel-slice {
+    transition: none;
+  }
+}
+@media (max-width: 899px) {
+  .discover-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "moods"
+      "wheel"
+      "result";
+    grid-template-rows: none;
+  }
+  .discover-layout .panel {
+    padding: 22px;
+  }
+  .discover-wheel {
+    position: static;
+    padding: 20px 16px 24px;
+  }
+}
+@media (max-width: 480px) {
+  .moods {
+    gap: 8px;
+  }
+  .mood {
+    padding: 11px 12px;
+  }
+  .mood strong {
+    font-size: 14.5px;
+  }
+  .mood small {
+    font-size: 11.5px;
+  }
+  .spin-result {
+    grid-template-columns: 84px minmax(0, 1fr);
+    column-gap: 16px;
+  }
+  .spin-result h4 {
+    font-size: 25px;
+  }
 }

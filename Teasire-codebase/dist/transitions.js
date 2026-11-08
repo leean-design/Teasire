@@ -19,7 +19,7 @@
     "fruit",
     "builder",
     "about",
-    "aroma",
+    "discover",
     "subscriptions",
     "checkout",
   ];
