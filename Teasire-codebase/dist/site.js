@@ -710,11 +710,13 @@ function wheelDisc(list) {
   const slices = wheelSlices(list),
     n = slices.length,
     a = 360 / n,
-    size = n <= 6 ? 17.5 : n <= 8 ? 16 : 15,
-    outer = 166,
-    inner = outer - size - 2.5,
-    ring = 144, // where the photos end and the ring of names begins
+    size = n <= 6 ? 14.5 : n <= 8 ? 13.5 : 12.5,
+    ring = 150, // where the photos end and the ring of names begins
     rim = 184,
+    edge = 192.5, // the outside of the white rim round the ring
+    // The two lines of each name sit in the middle of the white edge.
+    outer = (ring + edge) / 2 + size * 0.26 + 1.25,
+    inner = outer - size - 2.5,
     // Each photo is wide enough to fill its slice, with the cup near the middle.
     pw = Math.max(150, 3 * ring * Math.sin((a * Math.PI) / 360)),
     at = (deg, r) => {
@@ -727,15 +729,15 @@ function wheelDisc(list) {
   return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-195 -195 390 390" style="font-size:${size}px" aria-hidden="true" focusable="false"><defs><clipPath id="wheel-slice"><path d="M0 0L${at(-a / 2, ring)}A${ring} ${ring} 0 0 1 ${at(a / 2, ring)}Z"/></clipPath></defs>${each(
     (t, i) =>
       `<g transform="${turn(i * a)}" clip-path="url(#wheel-slice)"><image href="assets/clean/${t.image}-480.webp" x="${(-pw / 2).toFixed(1)}" y="${(-98 - pw * 0.72).toFixed(1)}" width="${pw.toFixed(1)}" height="${((pw * 4) / 3).toFixed(1)}" preserveAspectRatio="xMidYMid slice"/></g>`,
-  )}<circle class="wheel-veil" r="${ring}"/><circle class="wheel-ring" r="${(ring + rim) / 2}" stroke-width="${rim - ring}"/><path class="wheel-mark" d="M${at(-a / 2, rim)}A${rim} ${rim} 0 0 1 ${at(a / 2, rim)}L${at(a / 2, ring)}A${ring} ${ring} 0 0 0 ${at(-a / 2, ring)}Z"/>${each(
+  )}<circle class="wheel-veil" r="${ring}"/><circle class="wheel-ring" r="${(ring + rim) / 2}" stroke-width="${rim - ring}"/><circle class="wheel-rim" r="188"/><path class="wheel-mark" d="M${at(-a / 2, edge)}A${edge} ${edge} 0 0 1 ${at(a / 2, edge)}L${at(a / 2, ring)}A${ring} ${ring} 0 0 0 ${at(-a / 2, ring)}Z"/>${each(
     (_, i) =>
-      `<line class="wheel-line" transform="${turn((i + 0.5) * a)}" y1="-40" y2="-${ring}"/><line class="wheel-tick" transform="${turn((i + 0.5) * a)}" y1="-${ring + 7}" y2="-${rim - 7}"/>`,
+      `<line class="wheel-line" transform="${turn((i + 0.5) * a)}" y1="-40" y2="-${ring}"/><line class="wheel-tick" transform="${turn((i + 0.5) * a)}" y1="-${ring + 7}" y2="-${rim - 1}"/>`,
   )}<circle class="wheel-inner" r="${ring}"/>${each((t, i) => {
     const words = t.name.split(" "),
       last = words.pop(),
       lines = words.length ? [words.join(" "), last] : [last];
     return `<g class="wheel-label" data-slice="${i}" transform="${turn(i * a)}">${lines.map((line, l) => `<text class="wheel-name" y="${-(l ? inner : outer)}">${line}</text>`).join("")}</g>`;
-  })}<circle class="wheel-rim" r="188"/></svg></div>`;
+  })}</svg></div>`;
 }
 function discover() {
   const prices = [...new Set(teas.map((t) => t.price))];
