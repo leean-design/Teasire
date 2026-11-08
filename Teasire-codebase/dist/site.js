@@ -16,7 +16,7 @@ const esc = (s) =>
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 // `name` is the tea's own name and `blend` what's in it, shown under the name.
 // `price` is in RM for a pack of 10 individually packed teabags.
-// `color` is the tea's slice on the Discover page's tea wheel.
+// `color` is the tea's colour on the Discover page's tea wheel (the ribbon round its slice).
 const teas = [
   {
     id: "green-tea-jasmine",
@@ -27,7 +27,7 @@ const teas = [
     price: 20,
     image: "01_Green_Tea_Jasmine",
     notes: "Light · Floral · Fresh",
-    color: "#efe6cb",
+    color: "#e2d3a4",
     ingredients: ["Green tea", "Jasmine"],
     description:
       "Fresh green tea meets the soft, unmistakable fragrance of jasmine. A light floral cup for your everyday pause.",
@@ -41,7 +41,7 @@ const teas = [
     price: 20,
     image: "02_Oolong_Osmanthus",
     notes: "Golden · Floral · Mellow",
-    color: "#ecc888",
+    color: "#e3b35c",
     ingredients: ["Oolong tea", "Osmanthus"],
     description:
       "A rounded oolong base with delicate golden osmanthus. Fragrant, mellow and easy to return to.",
@@ -55,7 +55,7 @@ const teas = [
     price: 20,
     image: "03_Oolong_Rose",
     notes: "Rounded · Rosy · Aromatic",
-    color: "#dba8ab",
+    color: "#b9737a",
     ingredients: ["Oolong tea", "Rose"],
     description:
       "The deeper character of oolong, softened by rose. An expressive floral blend for a slower moment.",
@@ -69,7 +69,7 @@ const teas = [
     price: 20,
     image: "04_Green_Tea_Rose",
     notes: "Fresh · Rosy · Delicate",
-    color: "#f4cdd0",
+    color: "#eab3bb",
     ingredients: ["Green tea", "Rose"],
     description:
       "Fresh tea notes and gentle rose fragrance come together in a delicate everyday cup.",
@@ -83,7 +83,7 @@ const teas = [
     price: 20,
     image: "09_Osmanthus_Rose",
     notes: "Rosy · Honeyed · Soft",
-    color: "#f5d3b6",
+    color: "#eec09a",
     ingredients: ["Osmanthus", "Rose"],
     description:
       "Gentle rose with a touch of golden osmanthus. A softly sweet floral cup for letting your thoughts wander.",
@@ -97,7 +97,7 @@ const teas = [
     price: 20,
     image: "10_Rose_Pandan",
     notes: "Rosy · Sweet · Fragrant",
-    color: "#cbd9ab",
+    color: "#a9c08a",
     ingredients: ["Rose", "Pandan"],
     description:
       "Rose meets the warm, sweet fragrance of pandan. A gentle floral cup with a familiar Malaysian twist.",
@@ -111,7 +111,7 @@ const teas = [
     price: 20,
     image: "05_Chrysanthemum_Orange",
     notes: "Bright · Floral · Citrusy",
-    color: "#f4da8a",
+    color: "#f0c95e",
     ingredients: ["Chrysanthemum", "Orange"],
     description:
       "Soft chrysanthemum and bright orange make a sunny, fragrant pairing.",
@@ -125,7 +125,7 @@ const teas = [
     price: 20,
     image: "06_Oolong_Orange",
     notes: "Rounded · Citrus · Smooth",
-    color: "#eab384",
+    color: "#d98c4e",
     ingredients: ["Oolong tea", "Orange"],
     description:
       "Rounded oolong with the lively character of orange. A little brightness for your daily ritual.",
@@ -139,7 +139,7 @@ const teas = [
     price: 20,
     image: "07_Green_Tea_Orange",
     notes: "Crisp · Citrus · Fresh",
-    color: "#dae1a4",
+    color: "#c9d27e",
     ingredients: ["Green tea", "Orange"],
     description:
       "A fresh green tea base with a citrus finish. Bright, simple and full of everyday possibility.",
@@ -153,7 +153,7 @@ const teas = [
     price: 20,
     image: "08_Osmanthus_Black_Tea_Red_Dates",
     notes: "Warm · Floral · Rich",
-    color: "#d9a497",
+    color: "#a85a52",
     ingredients: ["Osmanthus", "Black tea", "Red dates"],
     description:
       "Black tea, golden osmanthus and red dates create a warm, fragrant blend with a richer character.",
@@ -703,36 +703,35 @@ const moodTeas = (mood) =>
 // list still makes a full wheel.
 const wheelSlices = (list) =>
   Array.from({ length: Math.ceil(6 / list.length) }, () => list).flat();
-// The wheel itself, which turns: a slice for each tea with its photo and name,
-// the first slice centred under the pointer. Slices get more room, and bigger
-// names and photos, when there are fewer of them.
+// The wheel itself, which turns: a slice for each tea with its name, the slices
+// in two alternating tones (three when their number is odd) and a ribbon of the
+// tea's colour round the edge. The first slice is centred under the pointer.
+// Names are drawn bigger when there are fewer slices.
 function wheelDisc(list) {
   const slices = wheelSlices(list),
     n = slices.length,
     a = 360 / n,
-    room = n <= 6 ? 2 : n <= 8 ? 1 : 0,
-    size = [15, 17, 19][room],
-    outer = [158, 157, 155][room],
+    tones = n % 2 ? ["#fcfaf5", "#eef1ea", "#f4f1e8"] : ["#fcfaf5", "#eef1ea"],
+    size = n <= 6 ? 18 : n <= 8 ? 16.5 : 14.5,
+    outer = 153,
     inner = outer - size - 3,
-    pr = [22, 26, 29][room],
-    pc = inner - size * 0.3 - 6 - pr,
-    pw = (pr * 2) / 0.7,
     at = (deg, r) => {
       const t = (deg * Math.PI) / 180;
       return (r * Math.sin(t)).toFixed(2) + " " + (-r * Math.cos(t)).toFixed(2);
     },
-    slice = `M0 0L${at(-a / 2, 188)}A188 188 0 0 1 ${at(a / 2, 188)}Z`;
+    wedge = `M0 0L${at(-a / 2, 181)}A181 181 0 0 1 ${at(a / 2, 181)}Z`,
+    ribbon = `M${at(-a / 2, 181)}A181 181 0 0 1 ${at(a / 2, 181)}L${at(a / 2, 168)}A168 168 0 0 0 ${at(-a / 2, 168)}Z`;
   const label = [...new Set(slices.map((t) => t.name))].join(", ");
-  return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-197 -197 394 394" style="font-size:${size}px" aria-hidden="true" focusable="false"><defs><clipPath id="wheel-photo"><circle cy="${-pc}" r="${pr}"/></clipPath></defs>${slices
+  return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-197 -197 394 394" style="font-size:${size}px" aria-hidden="true" focusable="false">${slices
     .map((t, i) => {
       const words = t.name.split(" "),
         last = words.pop(),
         lines = words.length ? [words.join(" "), last] : [last];
-      return `<g class="wheel-slice" data-slice="${i}" transform="rotate(${(i * a).toFixed(2)})"><path d="${slice}" fill="${t.color}"/><image href="assets/clean/${t.image}-480.webp" x="${(-pw / 2).toFixed(2)}" y="${(-pc - (pw * 2) / 3).toFixed(2)}" width="${pw.toFixed(2)}" height="${((pw * 4) / 3).toFixed(2)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#wheel-photo)"/><circle class="wheel-photo-ring" cy="${-pc}" r="${pr}"/>${lines.map((line, l) => `<text class="wheel-name" y="${-(l ? inner : outer)}">${line}</text>`).join("")}</g>`;
+      return `<g class="wheel-slice" data-slice="${i}" transform="rotate(${(i * a).toFixed(2)})"><path class="wheel-wedge" d="${wedge}" fill="${tones[i % tones.length]}"/><path d="${ribbon}" fill="${t.color}"/>${lines.map((line, l) => `<text class="wheel-name" y="${-(l ? inner : outer)}">${line}</text>`).join("")}</g>`;
     })
     .join(
       "",
-    )}<circle class="wheel-rim" r="192"/><circle class="wheel-edge" r="196.5"/>${slices.map((_, i) => `<circle class="wheel-peg" transform="rotate(${((i + 0.5) * a).toFixed(2)})" cy="-192" r="2.6"/>`).join("")}</svg></div>`;
+    )}<circle class="wheel-rim" r="184.5"/><circle class="wheel-edge" r="189.5"/></svg></div>`;
 }
 function discover() {
   const prices = [...new Set(teas.map((t) => t.price))];
@@ -743,7 +742,7 @@ function discover() {
     )
     .join(
       "",
-    )}</div></section><section class="discover-wheel" aria-label="The tea wheel"><span class="eyebrow">THE TEA WHEEL</span><div class="wheel">${wheelDisc(moodTeas(moods[0]))}<svg class="wheel-pointer" viewBox="0 0 34 44" aria-hidden="true" focusable="false"><path d="M17 42C12 34 3 25 3 16a14 14 0 0 1 28 0c0 9-9 18-14 26Z"/><circle cx="17" cy="16" r="5"/></svg><span class="wheel-hub" aria-hidden="true"><img src="assets/teasire-magpie-264.png" alt="" width="264" height="161"><span>SPIN</span></span></div><button class="button wheel-spin" id="wheel-spin" type="button">Spin the wheel <span aria-hidden="true">↻</span></button></section><section class="panel glass discover-result" aria-labelledby="result-title"><h3 id="result-title">02 / Your cup</h3><div id="spin-result"><p class="fine">Spin the wheel to meet your tea. Wherever it lands goes straight into your bag: 10 teabags${prices.length === 1 ? " for " + rm(prices[0]) : ""}. You can change or remove it in your bag before you order.</p></div><p class="visually-hidden" id="wheel-status" role="status"></p></section></div></div>`;
+    )}</div></section><section class="discover-wheel" aria-label="The tea wheel"><span class="eyebrow">THE TEA WHEEL</span><div class="wheel">${wheelDisc(moodTeas(moods[0]))}<svg class="wheel-pointer" viewBox="0 0 30 40" aria-hidden="true" focusable="false"><path d="M15 38 4 7.5Q3 3 7.5 3h15Q27 3 26 7.5Z"/></svg><span class="wheel-hub" aria-hidden="true"><img src="assets/teasire-magpie-264.png" alt="" width="264" height="161"><span>SPIN</span></span></div><button class="button wheel-spin" id="wheel-spin" type="button">Spin the wheel <span aria-hidden="true">↻</span></button></section><section class="panel glass discover-result" aria-labelledby="result-title"><h3 id="result-title">02 / Your cup</h3><div id="spin-result"><p class="fine">Spin the wheel to meet your tea. Wherever it lands goes straight into your bag: 10 teabags${prices.length === 1 ? " for " + rm(prices[0]) : ""}. You can change or remove it in your bag before you order.</p></div><p class="visually-hidden" id="wheel-status" role="status"></p></section></div></div>`;
 }
 function upcoming(kind) {
   const content = {
@@ -1132,7 +1131,6 @@ if (page === "discover") {
     setSpinning(true);
     spinButton.textContent = "Spinning…";
     $("#wheel-status").textContent = "Spinning…";
-    svg.classList.remove("has-winner");
     svg.querySelector(".won")?.classList.remove("won");
     disc.style.willChange = "transform";
     requestAnimationFrame(function turn(now) {
@@ -1157,7 +1155,6 @@ if (page === "discover") {
     disc.style.transform = `rotate(${angle}deg)`;
     disc.style.willChange = "";
     slice.classList.add("won");
-    slice.ownerSVGElement.classList.add("has-winner");
     addItem(t.name, 10, {}, "");
     chosen = { t, inBag: true };
     showChosen();

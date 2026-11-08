@@ -1830,59 +1830,51 @@ details > summary {
   width: 100%;
   height: 100%;
 }
-.wheel-slice path {
-  stroke: #fff;
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-}
-.wheel-slice {
-  transition: opacity 0.4s;
-}
-.has-winner .wheel-slice:not(.won) {
-  opacity: 0.42;
-}
-.wheel-photo-ring {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 2;
+.wheel-wedge {
+  stroke: #3e595426;
+  stroke-width: 1;
+  transition: fill 0.4s;
 }
 .wheel-name {
   font-family: Lora, Georgia, serif;
   font-weight: 500;
   text-anchor: middle;
-  fill: #1f2b28;
+  fill: #24332f;
+  transition: fill 0.4s;
+}
+/* Where the wheel stopped: that slice turns deep green. */
+.won .wheel-wedge {
+  fill: var(--green);
+}
+.won .wheel-name {
+  fill: #fff;
 }
 .wheel-rim {
   fill: none;
   stroke: #fff;
-  stroke-width: 8;
+  stroke-width: 9;
 }
 .wheel-edge {
   fill: none;
-  stroke: #dfe5dd;
-}
-.wheel-peg {
-  fill: #c3cbc4;
+  stroke: #3e595433;
 }
 /* The pointer grows with the wheel; its tip just reaches past the rim. */
 .wheel-pointer {
   position: absolute;
-  top: -6.3%;
+  top: -5.5%;
   left: 46.25%;
   z-index: 2;
   width: 7.5%;
   height: auto;
-  aspect-ratio: 34 / 44;
-  transform-origin: 50% 36%;
+  aspect-ratio: 30 / 40;
+  transform-origin: 50% 8%;
   filter: drop-shadow(0 3px 4px #17201d38);
 }
 .wheel-pointer path {
   fill: var(--green);
   stroke: #fff;
   stroke-width: 2.5;
-}
-.wheel-pointer circle {
-  fill: #f0ede5;
+  stroke-linejoin: round;
 }
 .wheel-hub {
   position: absolute;
@@ -1895,10 +1887,11 @@ details > summary {
   gap: 2px;
   width: 23%;
   aspect-ratio: 1;
-  border: 1px solid #dfe5dd;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 4px 14px #17201d24;
+  box-shadow:
+    0 0 0 2px var(--green),
+    0 4px 14px #17201d24;
   transform: translate(-50%, -50%);
 }
 .wheel-hub img {
@@ -1994,7 +1987,8 @@ details > summary {
 }
 @media (prefers-reduced-motion: reduce) {
   .mood,
-  .wheel-slice {
+  .wheel-wedge,
+  .wheel-name {
     transition: none;
   }
 }
