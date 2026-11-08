@@ -16,7 +16,7 @@ const esc = (s) =>
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 // `name` is the tea's own name and `blend` what's in it, shown under the name.
 // `price` is in RM for a pack of 10 individually packed teabags.
-// `color` is the tea's slice on the Discover page's tea wheel.
+// `color` is the colour of the tea's slice on the Discover page's tea wheel.
 const teas = [
   {
     id: "green-tea-jasmine",
@@ -27,7 +27,7 @@ const teas = [
     price: 20,
     image: "01_Green_Tea_Jasmine",
     notes: "Light · Floral · Fresh",
-    color: "#efe6cb",
+    color: "#f3e6b5",
     ingredients: ["Green tea", "Jasmine"],
     description:
       "Fresh green tea meets the soft, unmistakable fragrance of jasmine. A light floral cup for your everyday pause.",
@@ -41,7 +41,7 @@ const teas = [
     price: 20,
     image: "02_Oolong_Osmanthus",
     notes: "Golden · Floral · Mellow",
-    color: "#ecc888",
+    color: "#f7c870",
     ingredients: ["Oolong tea", "Osmanthus"],
     description:
       "A rounded oolong base with delicate golden osmanthus. Fragrant, mellow and easy to return to.",
@@ -55,7 +55,7 @@ const teas = [
     price: 20,
     image: "03_Oolong_Rose",
     notes: "Rounded · Rosy · Aromatic",
-    color: "#dba8ab",
+    color: "#e8a0ab",
     ingredients: ["Oolong tea", "Rose"],
     description:
       "The deeper character of oolong, softened by rose. An expressive floral blend for a slower moment.",
@@ -69,7 +69,7 @@ const teas = [
     price: 20,
     image: "04_Green_Tea_Rose",
     notes: "Fresh · Rosy · Delicate",
-    color: "#f4cdd0",
+    color: "#f9cad3",
     ingredients: ["Green tea", "Rose"],
     description:
       "Fresh tea notes and gentle rose fragrance come together in a delicate everyday cup.",
@@ -83,7 +83,7 @@ const teas = [
     price: 20,
     image: "09_Osmanthus_Rose",
     notes: "Rosy · Honeyed · Soft",
-    color: "#f5d3b6",
+    color: "#f9c39c",
     ingredients: ["Osmanthus", "Rose"],
     description:
       "Gentle rose with a touch of golden osmanthus. A softly sweet floral cup for letting your thoughts wander.",
@@ -97,7 +97,7 @@ const teas = [
     price: 20,
     image: "10_Rose_Pandan",
     notes: "Rosy · Sweet · Fragrant",
-    color: "#cbd9ab",
+    color: "#bfe0a9",
     ingredients: ["Rose", "Pandan"],
     description:
       "Rose meets the warm, sweet fragrance of pandan. A gentle floral cup with a familiar Malaysian twist.",
@@ -111,7 +111,7 @@ const teas = [
     price: 20,
     image: "05_Chrysanthemum_Orange",
     notes: "Bright · Floral · Citrusy",
-    color: "#f4da8a",
+    color: "#fbdc72",
     ingredients: ["Chrysanthemum", "Orange"],
     description:
       "Soft chrysanthemum and bright orange make a sunny, fragrant pairing.",
@@ -125,7 +125,7 @@ const teas = [
     price: 20,
     image: "06_Oolong_Orange",
     notes: "Rounded · Citrus · Smooth",
-    color: "#eab384",
+    color: "#f6aa72",
     ingredients: ["Oolong tea", "Orange"],
     description:
       "Rounded oolong with the lively character of orange. A little brightness for your daily ritual.",
@@ -139,7 +139,7 @@ const teas = [
     price: 20,
     image: "07_Green_Tea_Orange",
     notes: "Crisp · Citrus · Fresh",
-    color: "#dae1a4",
+    color: "#dbe896",
     ingredients: ["Green tea", "Orange"],
     description:
       "A fresh green tea base with a citrus finish. Bright, simple and full of everyday possibility.",
@@ -153,7 +153,7 @@ const teas = [
     price: 20,
     image: "08_Osmanthus_Black_Tea_Red_Dates",
     notes: "Warm · Floral · Rich",
-    color: "#d9a497",
+    color: "#eaa098",
     ingredients: ["Osmanthus", "Black tea", "Red dates"],
     description:
       "Black tea, golden osmanthus and red dates create a warm, fragrant blend with a richer character.",
@@ -654,17 +654,20 @@ function pricing() {
 }
 // Discover: the tea wheel. Each mood's wheel holds the teas listed for it, by
 // id (a tea can be in more than one mood); a mood without a list holds every tea.
-// `line` follows the number of teas under the mood's name: "4 blends with rose".
+// `chip` is the mood's button; `name` and `line` make the line under the
+// buttons once it's chosen: "Rosy & expressive · 4 blends with rose".
 const moods = [
-  { id: "all", name: "Surprise me" },
+  { id: "all", chip: "Surprise me" },
   {
     id: "rosy",
+    chip: "Rosy",
     name: "Rosy & expressive",
     line: "blends with rose",
     teas: ["oolong-rose", "green-tea-rose", "osmanthus-rose", "rose-pandan"],
   },
   {
     id: "golden",
+    chip: "Golden",
     name: "Golden & honeyed",
     line: "blends with osmanthus",
     teas: [
@@ -675,18 +678,21 @@ const moods = [
   },
   {
     id: "fresh",
+    chip: "Fresh",
     name: "Fresh & green",
     line: "green tea blends",
     teas: ["green-tea-jasmine", "green-tea-rose", "green-tea-orange"],
   },
   {
     id: "fruity",
+    chip: "Fruity",
     name: "Fruity & bright",
     line: "blends with orange",
     teas: ["chrysanthemum-orange", "oolong-orange", "green-tea-orange"],
   },
   {
     id: "warm",
+    chip: "Warm",
     name: "Warm & comforting",
     line: "oolong & black teas",
     teas: [
@@ -699,51 +705,63 @@ const moods = [
 ];
 const moodTeas = (mood) =>
   mood.teas ? teas.filter((t) => mood.teas.includes(t.id)) : teas;
+const moodLine = (mood) =>
+  mood.teas
+    ? `${mood.name} · ${moodTeas(mood).length} ${mood.line}`
+    : `All ${teas.length} blends on the wheel`;
 // A mood's teas, repeated until there are at least six slices, so a short
 // list still makes a full wheel.
 const wheelSlices = (list) =>
   Array.from({ length: Math.ceil(6 / list.length) }, () => list).flat();
-// The wheel itself, which turns: a slice for each tea with its photo and name,
-// the first slice centred under the pointer. Slices get more room, and bigger
-// names and photos, when there are fewer of them.
+// The wheel itself, which turns: a slice in each tea's colour, softly lit from
+// within, with its name near the rim. White lines part the slices, and a ring
+// marks the slice where the wheel stops. The first slice is centred under the
+// pointer. Names are drawn bigger when there are fewer slices.
 function wheelDisc(list) {
   const slices = wheelSlices(list),
     n = slices.length,
     a = 360 / n,
-    room = n <= 6 ? 2 : n <= 8 ? 1 : 0,
-    size = [15, 17, 19][room],
-    outer = [158, 157, 155][room],
-    inner = outer - size - 3,
-    pr = [22, 26, 29][room],
-    pc = inner - size * 0.3 - 6 - pr,
-    pw = (pr * 2) / 0.7,
+    size = n <= 6 ? 16.5 : n <= 8 ? 15 : 13,
+    outer = 154,
+    inner = outer - size - 4.5,
     at = (deg, r) => {
       const t = (deg * Math.PI) / 180;
       return (r * Math.sin(t)).toFixed(2) + " " + (-r * Math.cos(t)).toFixed(2);
     },
-    slice = `M0 0L${at(-a / 2, 188)}A188 188 0 0 1 ${at(a / 2, 188)}Z`;
+    wedge = (r) => `M0 0L${at(-a / 2, r)}A${r} ${r} 0 0 1 ${at(a / 2, r)}Z`,
+    turn = (deg) => `rotate(${deg.toFixed(2)})`;
   const label = [...new Set(slices.map((t) => t.name))].join(", ");
-  return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-197 -197 394 394" style="font-size:${size}px" aria-hidden="true" focusable="false"><defs><clipPath id="wheel-photo"><circle cy="${-pc}" r="${pr}"/></clipPath></defs>${slices
+  return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-195 -195 390 390" style="font-size:${size}px" aria-hidden="true" focusable="false"><defs><radialGradient id="wheel-glow"><stop offset="0.25" stop-color="#fff" stop-opacity="0.55"/><stop offset="0.95" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>${slices
     .map((t, i) => {
       const words = t.name.split(" "),
         last = words.pop(),
         lines = words.length ? [words.join(" "), last] : [last];
-      return `<g class="wheel-slice" data-slice="${i}" transform="rotate(${(i * a).toFixed(2)})"><path d="${slice}" fill="${t.color}"/><image href="assets/clean/${t.image}-480.webp" x="${(-pw / 2).toFixed(2)}" y="${(-pc - (pw * 2) / 3).toFixed(2)}" width="${pw.toFixed(2)}" height="${((pw * 4) / 3).toFixed(2)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#wheel-photo)"/><circle class="wheel-photo-ring" cy="${-pc}" r="${pr}"/>${lines.map((line, l) => `<text class="wheel-name" y="${-(l ? inner : outer)}">${line}</text>`).join("")}</g>`;
+      return `<g class="wheel-slice" data-slice="${i}" transform="${turn(i * a)}"><path d="${wedge(182)}" fill="${t.color}"/><path d="${wedge(182)}" fill="url(#wheel-glow)"/>${lines.map((line, l) => `<text class="wheel-name" y="${-(l ? inner : outer)}">${line}</text>`).join("")}</g>`;
     })
-    .join(
-      "",
-    )}<circle class="wheel-rim" r="192"/><circle class="wheel-edge" r="196.5"/>${slices.map((_, i) => `<circle class="wheel-peg" transform="rotate(${((i + 0.5) * a).toFixed(2)})" cy="-192" r="2.6"/>`).join("")}</svg></div>`;
-}
-function discover() {
-  const prices = [...new Set(teas.map((t) => t.price))];
-  return `<div class="page">${intro("A LITTLE TEA DISCOVERY", "Spin for your<br>next cup.", "Choose a mood, spin the wheel and let it pick your tea. Wherever it lands goes straight into your bag.")}<div class="discover-layout"><section class="panel glass discover-moods" aria-labelledby="moods-title"><h3 id="moods-title">01 / Choose your mood</h3><div class="moods">${moods
+    .join("")}${slices
     .map(
-      (m, i) =>
-        `<button class="mood" type="button" data-mood="${m.id}" aria-pressed="${i === 0}"><strong>${m.name}</strong><small>${m.teas ? moodTeas(m).length + " " + m.line : "All " + teas.length + " blends"}</small></button>`,
+      (_, i) =>
+        `<line class="wheel-line" transform="${turn((i + 0.5) * a)}" y1="-46" y2="-182"/>`,
     )
     .join(
       "",
-    )}</div></section><section class="discover-wheel" aria-label="The tea wheel"><span class="eyebrow">THE TEA WHEEL</span><div class="wheel">${wheelDisc(moodTeas(moods[0]))}<svg class="wheel-pointer" viewBox="0 0 34 44" aria-hidden="true" focusable="false"><path d="M17 42C12 34 3 25 3 16a14 14 0 0 1 28 0c0 9-9 18-14 26Z"/><circle cx="17" cy="16" r="5"/></svg><span class="wheel-hub" aria-hidden="true"><img src="assets/teasire-magpie-264.png" alt="" width="264" height="161"><span>SPIN</span></span></div><button class="button wheel-spin" id="wheel-spin" type="button">Spin the wheel <span aria-hidden="true">↻</span></button></section><section class="panel glass discover-result" aria-labelledby="result-title"><h3 id="result-title">02 / Your cup</h3><div id="spin-result"><p class="fine">Spin the wheel to meet your tea. Wherever it lands goes straight into your bag: 10 teabags${prices.length === 1 ? " for " + rm(prices[0]) : ""}. You can change or remove it in your bag before you order.</p></div><p class="visually-hidden" id="wheel-status" role="status"></p></section></div></div>`;
+    )}<path class="wheel-mark" d="${wedge(180)}"/><circle class="wheel-rim" r="188"/>${slices
+    .map(
+      (_, i) =>
+        `<circle class="wheel-dot" transform="${turn((i + 0.5) * a)}" cy="-188" r="3.2"/>`,
+    )
+    .join("")}</svg></div>`;
+}
+function discover() {
+  const prices = [...new Set(teas.map((t) => t.price))];
+  return `<div class="page">${intro("A LITTLE TEA DISCOVERY", "Spin for your<br>next cup.", "Choose a mood and spin. Wherever it lands goes straight into your bag.")}<div class="discover"><div class="moods" role="group" aria-label="Choose your mood">${moods
+    .map(
+      (m, i) =>
+        `<button class="mood" type="button" data-mood="${m.id}" aria-pressed="${i === 0}">${m.chip}</button>`,
+    )
+    .join(
+      "",
+    )}</div><p class="mood-line" id="mood-line">${moodLine(moods[0])}</p><div class="wheel">${wheelDisc(moodTeas(moods[0]))}<svg class="wheel-pointer" viewBox="0 0 40 50" aria-hidden="true" focusable="false"><path d="M20 48 7.5 17a13.5 13.5 0 1 1 25 0Z"/><circle cx="20" cy="13.5" r="4.5"/></svg><span class="wheel-hub" aria-hidden="true">SPIN</span></div><button class="button wheel-spin" id="wheel-spin" type="button">Spin the wheel <span aria-hidden="true">↻</span></button><p class="fine">Each spin adds 10 teabags${prices.length === 1 ? " (" + rm(prices[0]) + ")" : ""} of the tea it lands on to your bag. You can change or remove it in your bag.</p><p class="visually-hidden" id="wheel-status" role="status"></p></div><dialog class="spin-dialog" id="spin-dialog" aria-labelledby="spin-name"></dialog></div>`;
 }
 function upcoming(kind) {
   const content = {
@@ -1086,9 +1104,10 @@ if (page === "builder") {
   };
 }
 // Discover: choose a mood, then spin its wheel (the button, or the wheel itself).
-// The wheel slows to a stop on a tea, which goes straight into the bag; Undo
-// takes it out again. The pointer flicks as each slice passes it. Visitors who
-// prefer less motion see where it stops straight away.
+// The wheel slows to a stop on a tea, which goes straight into the bag, and a
+// card pops up to introduce it, with Undo to take it out again. The pointer
+// flicks as each slice passes it. Visitors who prefer less motion see where it
+// stops straight away.
 if (page === "discover") {
   let disc = $(".wheel-disc"),
     mood = moods[0],
@@ -1098,19 +1117,18 @@ if (page === "discover") {
   const wheel = $(".wheel"),
     pointer = $(".wheel-pointer"),
     spinButton = $("#wheel-spin"),
+    dialog = $("#spin-dialog"),
     spinLabel = (text) => `${text} <span aria-hidden="true">↻</span>`,
-    motion = () => (reduced.matches ? "instant" : "smooth");
+    ease = "cubic-bezier(0.2, 0.7, 0.2, 1)";
   // The slice under the pointer once the wheel has turned `deg`.
   const sliceAt = (deg, n) =>
     Math.floor((((-deg % 360) + 360) % 360) / (360 / n) + 0.5) % n;
-  // While the wheel turns, the moods and spin buttons wait (they stay
+  // While the wheel turns, the moods and the spin button wait (they stay
   // focusable, so keyboard users keep their place).
   function setSpinning(on) {
     spinning = on;
-    $(".discover-layout").classList.toggle("is-spinning", on);
-    for (const b of document.querySelectorAll(
-      "#wheel-spin, #spin-again, [data-mood]",
-    ))
+    $(".discover").classList.toggle("is-spinning", on);
+    for (const b of document.querySelectorAll("#wheel-spin, [data-mood]"))
       if (on) b.setAttribute("aria-disabled", "true");
       else b.removeAttribute("aria-disabled");
   }
@@ -1126,14 +1144,13 @@ if (page === "discover") {
       least = from + (reduced.matches ? 0 : 5 * 360),
       to = least + ((((-spot - least) % 360) + 360) % 360),
       duration = reduced.matches ? 0 : 5200 + Math.random() * 800,
-      svg = disc.querySelector("svg"),
+      mark = disc.querySelector(".wheel-mark"),
       start = performance.now();
     let under = sliceAt(from, n);
     setSpinning(true);
     spinButton.textContent = "Spinning…";
     $("#wheel-status").textContent = "Spinning…";
-    svg.classList.remove("has-winner");
-    svg.querySelector(".won")?.classList.remove("won");
+    mark.classList.remove("on");
     disc.style.willChange = "transform";
     requestAnimationFrame(function turn(now) {
       const t = duration ? Math.min(1, (now - start) / duration) : 1;
@@ -1149,28 +1166,29 @@ if (page === "discover") {
           );
       }
       if (t < 1) requestAnimationFrame(turn);
-      else land(slices[pick], svg.querySelector(`[data-slice="${pick}"]`));
+      else land(slices[pick], pick * a, mark);
     });
   }
-  function land(t, slice) {
+  function land(t, at, mark) {
     angle %= 360;
     disc.style.transform = `rotate(${angle}deg)`;
     disc.style.willChange = "";
-    slice.classList.add("won");
-    slice.ownerSVGElement.classList.add("has-winner");
+    mark.setAttribute("transform", `rotate(${at})`);
+    mark.classList.add("on");
     addItem(t.name, 10, {}, "");
     chosen = { t, inBag: true };
-    showChosen();
     spinButton.innerHTML = spinLabel("Spin again");
     $("#wheel-status").textContent =
       `The wheel chose ${teaAlt(t)}. 10 teabags are in your bag.`;
     setSpinning(false);
+    // Let the stop be seen, then introduce the tea.
+    setTimeout(showChosen, reduced.matches ? 0 : 650);
   }
   function showChosen() {
     const { t } = chosen;
-    $("#spin-result").innerHTML =
-      `<article class="spin-result"><img ${photoAttrs(t, "thumb")} alt="${teaAlt(t)}" width="1086" height="1448"><div class="spin-head"><h4>${t.name}</h4><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p></div><p class="spin-intro">${t.description}</p><p class="spin-bag"><span id="spin-bag-text" role="status"></span><button class="plain spin-undo" type="button" id="spin-undo"></button></p><div class="spin-actions"><a class="button" href="checkout.html">Go to your bag <span>↗</span></a><button class="button secondary" type="button" id="spin-again">${spinLabel("Spin again")}</button></div><a class="link" href="${productUrl(t.id)}">More about ${t.name} ↗</a></article>`;
+    dialog.innerHTML = `<button class="plain spin-close" type="button" id="spin-close" aria-label="Close">✕</button><img ${photoAttrs(t, "large")} alt="${teaAlt(t)}" width="1086" height="1448"><div class="spin-body"><span class="eyebrow">THE WHEEL CHOSE</span><h2 id="spin-name">${t.name}</h2><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p><p class="spin-intro">${t.description}</p><p class="spin-bag"><span id="spin-bag-text" role="status"></span><button class="plain spin-undo" type="button" id="spin-undo"></button></p><div class="spin-actions"><a class="button" href="checkout.html" autofocus>Go to your bag <span>↗</span></a><button class="button secondary" type="button" id="spin-again">${spinLabel("Spin again")}</button></div><a class="link" href="${productUrl(t.id)}">More about ${t.name} ↗</a></div>`;
     showInBag();
+    $("#spin-close").onclick = () => dialog.close();
     $("#spin-undo").onclick = () => {
       if (chosen.inBag) takeOut(chosen.t.name);
       else addItem(chosen.t.name, 10, {}, "");
@@ -1178,33 +1196,33 @@ if (page === "discover") {
       showInBag();
     };
     $("#spin-again").onclick = () => {
-      const r = wheel.getBoundingClientRect();
-      if (r.top < 0 || r.bottom > innerHeight)
-        wheel.scrollIntoView({ behavior: motion(), block: "center" });
+      dialog.close();
       spin();
     };
-    if (!reduced.matches)
-      $(".spin-result").animate(
-        [{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1 }],
-        { duration: 450, easing: "cubic-bezier(0.2, 0.7, 0.2, 1)" },
+    if (!dialog.open) dialog.showModal();
+    if (!reduced.matches) {
+      dialog.animate(
+        [{ opacity: 0, transform: "translateY(18px) scale(0.97)" }, {}],
+        { duration: 420, easing: ease },
       );
-    // On phones the result sits under the wheel: once the stop has been seen,
-    // bring the result into view.
-    setTimeout(
-      () =>
-        $("#spin-result").scrollIntoView({
-          behavior: motion(),
-          block: "nearest",
-        }),
-      reduced.matches ? 0 : 700,
-    );
+      try {
+        dialog.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 420,
+          pseudoElement: "::backdrop",
+        });
+      } catch {}
+    }
   }
   function showInBag() {
     $("#spin-bag-text").textContent = chosen.inBag
-      ? `✓ Added to your bag: 10 teabags, ${rm(chosen.t.price)}`
+      ? `✓ Added to your bag · 10 teabags · ${rm(chosen.t.price)}`
       : "Taken out of your bag.";
     $("#spin-undo").textContent = chosen.inBag ? "Undo" : "Add it back";
   }
+  // A tap on the dimmed page around the card closes it.
+  dialog.addEventListener("click", (e) => {
+    if (e.target === dialog) dialog.close();
+  });
   document.querySelectorAll("[data-mood]").forEach(
     (b) =>
       (b.onclick = () => {
@@ -1214,6 +1232,7 @@ if (page === "discover") {
         document
           .querySelectorAll("[data-mood]")
           .forEach((m) => m.setAttribute("aria-pressed", String(m === b)));
+        $("#mood-line").textContent = moodLine(mood);
         const holder = document.createElement("div");
         holder.innerHTML = wheelDisc(moodTeas(mood));
         const fresh = holder.firstElementChild;
@@ -1226,7 +1245,7 @@ if (page === "discover") {
               { opacity: 0, transform: "rotate(-40deg) scale(0.9)" },
               { opacity: 1, transform: "none" },
             ],
-            { duration: 500, easing: "cubic-bezier(0.2, 0.7, 0.2, 1)" },
+            { duration: 500, easing: ease },
           );
       }),
   );

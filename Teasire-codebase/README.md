@@ -112,9 +112,9 @@ The preparation script stops with an error if a photo's smaller copies are missi
 
 ### The tea wheel (Discovery page)
 
-On the Discovery page (`discover.html`), visitors choose a mood and spin a wheel of the teas that suit it. Wherever the wheel stops, 10 teabags of that tea go straight into the bag. The result shows the tea's photo and description, with Undo to take it out again. "Surprise me" spins all the teas.
+On the Discovery page (`discover.html`), visitors choose a mood and spin a wheel of the teas that suit it. Wherever the wheel stops, 10 teabags of that tea go straight into the bag, and a card pops up with the tea's photo and description, Undo, and a link to the bag. "Surprise me" spins all the teas.
 
-The moods are the `moods` list in `dist/site.js`: each has a `name`, the `teas` on its wheel (by `id`) and the `line` under its name ("4 blends with rose"). A mood without `teas` holds every tea. Each tea's slice colour is its `color` in the `teas` list. A wheel with fewer than six teas shows each tea more than once, so it still looks full.
+The moods are the `moods` list in `dist/site.js`: each has a `chip` (its button), a `name`, the `teas` on its wheel (by `id`) and the `line` shown under the buttons ("Rosy & expressive · 4 blends with rose"). A mood without `teas` holds every tea. Each slice's colour is the tea's `color` in the `teas` list. A wheel with fewer than six teas shows each tea more than once, so it still looks full.
 
 ### Hidden pages
 
