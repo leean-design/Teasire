@@ -120,7 +120,12 @@ for (const file of fs
     "/assets/clean/" +
     (tea?.image || "01_Green_Tea_Jasmine") +
     ".webp";
-  const noindex = ["checkout.html", "product.html"].includes(file);
+  // Left out of search results and the sitemap: the bag, the template for each
+  // tea's page, and pages hidden for now (Aroma Bags, until the collection is
+  // confirmed; it is also left out of the menus in site.js).
+  const noindex = ["checkout.html", "product.html", "aroma.html"].includes(
+    file,
+  );
   let body = markup.replace(
     '<main id="main-content" tabindex="-1">',
     '<noscript><div class="no-script">Explore our <a href="flower-tea.html">flower teas</a> and <a href="fruit-tea.html">fruit teas</a>. Enable JavaScript for blending and your bag, or <a href="https://wa.me/60126769675">contact Teasire on WhatsApp</a>.</div></noscript><main id="main-content" tabindex="-1">',

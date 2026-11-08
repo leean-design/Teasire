@@ -16,6 +16,7 @@ const esc = (s) =>
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 // `name` is the tea's own name and `blend` what's in it, shown under the name.
 // `price` is in RM for a pack of 10 individually packed teabags.
+// `color` is the tea's slice on the Discover page's tea wheel.
 const teas = [
   {
     id: "green-tea-jasmine",
@@ -26,6 +27,7 @@ const teas = [
     price: 20,
     image: "01_Green_Tea_Jasmine",
     notes: "Light · Floral · Fresh",
+    color: "#efe6cb",
     ingredients: ["Green tea", "Jasmine"],
     description:
       "Fresh green tea meets the soft, unmistakable fragrance of jasmine. A light floral cup for your everyday pause.",
@@ -39,6 +41,7 @@ const teas = [
     price: 20,
     image: "02_Oolong_Osmanthus",
     notes: "Golden · Floral · Mellow",
+    color: "#ecc888",
     ingredients: ["Oolong tea", "Osmanthus"],
     description:
       "A rounded oolong base with delicate golden osmanthus. Fragrant, mellow and easy to return to.",
@@ -52,6 +55,7 @@ const teas = [
     price: 20,
     image: "03_Oolong_Rose",
     notes: "Rounded · Rosy · Aromatic",
+    color: "#dba8ab",
     ingredients: ["Oolong tea", "Rose"],
     description:
       "The deeper character of oolong, softened by rose. An expressive floral blend for a slower moment.",
@@ -65,6 +69,7 @@ const teas = [
     price: 20,
     image: "04_Green_Tea_Rose",
     notes: "Fresh · Rosy · Delicate",
+    color: "#f4cdd0",
     ingredients: ["Green tea", "Rose"],
     description:
       "Fresh tea notes and gentle rose fragrance come together in a delicate everyday cup.",
@@ -78,6 +83,7 @@ const teas = [
     price: 20,
     image: "09_Osmanthus_Rose",
     notes: "Rosy · Honeyed · Soft",
+    color: "#f5d3b6",
     ingredients: ["Osmanthus", "Rose"],
     description:
       "Gentle rose with a touch of golden osmanthus. A softly sweet floral cup for letting your thoughts wander.",
@@ -91,6 +97,7 @@ const teas = [
     price: 20,
     image: "10_Rose_Pandan",
     notes: "Rosy · Sweet · Fragrant",
+    color: "#cbd9ab",
     ingredients: ["Rose", "Pandan"],
     description:
       "Rose meets the warm, sweet fragrance of pandan. A gentle floral cup with a familiar Malaysian twist.",
@@ -104,6 +111,7 @@ const teas = [
     price: 20,
     image: "05_Chrysanthemum_Orange",
     notes: "Bright · Floral · Citrusy",
+    color: "#f4da8a",
     ingredients: ["Chrysanthemum", "Orange"],
     description:
       "Soft chrysanthemum and bright orange make a sunny, fragrant pairing.",
@@ -117,6 +125,7 @@ const teas = [
     price: 20,
     image: "06_Oolong_Orange",
     notes: "Rounded · Citrus · Smooth",
+    color: "#eab384",
     ingredients: ["Oolong tea", "Orange"],
     description:
       "Rounded oolong with the lively character of orange. A little brightness for your daily ritual.",
@@ -130,6 +139,7 @@ const teas = [
     price: 20,
     image: "07_Green_Tea_Orange",
     notes: "Crisp · Citrus · Fresh",
+    color: "#dae1a4",
     ingredients: ["Green tea", "Orange"],
     description:
       "A fresh green tea base with a citrus finish. Bright, simple and full of everyday possibility.",
@@ -143,6 +153,7 @@ const teas = [
     price: 20,
     image: "08_Osmanthus_Black_Tea_Red_Dates",
     notes: "Warm · Floral · Rich",
+    color: "#d9a497",
     ingredients: ["Osmanthus", "Black tea", "Red dates"],
     description:
       "Black tea, golden osmanthus and red dates create a warm, fragrant blend with a richer character.",
@@ -231,18 +242,32 @@ function toast(message) {
   $("#toast").classList.add("show");
   setTimeout(() => $("#toast").classList.remove("show"), 2500);
 }
-function addItem(name, qty = 10, extra = {}) {
+// `note` is the message shown once it's in the bag; none when the page says so itself.
+function addItem(name, qty = 10, extra = {}, note = "Added to your tea bag") {
   refreshBag();
   const item = bag.find((i) => i.name === name);
   if (item) item.qty += qty;
   else bag.push({ name, qty, ...extra });
   saveBag();
-  toast("Added to your tea bag");
+  if (note) toast(note);
 }
+// Take a pack back out of the bag (Undo on the Discover wheel).
+function takeOut(name, qty = 10) {
+  refreshBag();
+  const item = bag.find((i) => i.name === name);
+  if (!item) return;
+  item.qty -= qty;
+  if (item.qty < 10) bag.splice(bag.indexOf(item), 1);
+  saveBag();
+}
+// The Aroma Bags page (aroma.html) is left out of the menus, the sitemap and
+// search results until the collection is confirmed. To bring it back, add
+// ["aroma.html", "Aroma Bags"] here and take it off the list in
+// scripts/prepare-site.mjs.
 const navItems = [
   ["blend-studio.html", "Blend Studio"],
   ["about.html", "Our Story"],
-  ["aroma.html", "Aroma Bags"],
+  ["discover.html", "Discovery"],
   ["subscriptions.html", "Subscription"],
 ];
 function brand() {
@@ -298,7 +323,7 @@ function home() {
       "Eleven",
       "Twelve",
     ][teas.length - 1] ?? teas.length;
-  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" tabindex="0" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light. Select to play or pause."><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video></figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `${count} blends, each ${rm(prices[0])} for 10 individually packed teabags.` : `${count} blends in individually packed teabags.`}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Find your tea in one question.</h3><p>Tell us which notes you love, and we’ll match you with a blend.</p></div><a class="button" href="discover.html">Find your tea <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><figure class="story-film"><img src="assets/teasire-osmanthus-still.webp" srcset="assets/teasire-osmanthus-still-480.webp 480w, assets/teasire-osmanthus-still.webp 834w" sizes="${photoSizes.large}" alt="" loading="lazy" decoding="async" width="834" height="1112"><video id="story-film" muted loop playsinline preload="none" tabindex="0" aria-label="A glass cup of osmanthus tea on a stone ledge, with blossoms drifting down from the branch above into the cup. Select to play or pause."><source src="assets/teasire-osmanthus-film.mp4" type="video/mp4"></video></figure><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
+  return `<section class="film-hero" aria-labelledby="hero-title"><div class="film-hero-ambient" aria-hidden="true"></div><div class="film-hero-inner"><div class="film-hero-copy"><span class="eyebrow">MALAYSIA · SMALL BATCHES</span><h1 id="hero-title">A little tea.<br>A little stillness.</h1><p>The gentle pour. The warmth of the light. The first unhurried sip.</p><div class="film-hero-actions"><a class="button" href="#blends">Explore our teas <span>↗</span></a><a class="button secondary" href="blend-studio.html">Create your own tea <span>↗</span></a></div><span class="film-hero-note">INDIVIDUALLY PACKED · START WITH 10</span></div><figure class="film-hero-media"><video id="tea-film" muted playsinline preload="metadata" tabindex="0" poster="assets/teasire-pouring-poster.jpg" aria-label="Tea pouring gently over ice in a glass, in warm natural light. Select to play or pause."><source src="assets/teasire-pouring-film.mp4" type="video/mp4"></video></figure></div></section><div class="marquee"><div class="marquee-track">${Array(2).fill("<span>YOUR NOTES. YOUR MOOD.</span><span>SMALL BATCH, HAND PACKED</span><span>A LITTLE RITUAL, ENTIRELY YOURS</span>").join("")}</div></div><section class="section home-shop" id="blends" aria-labelledby="blends-title"><div class="page-top"><div><span class="eyebrow">SIGNATURE BLENDS</span><h2 id="blends-title">Find your next<br>favourite cup.</h2></div><p>${prices.length === 1 ? `${count} blends, each ${rm(prices[0])} for 10 individually packed teabags.` : `${count} blends in individually packed teabags.`}</p></div>${series("flower", "Flower Tea")}${series("fruit", "Fruit Tea")}<aside class="quiz-nudge" aria-labelledby="quiz-nudge-title"><div><span class="eyebrow">NOT SURE WHERE TO START?</span><h3 id="quiz-nudge-title">Let the tea wheel choose.</h3><p>Pick a mood and spin. Wherever it lands goes straight into your bag.</p></div><a class="button" href="discover.html">Spin the wheel <span>↗</span></a></aside></section><section class="section quiet-story"><div class="split"><figure class="story-film"><img src="assets/teasire-osmanthus-still.webp" srcset="assets/teasire-osmanthus-still-480.webp 480w, assets/teasire-osmanthus-still.webp 834w" sizes="${photoSizes.large}" alt="" loading="lazy" decoding="async" width="834" height="1112"><video id="story-film" muted loop playsinline preload="none" tabindex="0" aria-label="A glass cup of osmanthus tea on a stone ledge, with blossoms drifting down from the branch above into the cup. Select to play or pause."><source src="assets/teasire-osmanthus-film.mp4" type="video/mp4"></video></figure><div><span class="eyebrow">SLOW DOWN. STEEP SOMETHING GOOD.</span><h2>Nothing to rush.<br>Just a little ritual.</h2><p>A favourite cup, the fragrance of flowers, the warmth between your hands. Teasire is a small invitation to make room for yourself.</p><a class="link" href="about.html">Our story ↗</a></div></div></section>${cta()}`;
 }
 function collection(series) {
   const flower = series === "flower";
@@ -605,29 +630,98 @@ function pricing() {
       "",
     )}<tr><td><a href="blend-studio.html">Your own blend</a></td><td>Blend Studio</td><td>${rm(customBlendPrice)} / 10 teabags</td></tr></tbody></table></div><div class="grid two" style="margin-top:35px"><div class="panel glass"><h3>Custom blending</h3><p>Choose your tea base and botanical notes in the Blend Studio. Custom blends start at 10 individually packed teabags.</p><a class="link" href="blend-studio.html">Explore the Blend Studio ↗</a></div><div class="panel glass"><h3>Delivery</h3><p>Free delivery on orders above RM150. Otherwise the fee for your location is added in your bag.</p><a class="link" href="checkout.html">Review your bag ↗</a></div></div></div>`;
 }
+// Discover: the tea wheel. Each mood's wheel holds the teas listed for it, by
+// id (a tea can be in more than one mood); a mood without a list holds every tea.
+// `line` follows the number of teas under the mood's name: "4 blends with rose".
+const moods = [
+  { id: "all", name: "Surprise me" },
+  {
+    id: "rosy",
+    name: "Rosy & expressive",
+    line: "blends with rose",
+    teas: ["oolong-rose", "green-tea-rose", "osmanthus-rose", "rose-pandan"],
+  },
+  {
+    id: "golden",
+    name: "Golden & honeyed",
+    line: "blends with osmanthus",
+    teas: [
+      "oolong-osmanthus",
+      "osmanthus-rose",
+      "osmanthus-black-tea-red-dates",
+    ],
+  },
+  {
+    id: "fresh",
+    name: "Fresh & green",
+    line: "green tea blends",
+    teas: ["green-tea-jasmine", "green-tea-rose", "green-tea-orange"],
+  },
+  {
+    id: "fruity",
+    name: "Fruity & bright",
+    line: "blends with orange",
+    teas: ["chrysanthemum-orange", "oolong-orange", "green-tea-orange"],
+  },
+  {
+    id: "warm",
+    name: "Warm & comforting",
+    line: "oolong & black teas",
+    teas: [
+      "oolong-osmanthus",
+      "oolong-rose",
+      "oolong-orange",
+      "osmanthus-black-tea-red-dates",
+    ],
+  },
+];
+const moodTeas = (mood) =>
+  mood.teas ? teas.filter((t) => mood.teas.includes(t.id)) : teas;
+// A mood's teas, repeated until there are at least six slices, so a short
+// list still makes a full wheel.
+const wheelSlices = (list) =>
+  Array.from({ length: Math.ceil(6 / list.length) }, () => list).flat();
+// The wheel itself, which turns: a slice for each tea with its photo and name,
+// the first slice centred under the pointer. Slices get more room, and bigger
+// names and photos, when there are fewer of them.
+function wheelDisc(list) {
+  const slices = wheelSlices(list),
+    n = slices.length,
+    a = 360 / n,
+    room = n <= 6 ? 2 : n <= 8 ? 1 : 0,
+    size = [15, 17, 19][room],
+    outer = [158, 157, 155][room],
+    inner = outer - size - 3,
+    pr = [22, 26, 29][room],
+    pc = inner - size * 0.3 - 6 - pr,
+    pw = (pr * 2) / 0.7,
+    at = (deg, r) => {
+      const t = (deg * Math.PI) / 180;
+      return (r * Math.sin(t)).toFixed(2) + " " + (-r * Math.cos(t)).toFixed(2);
+    },
+    slice = `M0 0L${at(-a / 2, 188)}A188 188 0 0 1 ${at(a / 2, 188)}Z`;
+  const label = [...new Set(slices.map((t) => t.name))].join(", ");
+  return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-197 -197 394 394" style="font-size:${size}px" aria-hidden="true" focusable="false"><defs><clipPath id="wheel-photo"><circle cy="${-pc}" r="${pr}"/></clipPath></defs>${slices
+    .map((t, i) => {
+      const words = t.name.split(" "),
+        last = words.pop(),
+        lines = words.length ? [words.join(" "), last] : [last];
+      return `<g class="wheel-slice" data-slice="${i}" transform="rotate(${(i * a).toFixed(2)})"><path d="${slice}" fill="${t.color}"/><image href="assets/clean/${t.image}-480.webp" x="${(-pw / 2).toFixed(2)}" y="${(-pc - (pw * 2) / 3).toFixed(2)}" width="${pw.toFixed(2)}" height="${((pw * 4) / 3).toFixed(2)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#wheel-photo)"/><circle class="wheel-photo-ring" cy="${-pc}" r="${pr}"/>${lines.map((line, l) => `<text class="wheel-name" y="${-(l ? inner : outer)}">${line}</text>`).join("")}</g>`;
+    })
+    .join(
+      "",
+    )}<circle class="wheel-rim" r="192"/><circle class="wheel-edge" r="196.5"/>${slices.map((_, i) => `<circle class="wheel-peg" transform="rotate(${((i + 0.5) * a).toFixed(2)})" cy="-192" r="2.6"/>`).join("")}</svg></div>`;
+}
 function discover() {
-  return `<div class="page">${intro("A LITTLE TEA DISCOVERY", "Find your kind<br>of cup.", "What sounds most like your perfect tea? Choose the notes you naturally gravitate towards.")}<div class="panel glass" style="max-width:760px"><h3>Follow your taste.</h3>${[
-    [
-      "floral",
-      "Light, floral and gentle",
-      "Jasmine or osmanthus, with a soft tea base.",
-    ],
-    [
-      "rose",
-      "Rosy, fragrant and expressive",
-      "A floral cup with a little more character.",
-    ],
-    [
-      "fruit",
-      "Fruity, fresh and bright",
-      "A lively citrus note for your daily pause.",
-    ],
-  ]
+  const prices = [...new Set(teas.map((t) => t.price))];
+  return `<div class="page">${intro("A LITTLE TEA DISCOVERY", "Spin for your<br>next cup.", "Choose a mood, spin the wheel and let it pick your tea. Wherever it lands goes straight into your bag.")}<div class="discover-layout"><section class="panel glass discover-moods" aria-labelledby="moods-title"><h3 id="moods-title">01 / Choose your mood</h3><div class="moods">${moods
     .map(
-      ([id, title, copy]) =>
-        `<button class="quiz-option" data-quiz="${id}" aria-pressed="false"><strong>${title}</strong><p style="margin:8px 0 0">${copy}</p></button>`,
+      (m, i) =>
+        `<button class="mood" type="button" data-mood="${m.id}" aria-pressed="${i === 0}"><strong>${m.name}</strong><small>${m.teas ? moodTeas(m).length + " " + m.line : "All " + teas.length + " blends"}</small></button>`,
     )
-    .join("")}<div id="quiz-result" aria-live="polite"></div></div></div>`;
+    .join(
+      "",
+    )}</div></section><section class="discover-wheel" aria-label="The tea wheel"><span class="eyebrow">THE TEA WHEEL</span><div class="wheel">${wheelDisc(moodTeas(moods[0]))}<svg class="wheel-pointer" viewBox="0 0 34 44" aria-hidden="true" focusable="false"><path d="M17 42C12 34 3 25 3 16a14 14 0 0 1 28 0c0 9-9 18-14 26Z"/><circle cx="17" cy="16" r="5"/></svg><span class="wheel-hub" aria-hidden="true"><img src="assets/teasire-magpie-264.png" alt="" width="264" height="161"><span>SPIN</span></span></div><button class="button wheel-spin" id="wheel-spin" type="button">Spin the wheel <span aria-hidden="true">↻</span></button></section><section class="panel glass discover-result" aria-labelledby="result-title"><h3 id="result-title">02 / Your cup</h3><div id="spin-result"><p class="fine">Spin the wheel to meet your tea. Wherever it lands goes straight into your bag: 10 teabags${prices.length === 1 ? " for " + rm(prices[0]) : ""}. You can change or remove it in your bag before you order.</p></div><p class="visually-hidden" id="wheel-status" role="status"></p></section></div></div>`;
 }
 function upcoming(kind) {
   const content = {
@@ -969,22 +1063,153 @@ if (page === "builder") {
     });
   };
 }
+// Discover: choose a mood, then spin its wheel (the button, or the wheel itself).
+// The wheel slows to a stop on a tea, which goes straight into the bag; Undo
+// takes it out again. The pointer flicks as each slice passes it. Visitors who
+// prefer less motion see where it stops straight away.
 if (page === "discover") {
-  document.querySelectorAll("[data-quiz]").forEach(
+  let disc = $(".wheel-disc"),
+    mood = moods[0],
+    angle = 0, // how far the wheel has turned, in degrees clockwise
+    spinning = false,
+    chosen = null; // the last spin's tea, and whether it's still in the bag
+  const wheel = $(".wheel"),
+    pointer = $(".wheel-pointer"),
+    spinButton = $("#wheel-spin"),
+    spinLabel = (text) => `${text} <span aria-hidden="true">↻</span>`,
+    motion = () => (reduced.matches ? "instant" : "smooth");
+  // The slice under the pointer once the wheel has turned `deg`.
+  const sliceAt = (deg, n) =>
+    Math.floor((((-deg % 360) + 360) % 360) / (360 / n) + 0.5) % n;
+  // While the wheel turns, the moods and spin buttons wait (they stay
+  // focusable, so keyboard users keep their place).
+  function setSpinning(on) {
+    spinning = on;
+    $(".discover-layout").classList.toggle("is-spinning", on);
+    for (const b of document.querySelectorAll(
+      "#wheel-spin, #spin-again, [data-mood]",
+    ))
+      if (on) b.setAttribute("aria-disabled", "true");
+      else b.removeAttribute("aria-disabled");
+  }
+  function spin() {
+    if (spinning) return;
+    const slices = wheelSlices(moodTeas(mood)),
+      n = slices.length,
+      a = 360 / n,
+      pick = Math.floor(Math.random() * n),
+      // Somewhere inside the chosen slice, never on its edge.
+      spot = (pick - 0.35 + Math.random() * 0.7) * a,
+      from = angle,
+      least = from + (reduced.matches ? 0 : 5 * 360),
+      to = least + ((((-spot - least) % 360) + 360) % 360),
+      duration = reduced.matches ? 0 : 5200 + Math.random() * 800,
+      svg = disc.querySelector("svg"),
+      start = performance.now();
+    let under = sliceAt(from, n);
+    setSpinning(true);
+    spinButton.textContent = "Spinning…";
+    $("#wheel-status").textContent = "Spinning…";
+    svg.classList.remove("has-winner");
+    svg.querySelector(".won")?.classList.remove("won");
+    disc.style.willChange = "transform";
+    requestAnimationFrame(function turn(now) {
+      const t = duration ? Math.min(1, (now - start) / duration) : 1;
+      angle = from + (to - from) * (1 - (1 - t) ** 3);
+      disc.style.transform = `rotate(${angle}deg)`;
+      const at = sliceAt(angle, n);
+      if (at !== under) {
+        under = at;
+        if (!reduced.matches)
+          pointer.animate(
+            [{ transform: "rotate(-24deg)" }, { transform: "none" }],
+            { duration: 180, easing: "cubic-bezier(0.25, 1.6, 0.5, 1)" },
+          );
+      }
+      if (t < 1) requestAnimationFrame(turn);
+      else land(slices[pick], svg.querySelector(`[data-slice="${pick}"]`));
+    });
+  }
+  function land(t, slice) {
+    angle %= 360;
+    disc.style.transform = `rotate(${angle}deg)`;
+    disc.style.willChange = "";
+    slice.classList.add("won");
+    slice.ownerSVGElement.classList.add("has-winner");
+    addItem(t.name, 10, {}, "");
+    chosen = { t, inBag: true };
+    showChosen();
+    spinButton.innerHTML = spinLabel("Spin again");
+    $("#wheel-status").textContent =
+      `The wheel chose ${teaAlt(t)}. 10 teabags are in your bag.`;
+    setSpinning(false);
+  }
+  function showChosen() {
+    const { t } = chosen;
+    $("#spin-result").innerHTML =
+      `<article class="spin-result"><img ${photoAttrs(t, "thumb")} alt="${teaAlt(t)}" width="1086" height="1448"><div class="spin-head"><h4>${t.name}</h4><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p></div><p class="spin-intro">${t.description}</p><p class="spin-bag"><span id="spin-bag-text" role="status"></span><button class="plain spin-undo" type="button" id="spin-undo"></button></p><div class="spin-actions"><a class="button" href="checkout.html">Go to your bag <span>↗</span></a><button class="button secondary" type="button" id="spin-again">${spinLabel("Spin again")}</button></div><a class="link" href="${productUrl(t.id)}">More about ${t.name} ↗</a></article>`;
+    showInBag();
+    $("#spin-undo").onclick = () => {
+      if (chosen.inBag) takeOut(chosen.t.name);
+      else addItem(chosen.t.name, 10, {}, "");
+      chosen.inBag = !chosen.inBag;
+      showInBag();
+    };
+    $("#spin-again").onclick = () => {
+      const r = wheel.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight)
+        wheel.scrollIntoView({ behavior: motion(), block: "center" });
+      spin();
+    };
+    if (!reduced.matches)
+      $(".spin-result").animate(
+        [{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1 }],
+        { duration: 450, easing: "cubic-bezier(0.2, 0.7, 0.2, 1)" },
+      );
+    // On phones the result sits under the wheel: once the stop has been seen,
+    // bring the result into view.
+    setTimeout(
+      () =>
+        $("#spin-result").scrollIntoView({
+          behavior: motion(),
+          block: "nearest",
+        }),
+      reduced.matches ? 0 : 700,
+    );
+  }
+  function showInBag() {
+    $("#spin-bag-text").textContent = chosen.inBag
+      ? `✓ Added to your bag: 10 teabags, ${rm(chosen.t.price)}`
+      : "Taken out of your bag.";
+    $("#spin-undo").textContent = chosen.inBag ? "Undo" : "Add it back";
+  }
+  document.querySelectorAll("[data-mood]").forEach(
     (b) =>
       (b.onclick = () => {
+        const next = moods.find((m) => m.id === b.dataset.mood);
+        if (spinning || !next || next === mood) return;
+        mood = next;
         document
-          .querySelectorAll("[data-quiz]")
-          .forEach((t) => t.setAttribute("aria-pressed", t === b));
-        const choice = b.dataset.quiz;
-        const id =
-          { rose: "oolong-rose", fruit: "green-tea-orange" }[choice] ||
-          "green-tea-jasmine";
-        const t = teas.find((t) => t.id === id);
-        $("#quiz-result").innerHTML =
-          `<div class="notice"><span class="eyebrow">YOUR TASTE MATCH</span><h3>${t.name}</h3><p class="tea-blend">${t.blend}</p><p>${t.description}</p><a class="button" href="${productUrl(t.id)}">Meet your blend ↗</a><p class="fine" style="margin:15px 0 0">Taste-based suggestion only, not a health assessment.</p></div>`;
+          .querySelectorAll("[data-mood]")
+          .forEach((m) => m.setAttribute("aria-pressed", String(m === b)));
+        const holder = document.createElement("div");
+        holder.innerHTML = wheelDisc(moodTeas(mood));
+        const fresh = holder.firstElementChild;
+        disc.replaceWith(fresh);
+        disc = fresh;
+        angle = 0;
+        if (!reduced.matches)
+          disc.animate(
+            [
+              { opacity: 0, transform: "rotate(-40deg) scale(0.9)" },
+              { opacity: 1, transform: "none" },
+            ],
+            { duration: 500, easing: "cubic-bezier(0.2, 0.7, 0.2, 1)" },
+          );
       }),
   );
+  spinButton.onclick = spin;
+  wheel.addEventListener("click", spin);
 }
 if (page === "checkout") {
   renderCart();
@@ -1176,46 +1401,19 @@ document.addEventListener("click", (e) => {
   });
 });
 
-// Home film: plays once while in view and holds on the finished glass.
-// It starts with sound where the browser allows it. Most browsers only allow
-// sound after the visitor's first tap, click or key press, so until then it
-// plays silently and the sound comes on at that first interaction.
+// Home film: plays once, silently, while in view and holds on the finished glass.
+// The film has no sound track.
 // Tapping the film (or Enter/Space when it has focus) plays or pauses it.
 const teaFilm = document.querySelector("#tea-film");
 if (teaFilm) {
   let manuallyPaused = false,
     visible = false;
-  async function playFilm() {
-    teaFilm.muted = false;
-    try {
-      await teaFilm.play();
-    } catch {
-      // Sound isn't allowed yet: play silently instead.
-      teaFilm.muted = true;
-      try {
-        await teaFilm.play();
-      } catch {}
-    }
-  }
-  function soundOn(e) {
-    if (e.target === teaFilm) return; // the film's own tap is handled below
-    if (!teaFilm.muted || teaFilm.paused || teaFilm.ended) return;
-    if (navigator.userActivation && !navigator.userActivation.isActive) return;
-    teaFilm.muted = false;
-    // A browser that still refuses sound pauses the film; keep it playing silently.
-    setTimeout(() => {
-      if (teaFilm.paused && !teaFilm.ended && !manuallyPaused) {
-        teaFilm.muted = true;
-        teaFilm.play().catch(() => {});
-      }
-    }, 100);
-  }
-  for (const type of ["click", "keydown", "touchend"])
-    document.addEventListener(type, soundOn, { capture: true, passive: true });
+  const playFilm = () => {
+    teaFilm.muted = true;
+    teaFilm.play().catch(() => {});
+  };
   function tapFilm() {
-    if (!teaFilm.paused && !teaFilm.ended && teaFilm.muted) {
-      teaFilm.muted = false;
-    } else if (teaFilm.paused || teaFilm.ended) {
+    if (teaFilm.paused || teaFilm.ended) {
       manuallyPaused = false;
       playFilm();
     } else {

@@ -9,7 +9,7 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions.
 - `dist/transitions.js`: the page transitions. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. Moving along the menu, the line under it glides to the new item and the page sweeps in from that side; leaving the phone menu, the page rises in. Each new page's opening lines arrive one after another. It runs in Chrome, Edge and Safari; other browsers change page normally.
 - `dist/*.html`: generated page documents, including individual tea pages.
-- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film and its poster at the top of the home page, and the osmanthus film and its still further down), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
+- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film and its poster at the top of the home page, and the osmanthus film and its still further down; both are silent), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
 - `dist/config/payments.json`: turns online payment (Billplz) on or off and holds the payments worker's address. See "Online payments (Billplz)" below.
 - `dist/config/prices.json`: generated from `site.js` by the preparation script. The payments worker charges from it.
@@ -106,9 +106,19 @@ Run the worker's tests with `npm test` in `worker/`.
    python scripts/make-photo-sizes.py
    ```
 
-3. Add the tea to the `teas` list in `dist/site.js`, then run `node scripts/prepare-site.mjs` to create its page.
+3. Add the tea to the `teas` list in `dist/site.js`, with a `color` for its slice of the tea wheel. Add its `id` to any `moods` it suits (see "The tea wheel" below). Then run `node scripts/prepare-site.mjs` to create its page.
 
 The preparation script stops with an error if a photo's smaller copies are missing, so a deploy never publishes broken images.
+
+### The tea wheel (Discovery page)
+
+On the Discovery page (`discover.html`), visitors choose a mood and spin a wheel of the teas that suit it. Wherever the wheel stops, 10 teabags of that tea go straight into the bag. The result shows the tea's photo and description, with Undo to take it out again. "Surprise me" spins all the teas.
+
+The moods are the `moods` list in `dist/site.js`: each has a `name`, the `teas` on its wheel (by `id`) and the `line` under its name ("4 blends with rose"). A mood without `teas` holds every tea. Each tea's slice colour is its `color` in the `teas` list. A wheel with fewer than six teas shows each tea more than once, so it still looks full.
+
+### Hidden pages
+
+The Aroma Bags page (`aroma.html`) is hidden until the collection is confirmed. It is left out of the menus, the sitemap and search results, but its address still opens it, for previewing. To bring it back, add `["aroma.html", "Aroma Bags"]` to `navItems` in `dist/site.js`, take `aroma.html` off the `noindex` list in `scripts/prepare-site.mjs`, and run the script.
 
 ### The osmanthus film
 

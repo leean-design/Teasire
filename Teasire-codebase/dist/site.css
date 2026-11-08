@@ -503,21 +503,6 @@ input[type="range"] {
   font-size: 10px;
   color: var(--green);
 }
-.quiz-option {
-  display: block;
-  width: 100%;
-  padding: 22px;
-  text-align: left;
-  margin: 12px 0;
-  border: 1px solid #75888655;
-  border-radius: 13px;
-  background: #ffffff40;
-  color: var(--green);
-}
-.quiz-option[aria-pressed="true"] {
-  background: var(--green);
-  color: var(--ivory);
-}
 .product-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
