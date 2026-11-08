@@ -106,7 +106,7 @@ Run the worker's tests with `npm test` in `worker/`.
    python scripts/make-photo-sizes.py
    ```
 
-3. Add the tea to the `teas` list in `dist/site.js`, with a `color` for its slice of the tea wheel. Add its `id` to any `moods` it suits (see "The tea wheel" below). Then run `node scripts/prepare-site.mjs` to create its page.
+3. Add the tea to the `teas` list in `dist/site.js`, and its `id` to any `moods` it suits (see "The tea wheel" below). Then run `node scripts/prepare-site.mjs` to create its page.
 
 The preparation script stops with an error if a photo's smaller copies are missing, so a deploy never publishes broken images.
 
@@ -114,7 +114,7 @@ The preparation script stops with an error if a photo's smaller copies are missi
 
 On the Discovery page (`discover.html`), visitors choose a mood and spin a wheel of the teas that suit it. Wherever the wheel stops, 10 teabags of that tea go straight into the bag, and a card pops up with the tea's photo and description, Undo, and a link to the bag. "Surprise me" spins all the teas.
 
-The moods are the `moods` list in `dist/site.js`: each has a `chip` (its button), a `name`, the `teas` on its wheel (by `id`) and the `line` shown under the buttons ("Rosy & expressive · 4 blends with rose"). A mood without `teas` holds every tea. Each slice's colour is the tea's `color` in the `teas` list. A wheel with fewer than six teas shows each tea more than once, so it still looks full.
+The moods are the `moods` list in `dist/site.js`: each has a `chip` (its button), a `name`, the `teas` on its wheel (by `id`) and the `line` shown under the buttons ("Rosy & expressive · 4 blends with rose"). A mood without `teas` holds every tea. Each slice shows the tea's photo, with its name on a white ring round the edge. A wheel with fewer than six teas shows each tea more than once, so it still looks full.
 
 ### Hidden pages
 
