@@ -726,9 +726,9 @@ function wheelDisc(list) {
     turn = (deg) => `rotate(${deg.toFixed(2)})`,
     each = (draw) => slices.map(draw).join("");
   const label = [...new Set(slices.map((t) => t.name))].join(", ");
-  return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-195 -195 390 390" style="font-size:${size}px" aria-hidden="true" focusable="false"><defs><clipPath id="wheel-slice"><path d="M0 0L${at(-a / 2, ring)}A${ring} ${ring} 0 0 1 ${at(a / 2, ring)}Z"/></clipPath></defs>${each(
+  return `<div class="wheel-disc" role="img" aria-label="A tea wheel with ${label}"><svg viewBox="-195 -195 390 390" style="font-size:${size}px" aria-hidden="true" focusable="false"><defs><clipPath id="wheel-slice-${n}"><path d="M0 0L${at(-a / 2, ring)}A${ring} ${ring} 0 0 1 ${at(a / 2, ring)}Z"/></clipPath></defs>${each(
     (t, i) =>
-      `<g transform="${turn(i * a)}" clip-path="url(#wheel-slice)"><image href="assets/clean/${t.image}-480.webp" x="${(-pw / 2).toFixed(1)}" y="${(-98 - pw * 0.72).toFixed(1)}" width="${pw.toFixed(1)}" height="${((pw * 4) / 3).toFixed(1)}" preserveAspectRatio="xMidYMid slice"/></g>`,
+      `<g transform="${turn(i * a)}" clip-path="url(#wheel-slice-${n})"><image href="assets/clean/${t.image}-480.webp" x="${(-pw / 2).toFixed(1)}" y="${(-98 - pw * 0.72).toFixed(1)}" width="${pw.toFixed(1)}" height="${((pw * 4) / 3).toFixed(1)}" preserveAspectRatio="xMidYMid slice"/></g>`,
   )}<circle class="wheel-veil" r="${ring}"/><circle class="wheel-ring" r="${(ring + rim) / 2}" stroke-width="${rim - ring}"/><circle class="wheel-rim" r="188"/><path class="wheel-mark" d="M${at(-a / 2, edge)}A${edge} ${edge} 0 0 1 ${at(a / 2, edge)}L${at(a / 2, ring)}A${ring} ${ring} 0 0 0 ${at(-a / 2, ring)}Z"/>${each(
     (_, i) =>
       `<line class="wheel-line" transform="${turn((i + 0.5) * a)}" y1="-40" y2="-${ring}"/><line class="wheel-tick" transform="${turn((i + 0.5) * a)}" y1="-${ring + 7}" y2="-${rim - 1}"/>`,
@@ -1097,16 +1097,21 @@ if (page === "builder") {
 // stops straight away.
 if (page === "discover") {
   let disc = $(".wheel-disc"),
+    leaving = null, // the last mood's wheel, fading out under the new one
     mood = moods[0],
     angle = 0, // how far the wheel has turned, in degrees clockwise
     spinning = false,
+    closing = null, // the card's closing animation, while it plays
     chosen = null; // the last spin's tea, and whether it's still in the bag
   const wheel = $(".wheel"),
     pointer = $(".wheel-pointer"),
     spinButton = $("#wheel-spin"),
     dialog = $("#spin-dialog"),
     spinLabel = (text) => `${text} <span aria-hidden="true">↻</span>`,
-    ease = "cubic-bezier(0.2, 0.7, 0.2, 1)";
+    // Things glide to a stop. The spin builds up speed for a moment, then
+    // slows down gently over several seconds.
+    easeOut = "cubic-bezier(0.22, 1, 0.36, 1)",
+    spinEase = "cubic-bezier(0.2, 0.35, 0.1, 1)";
   // The slice under the pointer once the wheel has turned `deg`.
   const sliceAt = (deg, n) =>
     Math.floor((((-deg % 360) + 360) % 360) / (360 / n) + 0.5) % n;
@@ -1119,48 +1124,70 @@ if (page === "discover") {
       if (on) b.setAttribute("aria-disabled", "true");
       else b.removeAttribute("aria-disabled");
   }
+  // The wheel turns as an animation the browser runs on its own, so it stays
+  // smooth however busy the page is; each frame, the pointer checks which
+  // slice is under it and flicks as a new one passes.
   function spin() {
     if (spinning) return;
     const slices = wheelSlices(moodTeas(mood)),
       n = slices.length,
       a = 360 / n,
       pick = Math.floor(Math.random() * n),
+      t = slices[pick],
       // Somewhere inside the chosen slice, never on its edge.
       spot = (pick - 0.35 + Math.random() * 0.7) * a,
       from = angle,
-      least = from + (reduced.matches ? 0 : 5 * 360),
+      least = from + (reduced.matches ? 0 : 4 * 360),
       to = least + ((((-spot - least) % 360) + 360) % 360),
-      duration = reduced.matches ? 0 : 5200 + Math.random() * 800,
-      mark = disc.querySelector(".wheel-mark"),
-      start = performance.now();
-    let under = sliceAt(from, n);
+      mark = disc.querySelector(".wheel-mark");
     setSpinning(true);
     spinButton.textContent = "Spinning…";
     $("#wheel-status").textContent = "Spinning…";
     mark.classList.remove("on");
     disc.querySelector(".wheel-label.won")?.classList.remove("won");
-    disc.style.willChange = "transform";
-    requestAnimationFrame(function turn(now) {
-      const t = duration ? Math.min(1, (now - start) / duration) : 1;
-      angle = from + (to - from) * (1 - (1 - t) ** 3);
-      disc.style.transform = `rotate(${angle}deg)`;
-      const at = sliceAt(angle, n);
+    // Fetch the chosen tea's photo while the wheel turns, so the card that
+    // pops up shows it straight away.
+    const img = new Image();
+    img.sizes = photoSizes.large;
+    img.srcset = photoSet(t);
+    img.src = photo(t);
+    img.decode().catch(() => {});
+    if (reduced.matches) return land(t, pick, a, mark, to);
+    const turning = disc.animate(
+      [{ transform: `rotate(${from}deg)` }, { transform: `rotate(${to}deg)` }],
+      {
+        duration: 5600 + Math.random() * 700,
+        easing: spinEase,
+        fill: "forwards",
+      },
+    );
+    let under = sliceAt(from, n);
+    requestAnimationFrame(function watch() {
+      if (turning.playState !== "running") return;
+      let deg = from;
+      try {
+        const m = new DOMMatrixReadOnly(getComputedStyle(disc).transform);
+        deg = (Math.atan2(m.b, m.a) * 180) / Math.PI;
+      } catch {}
+      const at = sliceAt(deg, n);
       if (at !== under) {
         under = at;
-        if (!reduced.matches)
-          pointer.animate(
-            [{ transform: "rotate(-24deg)" }, { transform: "none" }],
-            { duration: 180, easing: "cubic-bezier(0.25, 1.6, 0.5, 1)" },
-          );
+        pointer.animate(
+          [{ transform: "rotate(-24deg)" }, { transform: "none" }],
+          { duration: 180, easing: "cubic-bezier(0.25, 1.6, 0.5, 1)" },
+        );
       }
-      if (t < 1) requestAnimationFrame(turn);
-      else land(slices[pick], pick, a, mark);
+      requestAnimationFrame(watch);
     });
+    turning.onfinish = () => {
+      disc.style.transform = `rotate(${to % 360}deg)`;
+      turning.cancel();
+      land(t, pick, a, mark, to);
+    };
   }
-  function land(t, pick, a, mark) {
-    angle %= 360;
+  function land(t, pick, a, mark, to) {
+    angle = to % 360;
     disc.style.transform = `rotate(${angle}deg)`;
-    disc.style.willChange = "";
     mark.setAttribute("transform", `rotate(${pick * a})`);
     mark.classList.add("on");
     disc
@@ -1173,13 +1200,13 @@ if (page === "discover") {
       `The wheel chose ${teaAlt(t)}. 10 teabags are in your bag.`;
     setSpinning(false);
     // Let the stop be seen, then introduce the tea.
-    setTimeout(showChosen, reduced.matches ? 0 : 650);
+    setTimeout(showChosen, reduced.matches ? 0 : 700);
   }
   function showChosen() {
     const { t } = chosen;
     dialog.innerHTML = `<button class="plain spin-close" type="button" id="spin-close" aria-label="Close">✕</button><img ${photoAttrs(t, "large")} alt="${teaAlt(t)}" width="1086" height="1448"><div class="spin-body"><span class="eyebrow">THE WHEEL CHOSE</span><h2 id="spin-name">${t.name}</h2><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p><p class="spin-intro">${t.description}</p><p class="spin-bag"><span id="spin-bag-text" role="status"></span><button class="plain spin-undo" type="button" id="spin-undo"></button></p><div class="spin-actions"><a class="button" href="checkout.html" autofocus>Go to your bag <span>↗</span></a><button class="button secondary" type="button" id="spin-again">${spinLabel("Spin again")}</button></div><a class="link" href="${productUrl(t.id)}">More about ${t.name} ↗</a></div>`;
     showInBag();
-    $("#spin-close").onclick = () => dialog.close();
+    $("#spin-close").onclick = closeCard;
     $("#spin-undo").onclick = () => {
       if (chosen.inBag) takeOut(chosen.t.name);
       else addItem(chosen.t.name, 10, {}, "");
@@ -1187,22 +1214,46 @@ if (page === "discover") {
       showInBag();
     };
     $("#spin-again").onclick = () => {
-      dialog.close();
+      closeCard();
       spin();
     };
     if (!dialog.open) dialog.showModal();
     if (!reduced.matches) {
       dialog.animate(
-        [{ opacity: 0, transform: "translateY(18px) scale(0.97)" }, {}],
-        { duration: 420, easing: ease },
+        [{ opacity: 0, transform: "translateY(24px) scale(0.97)" }, {}],
+        { duration: 520, easing: easeOut },
       );
       try {
-        dialog.animate([{ opacity: 0 }, { opacity: 1 }], {
+        dialog.animate([{ opacity: 0 }, {}], {
           duration: 420,
           pseudoElement: "::backdrop",
         });
       } catch {}
     }
+  }
+  // The card fades away rather than vanishing.
+  function closeCard() {
+    if (!dialog.open || closing) return;
+    if (reduced.matches) return dialog.close();
+    const card = dialog.animate(
+      [{}, { opacity: 0, transform: "translateY(12px) scale(0.98)" }],
+      { duration: 220, easing: "cubic-bezier(0.4, 0, 1, 1)", fill: "forwards" },
+    );
+    let veil = null;
+    try {
+      veil = dialog.animate([{}, { opacity: 0 }], {
+        duration: 220,
+        pseudoElement: "::backdrop",
+        fill: "forwards",
+      });
+    } catch {}
+    closing = card;
+    card.onfinish = () => {
+      dialog.close();
+      card.cancel();
+      veil?.cancel();
+      closing = null;
+    };
   }
   function showInBag() {
     $("#spin-bag-text").textContent = chosen.inBag
@@ -1210,10 +1261,15 @@ if (page === "discover") {
       : "Taken out of your bag.";
     $("#spin-undo").textContent = chosen.inBag ? "Undo" : "Add it back";
   }
-  // A tap on the dimmed page around the card closes it.
-  dialog.addEventListener("click", (e) => {
-    if (e.target === dialog) dialog.close();
+  // Esc, and a tap on the dimmed page around the card, close it too.
+  dialog.addEventListener("cancel", (e) => {
+    e.preventDefault();
+    closeCard();
   });
+  dialog.addEventListener("click", (e) => {
+    if (e.target === dialog) closeCard();
+  });
+  // A new mood's wheel fades in over the last one as it fades out.
   document.querySelectorAll("[data-mood]").forEach(
     (b) =>
       (b.onclick = () => {
@@ -1226,18 +1282,29 @@ if (page === "discover") {
         $("#mood-line").textContent = moodLine(mood);
         const holder = document.createElement("div");
         holder.innerHTML = wheelDisc(moodTeas(mood));
-        const fresh = holder.firstElementChild;
-        disc.replaceWith(fresh);
+        const fresh = holder.firstElementChild,
+          old = disc;
+        leaving?.remove();
         disc = fresh;
         angle = 0;
-        if (!reduced.matches)
-          disc.animate(
-            [
-              { opacity: 0, transform: "rotate(-40deg) scale(0.9)" },
-              { opacity: 1, transform: "none" },
-            ],
-            { duration: 500, easing: ease },
-          );
+        if (reduced.matches) return old.replaceWith(fresh);
+        old.after(fresh);
+        leaving = old;
+        old.animate([{}, { opacity: 0 }], {
+          duration: 420,
+          easing: "ease-out",
+          fill: "forwards",
+        }).onfinish = () => {
+          old.remove();
+          if (leaving === old) leaving = null;
+        };
+        fresh.animate(
+          [
+            { opacity: 0, transform: "rotate(-24deg) scale(0.94)" },
+            { opacity: 1, transform: "none" },
+          ],
+          { duration: 680, easing: easeOut },
+        );
       }),
   );
   spinButton.onclick = spin;
@@ -1335,14 +1402,22 @@ if (page === "checkout") {
   };
 }
 if ("IntersectionObserver" in window && !reduced.matches) {
+  // Things coming into view together arrive one after another.
   const observer = new IntersectionObserver(
     (entries) =>
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add("visible");
-          observer.unobserve(e.target);
-        }
-      }),
+      entries
+        .filter((e) => e.isIntersecting)
+        .forEach((e, i) => {
+          const el = e.target;
+          el.style.transitionDelay = Math.min(i, 5) * 90 + "ms";
+          el.classList.add("visible");
+          el.addEventListener(
+            "transitionend",
+            () => (el.style.transitionDelay = ""),
+            { once: true },
+          );
+          observer.unobserve(el);
+        }),
     { threshold: 0.05 },
   );
   document.querySelectorAll(".product,.split>*,.cta>*").forEach((el) => {
