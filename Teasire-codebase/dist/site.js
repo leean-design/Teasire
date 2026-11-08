@@ -232,10 +232,32 @@ function saveBag() {
   } catch {}
   updateBag();
 }
+// The header's bag shows how many packs of 10 are in it, in a badge that hides
+// when the bag is empty and pops when a tea goes in.
+let shownPacks = null;
 function updateBag() {
-  document
-    .querySelectorAll(".bag-count")
-    .forEach((el) => (el.textContent = bag.reduce((n, i) => n + i.qty, 0)));
+  const packs = Math.round(bag.reduce((n, i) => n + i.qty, 0) / 10);
+  document.querySelectorAll(".bag-link").forEach((link) => {
+    const badge = link.querySelector(".bag-count");
+    link.setAttribute(
+      "aria-label",
+      packs
+        ? `Your bag, ${packs} ${packs === 1 ? "pack" : "packs"} of 10 teabags`
+        : "Your bag, empty",
+    );
+    badge.textContent = packs;
+    badge.hidden = !packs;
+    if (shownPacks !== null && packs > shownPacks && !reduced.matches)
+      badge.animate(
+        [
+          { transform: "scale(1)" },
+          { transform: "scale(1.45)" },
+          { transform: "scale(1)" },
+        ],
+        { duration: 420, easing: "cubic-bezier(0.3, 1.5, 0.5, 1)" },
+      );
+  });
+  shownPacks = packs;
 }
 function toast(message) {
   $("#toast").textContent = message;
@@ -286,7 +308,7 @@ function signatureMenu(
 function header() {
   // The series pages and each tea's own page sit under Signature Blend.
   const inSignature = ["flower", "fruit", "product"].includes(page);
-  return `<div class="progress" aria-hidden="true"></div><header class="site-header glass">${brand()}<nav class="site-nav" aria-label="Main navigation">${signatureMenu("Signature Blend", false, inSignature)}${navItems.map(([url, label]) => (location.pathname.endsWith(url) ? `<a href="${url}" aria-current="page">${label}${navMarker}</a>` : `<a href="${url}">${label}</a>`)).join("")}</nav><div class="header-tools"><a class="pill" href="checkout.html">Bag <span class="bag-count">0</span></a><button class="plain menu-btn" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">☰</button></div></header><nav class="mobile-menu" id="mobile-menu" aria-label="Expanded navigation" inert><div class="mobile-menu-top"><span class="mobile-menu-label">Explore Teasire</span><button class="plain" id="menu-close" type="button" aria-label="Close navigation">Close ✕</button></div>${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav>`;
+  return `<div class="progress" aria-hidden="true"></div><header class="site-header glass">${brand()}<nav class="site-nav" aria-label="Main navigation">${signatureMenu("Signature Blend", false, inSignature)}${navItems.map(([url, label]) => (location.pathname.endsWith(url) ? `<a href="${url}" aria-current="page">${label}${navMarker}</a>` : `<a href="${url}">${label}</a>`)).join("")}</nav><div class="header-tools"><a class="bag-link" href="checkout.html" aria-label="Your bag"><svg class="bag-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.2 8.5h13.6l-.9 11.4a1.3 1.3 0 0 1-1.3 1.2H7.4a1.3 1.3 0 0 1-1.3-1.2L5.2 8.5Z"/><path d="M9 10.5V7a3 3 0 0 1 6 0v3.5"/></svg><span class="bag-count" aria-hidden="true" hidden>0</span></a><button class="plain menu-btn" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9h16M4 15h16"/></svg></button></div></header><nav class="mobile-menu" id="mobile-menu" aria-label="Expanded navigation" inert><div class="mobile-menu-top"><span class="mobile-menu-label">Explore Teasire</span><button class="plain" id="menu-close" type="button" aria-label="Close navigation">Close ✕</button></div>${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav>`;
 }
 function footer() {
   return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-legal"><span id="business-details"></span><nav class="footer-policies" aria-label="Shop policies"><a href="policies.html#delivery">Delivery</a><a href="policies.html#returns">Returns</a><a href="policies.html#terms">Terms</a><a href="policies.html#privacy">Privacy</a><span id="social-links"></span></nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;

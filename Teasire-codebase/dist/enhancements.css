@@ -2036,3 +2036,74 @@ details > summary {
     font-size: 25px;
   }
 }
+
+/* Header bag: a line-drawn tote with the number of packs in a badge (hidden
+   while the bag is empty). The menu button on phones is drawn to match. */
+.bag-link {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--night);
+  transition: color 0.2s;
+}
+.bag-link:hover,
+.menu-btn:hover {
+  color: var(--green);
+}
+.bag-icon,
+.menu-icon {
+  display: block;
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.menu-btn {
+  color: var(--night);
+}
+.menu-icon {
+  margin: auto;
+}
+.header-tools .bag-link .bag-count {
+  position: absolute;
+  top: 3px;
+  right: 0;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--green);
+  box-shadow: 0 0 0 2px #fff;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+}
+.header-tools .bag-link .bag-count[hidden] {
+  display: none;
+}
+/* On wider screens the bag is drawn a little larger, in scale with the logo. */
+@media (min-width: 751px) {
+  .bag-link {
+    width: 52px;
+    height: 52px;
+  }
+  .bag-icon {
+    width: 31px;
+    height: 31px;
+  }
+  .header-tools .bag-link .bag-count {
+    top: 4px;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+}
