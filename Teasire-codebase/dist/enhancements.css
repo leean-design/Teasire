@@ -1284,10 +1284,10 @@ details > summary {
 }
 /* The plain change: the old page fades up and out and the new one rises in. */
 ::view-transition-old(root) {
-  animation: teasire-page-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation: teasire-page-out 220ms cubic-bezier(0.4, 0, 1, 1) both;
 }
 ::view-transition-new(root) {
-  animation: teasire-page-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: teasire-page-in 560ms var(--ease-out) 40ms both;
 }
 @keyframes teasire-page-out {
   to {
@@ -1362,11 +1362,11 @@ details > summary {
 /* A photo or name with no partner on the other page moves with the page. */
 ::view-transition-old(*.tea-photo):only-child,
 ::view-transition-old(*.tea-title):only-child {
-  animation: teasire-page-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation: teasire-page-out 220ms cubic-bezier(0.4, 0, 1, 1) both;
 }
 ::view-transition-new(*.tea-photo):only-child,
 ::view-transition-new(*.tea-title):only-child {
-  animation: teasire-page-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: teasire-page-in 560ms var(--ease-out) 40ms both;
 }
 /* Moving along the menu (data-turn "forward" or "back"): the line under the
    menu glides to the new page's item while the page sweeps in from the side
@@ -1402,44 +1402,44 @@ details > summary {
 :root[data-turn="forward"]::view-transition-old(*.tea-photo):only-child,
 :root[data-turn="forward"]::view-transition-old(*.tea-title):only-child {
   animation:
-    teasire-fade-out 160ms ease-out both,
-    teasire-out-left 240ms cubic-bezier(0.4, 0, 1, 1) both;
+    teasire-fade-out 200ms ease-out both,
+    teasire-out-left 280ms cubic-bezier(0.4, 0, 1, 1) both;
 }
 :root[data-turn="back"]::view-transition-old(root),
 :root[data-turn="back"]::view-transition-old(*.tea-photo):only-child,
 :root[data-turn="back"]::view-transition-old(*.tea-title):only-child {
   animation:
-    teasire-fade-out 160ms ease-out both,
-    teasire-out-right 240ms cubic-bezier(0.4, 0, 1, 1) both;
+    teasire-fade-out 200ms ease-out both,
+    teasire-out-right 280ms cubic-bezier(0.4, 0, 1, 1) both;
 }
 :root[data-turn="forward"]::view-transition-new(root) {
   animation:
-    teasire-fade-in 360ms ease-out 100ms both,
-    teasire-in-right 600ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+    teasire-fade-in 440ms ease-out 100ms both,
+    teasire-in-right 640ms var(--ease-out) 100ms both;
 }
 :root[data-turn="back"]::view-transition-new(root) {
   animation:
-    teasire-fade-in 360ms ease-out 100ms both,
-    teasire-in-left 600ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+    teasire-fade-in 440ms ease-out 100ms both,
+    teasire-in-left 640ms var(--ease-out) 100ms both;
 }
 @keyframes teasire-out-left {
   to {
-    transform: translateX(calc(-1 * clamp(24px, 6vw, 88px)));
+    transform: translateX(calc(-1 * clamp(16px, 4vw, 48px)));
   }
 }
 @keyframes teasire-out-right {
   to {
-    transform: translateX(clamp(24px, 6vw, 88px));
+    transform: translateX(clamp(16px, 4vw, 48px));
   }
 }
 @keyframes teasire-in-right {
   from {
-    transform: translateX(clamp(24px, 5vw, 72px));
+    transform: translateX(clamp(18px, 4vw, 52px));
   }
 }
 @keyframes teasire-in-left {
   from {
-    transform: translateX(calc(-1 * clamp(24px, 5vw, 72px)));
+    transform: translateX(calc(-1 * clamp(18px, 4vw, 52px)));
   }
 }
 /* Leaving the phone menu (data-turn "menu"): the menu lifts away, the page
@@ -1452,8 +1452,8 @@ details > summary {
 }
 :root[data-turn="menu"]::view-transition-new(root) {
   animation:
-    teasire-fade-in 360ms ease-out 100ms both,
-    teasire-rise 600ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+    teasire-fade-in 440ms ease-out 100ms both,
+    teasire-rise 640ms var(--ease-out) 100ms both;
 }
 ::view-transition-new(site-header):only-child,
 ::view-transition-new(whatsapp-button):only-child {
@@ -1477,8 +1477,8 @@ details > summary {
 }
 ::view-transition-new(*.intro) {
   animation:
-    teasire-fade-in 400ms ease-out both,
-    teasire-intro-rise 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    teasire-fade-in 480ms ease-out both,
+    teasire-intro-rise 680ms var(--ease-out) both;
 }
 :root[data-turn="forward"]::view-transition-new(*.intro) {
   animation-name: teasire-fade-in, teasire-intro-from-right;
@@ -1508,12 +1508,12 @@ details > summary {
 }
 @keyframes teasire-intro-from-right {
   from {
-    transform: translateX(clamp(32px, 8vw, 112px));
+    transform: translateX(clamp(24px, 5vw, 72px));
   }
 }
 @keyframes teasire-intro-from-left {
   from {
-    transform: translateX(calc(-1 * clamp(32px, 8vw, 112px)));
+    transform: translateX(calc(-1 * clamp(24px, 5vw, 72px)));
   }
 }
 /* Keep the pack label the same size whatever the blend, so its bottom band
@@ -1808,13 +1808,13 @@ details > summary {
   font-weight: 500;
   text-anchor: middle;
   fill: #24332f;
-  transition: fill 0.3s;
+  transition: fill 0.5s;
 }
 /* Where the wheel stopped: that tea's part of the ring turns deep green. */
 .wheel-mark {
   fill: var(--green);
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.5s;
 }
 .wheel-mark.on {
   opacity: 1;
@@ -2070,4 +2070,38 @@ details > summary {
 /* On the Discovery page the wheel follows the title more closely. */
 .page:has(> .discover) > .page-intro {
   margin-bottom: 34px;
+}
+
+/* Motion: one soft curve that settles gently, used for movement across the
+   site, so things glide to a stop instead of stopping short. */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.button,
+.whatsapp-float {
+  transition-duration: 0.35s;
+  transition-timing-function: var(--ease-out);
+}
+.product-image img {
+  transition-duration: 0.9s;
+  transition-timing-function: var(--ease-out);
+}
+.mobile-menu {
+  transition-duration: 0.35s;
+  transition-timing-function: var(--ease-out);
+}
+.toast {
+  transition:
+    opacity 0.35s,
+    transform 0.5s var(--ease-out);
+}
+.story-film video {
+  transition-duration: 0.8s;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .will-reveal {
+    transform: translateY(24px);
+    transition-duration: 0.9s;
+    transition-timing-function: var(--ease-out);
+  }
 }
