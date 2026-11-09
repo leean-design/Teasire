@@ -2105,3 +2105,17 @@ details > summary {
     transition-timing-function: var(--ease-out);
   }
 }
+
+/* Footer: who runs Teasire and its SSM number, above the WhatsApp number. */
+.footer-business {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--green);
+}
+.footer-business strong {
+  font-weight: 600;
+  color: var(--night);
+}

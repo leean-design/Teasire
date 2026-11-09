@@ -53,12 +53,14 @@ Prices are in RM per pack of 10 teabags, in `dist/site.js`:
 
 - `price` on each tea in the `teas` list.
 - `customBlendPrice` for blends made in the Blend Studio.
-- `freeDeliveryAbove` (RM150) decides when the bag shows free delivery. If you change it, also update the "above RM150" wording on the pages.
-- `deliveryFees`: the delivery fee for each location. The bag adds it to the total, and the Policies page lists it.
+- `freeDeliveryFrom` (RM150) and `freeDeliveryLocations` (Peninsular Malaysia): orders of that amount and above, delivered there, get free delivery. The bag, the WhatsApp order and every page that mentions free delivery follow these two values.
+- `deliveryFees`: the delivery fee for each location. The bag adds it to the total, and the Policies page lists it. The current fees (RM8 Peninsular Malaysia, RM15 Sabah, Sarawak and Labuan) are provisional until the courier's rates are confirmed.
+
+The payments worker charges from `config/prices.json`, which the preparation script writes from these values. After changing any of them, publish the site, then deploy the payments worker again (Actions → "Deploy payments worker"), so online payments charge the same total as the bag.
 
 ### Business details and shop policies
 
-- Business details live in `dist/config/business.json` under `business`: `registeredName`, `registrationNumber` (SSM), `email`, `address`, and full `https://` links for `instagram`, `facebook` and `tiktok`. Empty values are hidden, so nothing shows until it is filled in. The WhatsApp number is shown from `whatsappNumber`.
+- Business details live in `dist/config/business.json` under `business`: `registeredName`, `registrationNumber` (SSM), `email`, `address`, and full `https://` links for `instagram`, `facebook` and `tiktok`. Empty values are hidden. The footer of every page shows "Teasire is operated by" the registered name with its SSM number, then the WhatsApp number (`whatsappNumber`); the Contact section of the Policies page shows the WhatsApp number, email and address. The preparation script writes these into each page's HTML, so run it after changing the file.
 - The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` near the prices. The current text is a draft written as a placeholder: check every point matches how the shop runs.
 
 ### Online payments (Billplz)
@@ -96,6 +98,8 @@ curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" https://YOUR-WORKER.workers.dev
 Paid bills also appear in the Billplz dashboard, with the order reference and delivery address on each one. If you move the site to another domain, update `SITE_URL` in `wrangler.toml` too. Once online payment is on, also update the two "Card checkout is not active yet" lines in `site.js` (the product page's "Delivery & payment" and the FAQ).
 
 Run the worker's tests with `npm test` in `worker/`.
+
+Testing tips: test payments only work from the published site (`https://leean-design.github.io/Teasire/checkout.html?testpay=1`), because the worker only takes orders from there, and from a network that can reach `*.workers.dev`. From a local preview, or with the worker's address blocked, the checkout says it couldn't reach the payment service and nothing is charged. In the Billplz sandbox, choose Simulator → Billplz → Proceed to pay, then "Successful payment" or "Failed payment".
 
 ### Add a new tea
 

@@ -151,16 +151,28 @@ const teas = [
 const productUrl = (id) => "tea-" + id + ".html";
 // Price in RM for 10 teabags of a blend made in the Blend Studio.
 const customBlendPrice = 20;
-// Orders above this amount (RM) get free delivery, as the site's delivery notes say.
-const freeDeliveryAbove = 150;
-// Delivery fee in RM for each delivery location, for orders up to RM150.
-// Draft values: change them to your real courier rates.
+// Free delivery: orders of this amount (RM) and above, delivered to these locations.
+const freeDeliveryFrom = 150;
+const freeDeliveryLocations = ["Peninsular Malaysia"];
+// Delivery fee in RM for each delivery location, unless delivery is free.
+// Provisional, pending courier verification: RM8 Peninsular, RM15 East Malaysia.
 const deliveryFees = {
   "Peninsular Malaysia": 8,
   Sabah: 15,
   Sarawak: 15,
   Labuan: 15,
 };
+// Delivery for an order: free on orders of RM150 and above within Peninsular
+// Malaysia, otherwise the location's fee; null until a location is chosen.
+const deliveryFor = (tea, location) =>
+  !(location in deliveryFees)
+    ? null
+    : tea >= freeDeliveryFrom && freeDeliveryLocations.includes(location)
+      ? 0
+      : deliveryFees[location];
+// "free delivery within Peninsular Malaysia on orders of RM150 and above"
+const freeDeliveryText = `free delivery within ${freeDeliveryLocations.join(" and ")} on orders of RM${freeDeliveryFrom} and above`;
+const sentence = (text) => text[0].toUpperCase() + text.slice(1);
 const rm = (amount) => "RM" + amount.toFixed(2);
 // Price of a bag item: signature teas use their own price, custom blends the Blend Studio price.
 const itemPrice = (item) =>
@@ -299,8 +311,58 @@ function header() {
   const inSignature = ["flower", "fruit", "product"].includes(page);
   return `<div class="progress" aria-hidden="true"></div><header class="site-header glass">${brand()}<nav class="site-nav" aria-label="Main navigation">${signatureMenu("Signature Blend", false, inSignature)}${navItems.map(([url, label]) => (location.pathname.endsWith(url) ? `<a href="${url}" aria-current="page">${label}${navMarker}</a>` : `<a href="${url}">${label}</a>`)).join("")}</nav><div class="header-tools"><a class="bag-link" href="checkout.html" aria-label="Your bag"><svg class="bag-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.2 8.5h13.6l-.9 11.4a1.3 1.3 0 0 1-1.3 1.2H7.4a1.3 1.3 0 0 1-1.3-1.2L5.2 8.5Z"/><path d="M9 10.5V7a3 3 0 0 1 6 0v3.5"/></svg><span class="bag-count" aria-hidden="true" hidden>0</span></a><button class="plain menu-btn" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9h16M4 15h16"/></svg></button></div></header><nav class="mobile-menu" id="mobile-menu" aria-label="Expanded navigation" inert><div class="mobile-menu-top"><span class="mobile-menu-label">Explore Teasire</span><button class="plain" id="menu-close" type="button" aria-label="Close navigation">Close ✕</button></div>${signatureMenu()}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav>`;
 }
+// Business details from config/business.json. scripts/prepare-site.mjs passes
+// them in as `siteConfig` when it saves the pages, so they're in each page's HTML;
+// in the browser the same file is fetched again and the details refreshed.
+// Empty values stay hidden.
+function businessInfo(config) {
+  const details = config?.business || {},
+    get = (key) =>
+      typeof details[key] === "string" ? details[key].trim() : "",
+    phone = String(config?.whatsappNumber || "").replace(/[+\s()-]/g, ""),
+    email = get("email");
+  return {
+    name: get("registeredName"),
+    registration: get("registrationNumber"),
+    address: get("address"),
+    email: /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(email) ? email : "",
+    phone: /^[1-9][0-9]{7,14}$/.test(phone) ? phone : "",
+  };
+}
+const pageBusiness = businessInfo(
+  typeof siteConfig === "object" ? siteConfig : null,
+);
+const phoneText = (phone) =>
+  phone
+    .replace(/^60(1\d)(\d{3,4})(\d{4})$/, "+60 $1-$2 $3")
+    .replace(/^(\d+)$/, "+$1");
+// "Teasire is operated by SOLEIL CIRCLE SOLUTION (SSM: JR0166558-A)"
+function operatorLine(info) {
+  if (!info.name) return "";
+  return `Teasire is operated by <strong>${esc(info.name)}</strong>${info.registration ? ` (SSM: ${esc(info.registration)})` : ""}`;
+}
+// The footer's business lines: who runs Teasire, then the WhatsApp number.
+function footerBusiness(info) {
+  return [
+    operatorLine(info),
+    info.phone && "WhatsApp " + esc(phoneText(info.phone)),
+  ]
+    .filter(Boolean)
+    .map((line) => `<span>${line}</span>`)
+    .join("");
+}
+// The Contact section of the Policies page.
+function contactDetails(info) {
+  const ways = [
+    info.phone &&
+      `WhatsApp at <a class="link" href="https://wa.me/${info.phone}" target="_blank" rel="noopener noreferrer">${esc(phoneText(info.phone))}</a>`,
+    info.email &&
+      `email <a class="link" href="mailto:${esc(info.email)}">${esc(info.email)}</a>`,
+  ].filter(Boolean);
+  return `<p id="policy-contact">${ways.length ? "Message us on " + ways.join(" or ") + "." : "Message us on WhatsApp using the button at the bottom of any page."}</p>${info.address ? `<p id="policy-address">Address: ${esc(info.address)}</p>` : ""}${info.name ? `<p class="fine" id="policy-business">${operatorLine(info)}.</p>` : ""}`;
+}
 function footer() {
-  return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-legal"><span id="business-details"></span><nav class="footer-policies" aria-label="Shop policies"><a href="policies.html#delivery">Delivery</a><a href="policies.html#returns">Returns</a><a href="policies.html#terms">Terms</a><a href="policies.html#privacy">Privacy</a><span id="social-links"></span></nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;
+  return `<footer class="site-footer"><div class="footer-top"><div>${brand()}<p class="footer-mood">A small pause.<br>A cup that feels like you.</p></div><nav class="footer-links" aria-label="Footer navigation">${signatureMenu("Signature Blend", true)}${navItems.map(([url, label]) => `<a href="${url}">${label}</a>`).join("")}</nav></div><div class="footer-legal"><p class="footer-business" id="business-details">${footerBusiness(pageBusiness)}</p><nav class="footer-policies" aria-label="Shop policies"><a href="policies.html#delivery">Delivery</a><a href="policies.html#returns">Returns</a><a href="policies.html#terms">Terms</a><a href="policies.html#privacy">Privacy</a><span id="social-links"></span></nav></div><div class="footer-bottom"><span>Thoughtfully blended. Personally yours.</span><span>© 2026 Teasire · Malaysia</span></div></footer><button class="whatsapp-float" id="whatsapp-toggle" aria-label="WhatsApp enquiries" aria-expanded="false" aria-controls="whatsapp-panel"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 .8A15.1 15.1 0 0 0 2.9 23.5L.8 31.2l7.9-2.1A15.1 15.1 0 1 0 16 .8Zm0 27.6a12.4 12.4 0 0 1-6.3-1.7l-.5-.3-4.7 1.2 1.3-4.6-.3-.5a12.5 12.5 0 1 1 10.5 5.9Zm6.9-9.3c-.4-.2-2.2-1.1-2.5-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.8-1.1-1-1.8-2.2-2-2.6-.2-.4 0-.6.2-.8l.6-.7c.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.8-2-1.1-2.8-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.4.6 1.9.7.8.3 1.6.2 2.2.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>WhatsApp</span></button><section class="whatsapp-panel glass hidden" id="whatsapp-panel" aria-labelledby="whatsapp-title"><button class="plain whatsapp-close" id="whatsapp-close" aria-label="Close WhatsApp enquiries">✕</button><h3 id="whatsapp-title">Let’s talk tea.</h3><p id="whatsapp-message">WhatsApp enquiries are coming soon. Our contact details are being updated.</p><a id="whatsapp-link" class="button full hidden" target="_blank" rel="noopener noreferrer">Open WhatsApp ↗</a><a class="link" href="checkout.html">Prepare an order request ↗</a></section><div class="toast" id="toast" role="status"></div>`;
 }
 function card(t) {
   return `<article class="product reveal"><a class="product-image" href="${productUrl(t.id)}"><img ${photoAttrs(t, "card")} alt="${teaAlt(t)} with its botanical ingredients" loading="lazy" decoding="async" width="1086" height="1448"></a><h3><a href="${productUrl(t.id)}">${t.name}</a></h3><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p><div class="product-foot"><span class="card-price"><strong>${rm(t.price)}</strong><small>10 teabags</small></span><button class="add-button" data-add="${t.id}" aria-label="Add 10 ${t.name} teabags"><span aria-hidden="true">+</span> Add 10</button></div></article>`;
@@ -355,7 +417,7 @@ function product() {
   if (!t)
     return `<div class="page">${intro("THE TEASIRE COLLECTION", "Find your cup.", "This blend could not be found. Explore our tea collections to find your next little ritual.")}<a class="button" href="flower-tea.html">Explore Flower Tea ↗</a></div>`;
   document.title = t.name + " (" + t.blend + ") — Teasire";
-  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${teaAlt(t)}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">Delivery for your location is added in your bag.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. Free delivery on orders above RM150; otherwise the delivery fee for your location is added in your bag. Card checkout is not active yet.</p><a class="link" href="policies.html#delivery">Delivery & returns ↗</a></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
+  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${teaAlt(t)}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">Delivery for your location is added in your bag.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. ${sentence(freeDeliveryText)}; otherwise the delivery fee for your location is added in your bag. Card checkout is not active yet.</p><a class="link" href="policies.html#delivery">Delivery & returns ↗</a></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
     .filter((x) => x.series === t.series && x.id !== t.id)
     .map(card)
     .join("")}</div></section>`;
@@ -639,7 +701,7 @@ function pricing() {
     )
     .join(
       "",
-    )}<tr><td><a href="blend-studio.html">Your own blend</a></td><td>Blend Studio</td><td>${rm(customBlendPrice)} / 10 teabags</td></tr></tbody></table></div><div class="grid two" style="margin-top:35px"><div class="panel glass"><h3>Custom blending</h3><p>Choose your tea base and botanical notes in the Blend Studio. Custom blends start at 10 individually packed teabags.</p><a class="link" href="blend-studio.html">Explore the Blend Studio ↗</a></div><div class="panel glass"><h3>Delivery</h3><p>Free delivery on orders above RM150. Otherwise the fee for your location is added in your bag.</p><a class="link" href="checkout.html">Review your bag ↗</a></div></div></div>`;
+    )}<tr><td><a href="blend-studio.html">Your own blend</a></td><td>Blend Studio</td><td>${rm(customBlendPrice)} / 10 teabags</td></tr></tbody></table></div><div class="grid two" style="margin-top:35px"><div class="panel glass"><h3>Custom blending</h3><p>Choose your tea base and botanical notes in the Blend Studio. Custom blends start at 10 individually packed teabags.</p><a class="link" href="blend-studio.html">Explore the Blend Studio ↗</a></div><div class="panel glass"><h3>Delivery</h3><p>${sentence(freeDeliveryText)}. Otherwise the fee for your location is added in your bag.</p><a class="link" href="checkout.html">Review your bag ↗</a></div></div></div>`;
 }
 // Discover: the tea wheel. Each mood's wheel holds the teas listed for it, by
 // id (a tea can be in more than one mood); a mood without a list holds every tea.
@@ -786,14 +848,14 @@ ${Object.entries(deliveryFees)
       `<div class="summary-row"><span>${zone}</span><strong>${rm(fee)}</strong></div>`,
   )
   .join("")}
-<div class="summary-row"><span>Orders above RM150</span><strong>Free</strong></div>
+<div class="summary-row"><span>${freeDeliveryLocations.join(" and ")}, orders of RM${freeDeliveryFrom} and above</span><strong>Free</strong></div>
 </section>
 <section class="policy" id="returns"><h2>Returns & refunds</h2>
 <ul>
 <li><strong>Damaged, wrong or missing items:</strong> message us on WhatsApp within 7 days of delivery with a photo of the parcel and items. We’ll send a replacement or refund you in full, including delivery.</li>
 <li><strong>Change of mind:</strong> tea is a food product, so we can’t take back opened packs. Unopened signature teas can be returned within 7 days of delivery. You pay the return postage, and we refund the tea once it arrives.</li>
 <li><strong>Custom blends</strong> are made just for you, so they can’t be returned for a change of mind.</li>
-<li>Refunds are paid by bank transfer or DuitNow within 7 working days of approval. Online payments can also be refunded to the original payment method.</li>
+<li>Refunds go back to your original payment method where available; otherwise we pay them by bank transfer or DuitNow. Refunds are made within 7 working days of approval.</li>
 </ul>
 </section>
 <section class="policy" id="cancellations"><h2>Cancellations</h2>
@@ -805,11 +867,11 @@ ${Object.entries(deliveryFees)
 </section>
 <section class="policy" id="terms"><h2>Terms of sale</h2>
 <ul>
-<li>Prices are in Malaysian Ringgit (RM), per pack of 10 individually packed teabags. Delivery for your location is added in your bag unless your order is above RM150.</li>
-<li>You order by sending your bag to us on WhatsApp and paying the total shown. We confirm your order once we have checked your payment. If anything is unavailable, we refund it in full.</li>
+<li>Prices are in Malaysian Ringgit (RM), per pack of 10 individually packed teabags. Delivery for your location is added in your bag, with ${freeDeliveryText}.</li>
+<li>You order by sending your bag to us on WhatsApp and paying the total shown. We confirm your order once we have checked your payment. If anything is unavailable, we refund that item in full, unless you agree to a substitute.</li>
 <li>We accept DuitNow QR, including Touch ’n Go eWallet. Please pay the exact total shown in your order.</li>
 <li class="online-only hidden">You can also pay online by FPX online banking, credit or debit card or eWallet through Billplz. Your order is confirmed as soon as Billplz confirms your payment.</li>
-<li>Our teas are made from natural botanicals, so colour and flavour can vary slightly between batches. If an ingredient is unavailable, we’ll offer a substitute or a refund for that item.</li>
+<li>Our teas are made from natural botanicals, so colour and flavour can vary slightly between batches. If an ingredient is unavailable, we’ll only use a substitute if you agree to it; otherwise we refund the unavailable item.</li>
 <li>Green, black and oolong teas contain caffeine. Our teas are not medicines. If you are pregnant, breastfeeding, taking medication or have allergies, check the ingredients and ask your doctor if unsure.</li>
 <li>We may update these policies. The version on this page when you order applies to your order.</li>
 </ul>
@@ -826,8 +888,7 @@ ${Object.entries(deliveryFees)
 </ul>
 </section>
 <section class="policy" id="contact"><h2>Contact</h2>
-<p id="policy-contact">Message us on WhatsApp using the button at the bottom of any page.</p>
-<p class="fine" id="policy-business"></p>
+<div id="policy-contact-details">${contactDetails(pageBusiness)}</div>
 </section>
 </div></div>`;
 }
@@ -861,7 +922,7 @@ function about() {
     ],
     [
       "Do you deliver within Malaysia?",
-      "Yes, anywhere in Malaysia. Delivery is free for orders above RM150; otherwise the fee for your location is added in your bag.",
+      `Yes, anywhere in Malaysia. Delivery is ${freeDeliveryText.replace("free delivery", "free")}; otherwise the fee for your location is added in your bag.`,
     ],
     [
       "Can I pay by card?",
@@ -884,12 +945,12 @@ function checkout() {
       "",
     )}</select></label></div><label class="field">Delivery address *<textarea id="customer-address" autocomplete="street-address" maxlength="300" rows="3" required></textarea></label><label class="field">Anything you’d like us to know?<textarea id="customer-notes" maxlength="1000" rows="3" placeholder="Taste preferences or gifting requests…"></textarea></label><p class="fine">Your details stay on this page until you choose to pay online, open WhatsApp or copy your request.</p><button class="button" id="prepare" type="submit">Prepare order request ↗</button></form><div id="order-review" class="hidden" style="margin-top:30px"><h3>Your order request</h3><p class="fine">This is a draft. No request has been sent and no payment has been taken.</p><label class="field">Order details<textarea id="request-text" readonly rows="10"></textarea></label><div class="request-actions"><button class="button hidden" id="pay-online" type="button">Pay online ↗</button><a id="send-request" class="button hidden" target="_blank" rel="noopener noreferrer">Open request in WhatsApp ↗</a><button class="button secondary" id="copy-request">Copy request</button></div><p class="fine" id="next-step">Review your message in WhatsApp and tap Send.</p><p id="pay-status" role="status" class="fine"></p><p id="copy-status" role="status" class="fine" style="margin-top:15px"></p></div><div style="border-top:1px solid var(--border);padding-top:30px;margin-top:35px"><h3>How to pay</h3><p class="fine online-only hidden">Pay online by FPX online banking, card or eWallet in one step. Or pay by DuitNow QR:</p><ol class="order-steps"><li>Send your order on WhatsApp. Your total already includes delivery.</li><li>Pay the total with the DuitNow QR below, using Touch ’n Go or any banking app.</li><li>Send your receipt in the same WhatsApp chat. We’ll confirm and pack your order.</li></ol><details class="tng-payment"><summary><span class="tng-payment-name"><span class="tng-mark" aria-hidden="true">TNG</span><span>Touch ’n Go / DuitNow QR</span></span><span class="tng-status" id="tng-status">NOT ACTIVE YET</span></summary><div class="tng-content"><p class="fine" id="tng-description">Touch ’n Go eWallet payment is being set up. Please prepare your order request first; the final amount and payment details must be confirmed before paying.</p><div id="tng-ready" class="hidden"><p class="fine">Use your banking or eWallet app to scan the QR. On the same phone, save the QR and choose the image from your app’s scanner. Pay the exact total from your order and check the recipient name before confirming.</p><p id="tng-merchant" class="fine"></p><img id="tng-qr" class="hidden" alt="DuitNow payment QR for LEE AN" width="827" height="1280" loading="lazy"><a id="tng-download" class="button secondary full hidden" download="Teasire-DuitNow-QR.png">Save QR image ↓</a><a id="tng-open" class="button full hidden" target="_blank" rel="noopener noreferrer">Open payment link ↗</a><a id="tng-receipt" class="link hidden" target="_blank" rel="noopener noreferrer">Share your receipt on WhatsApp ↗</a><p class="fine">Payments are checked manually. Preparing a request or viewing this QR does not confirm payment.</p></div></div></details><details class="card-availability"><summary>Online banking, card & eWallet</summary><div class="payment-option"><span>FPX · Credit / debit card · eWallet</span><small id="online-status">NOT ACTIVE YET</small></div><p class="fine" id="online-description">Online payment is being set up. Please pay by DuitNow QR for now.</p><p class="fine">Online payments are made on Billplz’s secure page. No card or bank details are entered on this site.</p></details></div></div><aside class="panel glass"><span class="eyebrow">IN YOUR BAG</span><h3>Your tea selection</h3><div id="checkout-items"></div><div id="checkout-totals"></div></aside></div></div>`;
 }
-// Tea total, delivery for the chosen location (free above RM150) and the total to pay.
+// Tea total, delivery for the chosen location (see deliveryFor) and the total to pay.
 // delivery and total are null until a location is chosen.
 function orderTotals() {
   const tea = bag.reduce((n, i) => n + itemPrice(i), 0),
     location = $("#customer-delivery")?.value || "",
-    delivery = tea > freeDeliveryAbove ? 0 : (deliveryFees[location] ?? null);
+    delivery = deliveryFor(tea, location);
   return {
     tea,
     location,
@@ -900,7 +961,7 @@ function orderTotals() {
 function renderTotals() {
   const { tea, delivery, total } = orderTotals();
   $("#checkout-totals").innerHTML = bag.length
-    ? `<div class="summary-row"><span>Tea selection</span><span>${rm(tea)}</span></div><div class="summary-row"><span>Delivery</span><span>${delivery === null ? "Choose your location" : delivery === 0 ? "Free" : rm(delivery)}</span></div><div class="summary-row"><strong>Total (MYR)</strong><strong>${total === null ? rm(tea) + " + delivery" : rm(total)}</strong></div><p class="fine" style="margin-top:20px">Free delivery on orders above RM150.</p><a class="link" href="pricing.html">See all prices ↗</a><a class="link" href="policies.html#delivery" style="margin-left:18px">Delivery & returns ↗</a>`
+    ? `<div class="summary-row"><span>Tea selection</span><span>${rm(tea)}</span></div><div class="summary-row"><span>Delivery</span><span>${delivery === null ? "Choose your location" : delivery === 0 ? "Free" : rm(delivery)}</span></div><div class="summary-row"><strong>Total (MYR)</strong><strong>${total === null ? rm(tea) + " + delivery" : rm(total)}</strong></div><p class="fine" style="margin-top:20px">${sentence(freeDeliveryText)}.</p><a class="link" href="pricing.html">See all prices ↗</a><a class="link" href="policies.html#delivery" style="margin-left:18px">Delivery & returns ↗</a>`
     : "";
 }
 function renderCart() {
@@ -1645,10 +1706,16 @@ async function payOnline() {
     status = $("#pay-status");
   button.disabled = true;
   status.textContent = "Taking you to Billplz’s secure payment page…";
+  // Stop waiting after 20 seconds rather than leaving the customer stuck.
+  const timer = new AbortController(),
+    timeout = setTimeout(() => timer.abort(), 20000);
   try {
-    const r = await fetch(onlineApi + "/bills", {
+    let r;
+    try {
+      r = await fetch(onlineApi + "/bills", {
         method: "POST",
         headers: { "content-type": "application/json" },
+        signal: timer.signal,
         body: JSON.stringify({
           items: bag.map((i) => ({ name: i.name, qty: i.qty })),
           customer: {
@@ -1660,8 +1727,22 @@ async function payOnline() {
             notes: $("#customer-notes").value,
           },
         }),
-      }),
-      bill = await r.json().catch(() => ({}));
+      });
+    } catch (e) {
+      // The browser got no answer from the payment service: no connection, a
+      // network or browser extension blocking it, or a copy of the site the
+      // service doesn't take orders from. The browser's own wording ("Failed
+      // to fetch") means nothing to customers, so it goes to the console.
+      console.error("Couldn't reach the payment service:", e);
+      throw new Error(
+        e.name === "AbortError"
+          ? "The payment service took too long to answer, so nothing has been charged. Please try again, or send your order on WhatsApp and pay by DuitNow QR."
+          : "We couldn’t reach the payment service, so nothing has been charged. Please check your connection and try again, or send your order on WhatsApp and pay by DuitNow QR.",
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
+    const bill = await r.json().catch(() => ({}));
     if (!r.ok || !bill.url)
       throw new Error(
         bill.error ||
@@ -1782,34 +1863,16 @@ if (page === "checkout" || page === "policies")
         showPaymentResult(billId);
     })
     .catch(() => {});
-// Show the business details from config/business.json; empty values stay hidden.
-function renderBusinessDetails(config, phone) {
-  const details = config.business || {},
-    get = (key) =>
-      typeof details[key] === "string" ? details[key].trim() : "",
-    name = get("registeredName"),
-    registration = get("registrationNumber"),
-    address = get("address"),
-    email = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(get("email"))
-      ? get("email")
-      : "",
-    phoneText = phone
-      ? phone
-          .replace(/^60(1\d)(\d{3,4})(\d{4})$/, "+60 $1-$2 $3")
-          .replace(/^(\d+)$/, "+$1")
-      : "";
-  $("#business-details").textContent = [
-    name,
-    registration && "SSM " + registration,
-    phoneText && "WhatsApp " + phoneText,
-    email,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+// Refresh the business details from the fetched config/business.json, with
+// the same markup the pages were saved with.
+function renderBusinessDetails(config) {
+  const info = businessInfo(config),
+    details = config.business || {};
+  $("#business-details").innerHTML = footerBusiness(info);
   $("#social-links").innerHTML = [
-    ["Instagram", get("instagram")],
-    ["Facebook", get("facebook")],
-    ["TikTok", get("tiktok")],
+    ["Instagram", details.instagram],
+    ["Facebook", details.facebook],
+    ["TikTok", details.tiktok],
   ]
     .filter(([, url]) => {
       try {
@@ -1823,17 +1886,8 @@ function renderBusinessDetails(config, phone) {
         `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`,
     )
     .join("");
-  const contact = $("#policy-contact");
-  if (contact && phoneText)
-    contact.innerHTML = `Message us on WhatsApp at <a class="link" href="https://wa.me/${phone}" target="_blank" rel="noopener noreferrer">${phoneText}</a>${email ? ` or email <a class="link" href="mailto:${esc(email)}">${esc(email)}</a>` : ""}.`;
-  const who = $("#policy-business");
-  if (who)
-    who.textContent =
-      name || registration || address
-        ? [name || "Teasire", registration && "SSM " + registration, address]
-            .filter(Boolean)
-            .join(" · ")
-        : "";
+  const contact = $("#policy-contact-details");
+  if (contact) contact.innerHTML = contactDetails(info);
 }
 function invalidateOrder() {
   if (!$("#order-review")) return;
@@ -1931,10 +1985,7 @@ fetch("config/business.json")
   })
   .then((config) => {
     const phone = String(config.whatsappNumber || "").replace(/[+\s()-]/g, "");
-    renderBusinessDetails(
-      config,
-      /^[1-9][0-9]{7,14}$/.test(phone) ? phone : "",
-    );
+    renderBusinessDetails(config);
     if (/^[1-9][0-9]{7,14}$/.test(phone)) {
       document.querySelector("#whatsapp-message").textContent =
         "Ask us about your tea blend, gifting ideas or order.";
