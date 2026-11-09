@@ -108,9 +108,13 @@ export function priceOrder(body, list) {
     return { error: "Please enter your delivery address." };
   if (!(customer.location in list.deliveryFees))
     return { error: "Please choose a delivery location." };
+  // Free delivery on orders of freeDeliveryFrom (RM) and above, to the
+  // freeDeliveryLocations only; otherwise the location's fee.
   const tea = priced.reduce((n, i) => n + i.price, 0),
-    delivery =
-      tea > list.freeDeliveryAbove ? 0 : list.deliveryFees[customer.location];
+    free =
+      tea >= list.freeDeliveryFrom &&
+      (list.freeDeliveryLocations || []).includes(customer.location),
+    delivery = free ? 0 : list.deliveryFees[customer.location];
   return { items: priced, customer, tea, delivery, total: tea + delivery };
 }
 

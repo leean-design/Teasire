@@ -42,7 +42,10 @@
     }
   ],
   "customBlendPrice": 20,
-  "freeDeliveryAbove": 150,
+  "freeDeliveryFrom": 150,
+  "freeDeliveryLocations": [
+    "Peninsular Malaysia"
+  ],
   "deliveryFees": {
     "Peninsular Malaysia": 8,
     "Sabah": 15,

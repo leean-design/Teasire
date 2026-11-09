@@ -36,6 +36,12 @@ const renderEnd = source.indexOf(marker);
 if (renderEnd < 0)
   throw new Error("Could not find the marker `" + marker + "` in site.js");
 const renderSource = source.slice(0, renderEnd);
+// The business details (who runs the shop, its SSM number and how to reach it)
+// go into each page's HTML too, so the footer and Contact show them without
+// waiting for the browser to fetch the file.
+const siteConfig = JSON.parse(
+  fs.readFileSync(path.join(dist, "config", "business.json"), "utf8"),
+);
 const makeContext = (page, file, product) =>
   vm.createContext({
     document: { body: { dataset: { page, product } }, title: "" },
@@ -43,6 +49,7 @@ const makeContext = (page, file, product) =>
     localStorage: { getItem: () => null },
     matchMedia: () => ({ matches: true }),
     URLSearchParams,
+    siteConfig,
   });
 const inventory = makeContext("home", "index.html");
 vm.runInContext(renderSource, inventory);
@@ -66,7 +73,11 @@ fs.writeFileSync(
     {
       teas: teas.map((t) => ({ name: t.name, price: t.price })),
       customBlendPrice: vm.runInContext("customBlendPrice", inventory),
-      freeDeliveryAbove: vm.runInContext("freeDeliveryAbove", inventory),
+      freeDeliveryFrom: vm.runInContext("freeDeliveryFrom", inventory),
+      freeDeliveryLocations: vm.runInContext(
+        "freeDeliveryLocations",
+        inventory,
+      ),
       deliveryFees: vm.runInContext("deliveryFees", inventory),
     },
     null,

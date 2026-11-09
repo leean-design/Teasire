@@ -74,20 +74,28 @@ test("prices come from the price list, not the browser", () => {
   assert.equal(o.total, per10 * 2 + fee);
   assert.equal(o.customer.phone, "60123456789");
 });
-test("free delivery above the threshold", () => {
-  const o = priceOrder(
-    {
-      items: [
+test("free delivery from the threshold, Peninsular Malaysia only", () => {
+  // Packs of 10 bringing the tea total to the threshold or just above it.
+  const packs = Math.ceil(prices.freeDeliveryFrom / per10),
+    order = (location, list = prices) =>
+      priceOrder(
         {
-          name: tea,
-          qty: (Math.floor(prices.freeDeliveryAbove / per10) + 1) * 10,
+          items: [{ name: tea, qty: packs * 10 }],
+          customer: { ...customer, location },
         },
-      ],
-      customer,
-    },
-    prices,
-  );
-  assert.equal(o.delivery, 0);
+        list,
+      );
+  assert.deepEqual(prices.freeDeliveryLocations, ["Peninsular Malaysia"]);
+  assert.equal(order("Peninsular Malaysia").delivery, 0);
+  assert.equal(order("Sabah").delivery, prices.deliveryFees.Sabah);
+  assert.equal(order("Sarawak").delivery, prices.deliveryFees.Sarawak);
+  assert.equal(order("Labuan").delivery, prices.deliveryFees.Labuan);
+  // Exactly the threshold counts ("RM150 and above").
+  const exact = { ...prices, freeDeliveryFrom: packs * per10 };
+  assert.equal(order("Peninsular Malaysia", exact).delivery, 0);
+  // Just under the threshold pays the fee.
+  const under = { ...prices, freeDeliveryFrom: packs * per10 + 0.01 };
+  assert.equal(order("Peninsular Malaysia", under).delivery, fee);
 });
 test("rejects bad quantities and missing details", () => {
   assert.ok(
