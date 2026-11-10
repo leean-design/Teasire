@@ -878,12 +878,13 @@ ${Object.entries(deliveryFees)
 </section>
 <section class="policy" id="privacy"><h2>Privacy</h2>
 <ul>
-<li>When you send an order, we receive what is in your WhatsApp message: your name, email, delivery details, notes and WhatsApp number. We use them only to confirm, deliver and support your order.</li>
-<li class="online-only hidden">If you pay online, your order, name, email, phone number and delivery address are sent to us and to Billplz, our payment provider, to take your payment. Card and bank details are entered only on Billplz’s page; we never see them.</li>
-<li>Your bag and saved blends are stored in your own browser. They aren’t sent to us unless you include them in a message.</li>
-<li>We share your name, phone number and address only with our courier, to deliver your order. We never sell your details.</li>
-<li>We keep order records only as long as needed for your order and our accounts.</li>
-<li>This site doesn’t use tracking or advertising cookies. Fonts are loaded from Google Fonts, and WhatsApp messages are covered by WhatsApp’s own privacy policy.</li>
+<li>When you send an order on WhatsApp, we receive what is in your message: your name, email, delivery details, notes and WhatsApp number. We use them only to confirm, deliver and support your order.</li>
+<li class="online-only hidden">If you pay online, pressing Pay sends your order, name, email, phone number, delivery address and notes to our payment service, which runs on Cloudflare and keeps a record of the order. It passes your name, email, phone number, delivery address and a summary of your order to Billplz, our payment provider, to take your payment. This happens when you press Pay, even if you don’t finish paying. Card and bank details are entered only on Billplz’s page; we never see them.</li>
+<li class="email-only hidden">After an online payment, we email your order confirmation through Resend, an email delivery service, which handles your email address and the order and delivery details in that email.</li>
+<li>Your bag and saved blends are stored in your own browser, not with us. They reach us only when you send or pay for an order.<span class="online-only hidden"> When you start an online payment, a copy of your order message, including your delivery details, is also kept in your browser so we can show it after you pay. It is removed once your payment is confirmed, or the next time you visit after 24 hours.</span></li>
+<li>We share your details only as needed to complete your order: our courier receives your name, phone number and address<span class="online-only hidden">, and Cloudflare and Billplz receive the details described above</span>. We never sell your details.</li>
+<li>We keep order records for as long as needed for your order and our accounts. Orders sent on WhatsApp stay in our chat with you and aren’t deleted automatically.<span class="online-only hidden"> Online order records in our payment service are deleted automatically about 13 months after the order. Billplz keeps its own payment records under its privacy policy.</span></li>
+<li>This site doesn’t use tracking or advertising cookies. It is hosted on GitHub Pages and loads its fonts from Google Fonts, so GitHub and Google receive your IP address and browser details when pages load, as with any website. WhatsApp messages are covered by WhatsApp’s own privacy policy.</li>
 <li>To see, correct or delete your details, message us on WhatsApp.</li>
 </ul>
 </section>
@@ -1759,6 +1760,7 @@ async function payOnline() {
         JSON.stringify({
           billId: bill.billId,
           ref: bill.ref,
+          savedAt: Date.now(),
           // Without the closing "how I'll pay" line: this order is paid online.
           text: $("#request-text").value.replace(/\n\n[^\n]*$/, ""),
         }),
@@ -1770,6 +1772,14 @@ async function payOnline() {
     button.disabled = false;
   }
 }
+// The copy of an order kept while its online payment is under way holds the
+// customer's delivery details, so one never completed doesn't stay for good:
+// it goes on the first visit after a day (the privacy notice says so).
+try {
+  const saved = JSON.parse(localStorage.getItem("teasire-pending-order"));
+  if (saved && !(Date.now() - saved.savedAt < 24 * 60 * 60 * 1000))
+    localStorage.removeItem("teasire-pending-order");
+} catch {}
 // Billplz sends the customer back to checkout.html?billplz[id]=…; ask the worker what happened.
 let paidMessage = "";
 async function showPaymentResult(billId) {
@@ -1793,7 +1803,7 @@ async function showPaymentResult(billId) {
         order.ref +
         "." +
         (mine && pending.text ? "\n\n" + pending.text : "");
-      box.innerHTML = `<span class="eyebrow">PAYMENT RECEIVED</span><h3>Thank you, your order ${esc(order.ref)} is paid.</h3><p>We’ve received ${rm(order.total)} and will pack your order soon. Billplz has emailed your receipt. We’ll send your tracking number on WhatsApp.</p><a id="paid-whatsapp" class="button hidden" target="_blank" rel="noopener noreferrer">Message us about your order ↗</a>`;
+      box.innerHTML = `<span class="eyebrow">PAYMENT RECEIVED</span><h3>Thank you, your order ${esc(order.ref)} is paid.</h3><p>We’ve received ${rm(order.total)} and will pack your order soon. ${order.emailed ? "We’ve emailed your order confirmation, and Billplz has emailed your receipt." : "Billplz has emailed your receipt."} We’ll send your tracking number on WhatsApp.</p><a id="paid-whatsapp" class="button hidden" target="_blank" rel="noopener noreferrer">Message us about your order ↗</a>`;
       updatePaidWhatsApp();
       if (mine) {
         bag = [];
@@ -1848,8 +1858,14 @@ if (page === "checkout" || page === "policies")
       )
         return;
       onlineApi = api.href.replace(/\/$/, "");
+      // ".email-only" parts are about our own order emails, which the worker
+      // sends only while "orderEmails" is true in config/payments.json.
       document
-        .querySelectorAll(".online-only")
+        .querySelectorAll(
+          config.orderEmails === true
+            ? ".online-only, .email-only"
+            : ".online-only",
+        )
         .forEach((el) => el.classList.remove("hidden"));
       if (page !== "checkout") return;
       $("#online-status").textContent = config.enabled

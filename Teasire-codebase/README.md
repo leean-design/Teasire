@@ -61,6 +61,8 @@ The payments worker charges from `config/prices.json`, which the preparation scr
 ### Business details and shop policies
 
 - Business details live in `dist/config/business.json` under `business`: `registeredName`, `registrationNumber` (SSM), `email`, `address`, and full `https://` links for `instagram`, `facebook` and `tiktok`. Empty values are hidden. The footer of every page shows "Teasire is operated by" the registered name with its SSM number, then the WhatsApp number (`whatsappNumber`); the Contact section of the Policies page shows the WhatsApp number, email and address. The preparation script writes these into each page's HTML, so run it after changing the file.
+- The privacy text describes what the site really does, so change the two together: parts marked `online-only` show only while online payment is on (or in test mode), and `email-only` only while order emails are on. If you add a service that receives customers' details (analytics, another payment or email provider), add it to the privacy text in the same change.
+- Search engines get each tea's name, photo, price and availability, and the shop's details on the home page, from hidden notes the preparation script writes into the pages (`teaData` and `shopData` in `scripts/prepare-site.mjs`). They follow `site.js` and `business.json` automatically. Every tea is listed as in stock.
 - The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` near the prices. The current text is a draft written as a placeholder: check every point matches how the shop runs.
 
 ### Online payments (Billplz)
@@ -96,6 +98,16 @@ curl -H "Authorization: Bearer YOUR_ADMIN_TOKEN" https://YOUR-WORKER.workers.dev
 ```
 
 Paid bills also appear in the Billplz dashboard, with the order reference and delivery address on each one. If you move the site to another domain, update `SITE_URL` in `wrangler.toml` too. Once online payment is on, also update the two "Card checkout is not active yet" lines in `site.js` (the product page's "Delivery & payment" and the FAQ).
+
+#### Order emails
+
+When an order is paid online, the worker can email the customer a confirmation (items, total, delivery address) and the shop a notice with the full order. This is separate from Billplz's own payment receipt. It is off until all three of these are done:
+
+1. Open a [Resend](https://resend.com) account and verify the domain the emails will come from (Resend → Domains shows the DNS records to add). `ORDER_EMAIL_FROM` in `worker/wrangler.toml` must be an address on that domain.
+2. Create a Resend API key and add it as the repository secret `RESEND_API_KEY` (or `npx wrangler@4 secret put RESEND_API_KEY`), then deploy the worker again.
+3. Set `"orderEmails": true` in `dist/config/payments.json`. The worker reads this switch from the published site, and the same switch shows the privacy notice's line about Resend, so emails are never sent without the notice saying so.
+
+The shop's notice goes to `business.email` in `dist/config/business.json`; replying to it writes to the customer. Each email is sent once per order, and which ones went out is recorded on the order (`emails`) in `/orders`. If Resend can't be reached the payment is still recorded; the emails are tried again if Billplz repeats its message.
 
 Run the worker's tests with `npm test` in `worker/`.
 

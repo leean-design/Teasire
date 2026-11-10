@@ -7,6 +7,9 @@
 //                         Billplz sends the customer back. Asks Billplz directly.
 // POST /billplz/callback  Billplz tells us a bill was paid. Signed with the X Signature key.
 // GET  /orders            Recent orders, for the shop. Needs `Authorization: Bearer <ADMIN_TOKEN>`.
+//
+// When an order is paid, the worker can also email the customer a confirmation
+// and the shop a notice: see sendOrderEmails below.
 
 const json = (body, status = 200, headers = {}) =>
   new Response(JSON.stringify(body), {
@@ -200,30 +203,206 @@ async function markPaid(env, id, paidAt) {
   const key = "bill:" + id,
     order = JSON.parse((await env.ORDERS.get(key)) || "null");
   if (!order) return null;
+  const save = () =>
+    env.ORDERS.put(key, JSON.stringify(order), { expirationTtl: keepFor });
   if (order.status !== "paid") {
     order.status = "paid";
     order.paidAt = paidAt || new Date().toISOString();
-    await env.ORDERS.put(key, JSON.stringify(order), {
-      expirationTtl: keepFor,
-    });
+    // Saved before any email is tried, so an email problem never loses a payment.
+    await save();
   }
+  if (await sendOrderEmails(env, order)) await save();
   return order;
+}
+
+// One of the site's own settings files, e.g. config/business.json; null if unreadable.
+async function siteConfig(env, name) {
+  try {
+    const r = await fetch(env.SITE_URL + "/config/" + name + ".json", {
+      cf: { cacheTtl: 300 },
+    });
+    return r.ok ? await r.json() : null;
+  } catch {
+    return null;
+  }
+}
+
+const rm = (amount) => "RM" + amount.toFixed(2);
+const esc = (s) =>
+  String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+
+// The two emails for a paid order: a confirmation for the customer and a
+// notice for the shop. Each is plain text plus the same content as simple HTML.
+export function orderEmails(order, shop) {
+  const c = order.customer,
+    details = shop.business || {},
+    whatsapp = shop.whatsappNumber ? "+" + shop.whatsappNumber : "",
+    lines = [
+      ...order.items.map((i) => [i.qty + " × " + i.name, rm(i.price)]),
+      ["Tea", rm(order.tea)],
+      [
+        "Delivery (" + c.location + ")",
+        order.delivery ? rm(order.delivery) : "Free",
+      ],
+      ["Total paid", rm(order.total)],
+    ],
+    address = [c.name, "+" + c.phone, c.address, c.location],
+    operator = details.registeredName
+      ? "Teasire is operated by " +
+        details.registeredName +
+        (details.registrationNumber
+          ? " (SSM: " + details.registrationNumber + ")"
+          : "") +
+        "."
+      : "",
+    contact = [
+      whatsapp && "WhatsApp " + whatsapp,
+      details.email && "email " + details.email,
+    ]
+      .filter(Boolean)
+      .join(" or ");
+  // `paragraphs` are strings, or arrays of lines that belong together.
+  const build = (paragraphs) => {
+    const blocks = paragraphs.filter((b) => (Array.isArray(b) ? b.length : b));
+    return {
+      text: blocks
+        .map((b) =>
+          Array.isArray(b)
+            ? b.map((l) => (Array.isArray(l) ? l.join(": ") : l)).join("\n")
+            : b,
+        )
+        .join("\n\n"),
+      html:
+        '<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#1f2a24;max-width:560px">' +
+        blocks
+          .map((b) =>
+            Array.isArray(b) && Array.isArray(b[0])
+              ? '<table style="border-collapse:collapse;width:100%">' +
+                b
+                  .map(
+                    ([label, value]) =>
+                      `<tr><td style="padding:4px 12px 4px 0">${esc(label)}</td><td style="padding:4px 0;text-align:right;white-space:nowrap">${esc(value)}</td></tr>`,
+                  )
+                  .join("") +
+                "</table>"
+              : "<p>" +
+                (Array.isArray(b) ? b : [b]).map(esc).join("<br>") +
+                "</p>",
+          )
+          .join("") +
+        "</div>",
+    };
+  };
+  return {
+    customer: {
+      to: c.email,
+      replyTo: details.email,
+      subject: "Your Teasire order " + order.ref + " is confirmed",
+      ...build([
+        "Hi " + c.name + ",",
+        "Thank you for your order. We’ve received your payment of " +
+          rm(order.total) +
+          " and will pack it soon. We’ll send your tracking number on WhatsApp.",
+        "Order " + order.ref,
+        lines,
+        ["Delivering to:", ...address],
+        c.notes && ["Your note:", c.notes],
+        contact && "Questions about your order? Reach us on " + contact + ".",
+        operator,
+      ]),
+    },
+    shop: {
+      to: details.email,
+      replyTo: c.email,
+      subject: "New paid order " + order.ref + " · " + rm(order.total),
+      ...build([
+        "A new order has been paid online.",
+        "Order " + order.ref + " · paid " + order.paidAt,
+        lines,
+        ["Deliver to:", ...address],
+        ["Customer email:", c.email],
+        c.notes && ["Customer’s note:", c.notes],
+        "Billplz bill: " + order.billId,
+      ]),
+    },
+  };
+}
+
+// Emails a paid order's confirmation to the customer and a notice to the shop,
+// through Resend (resend.com). Nothing is sent unless all of these are in place:
+//   - the RESEND_API_KEY secret and the ORDER_EMAIL_FROM setting on this worker;
+//   - "orderEmails": true in the site's config/payments.json, which also shows
+//     the privacy notice's line about these emails, so the two can't drift apart.
+// Which emails went out is kept on the order (`emails`), so each is sent once.
+// Returns true if that record changed.
+async function sendOrderEmails(env, order) {
+  const sent = order.emails || {};
+  if (!env.RESEND_API_KEY || !env.ORDER_EMAIL_FROM) return false;
+  if (sent.customer && sent.shop) return false;
+  const [settings, shop] = await Promise.all([
+    siteConfig(env, "payments"),
+    siteConfig(env, "business"),
+  ]);
+  if (settings?.orderEmails !== true || !shop) return false;
+  let changed = false;
+  await Promise.all(
+    Object.entries(orderEmails(order, shop)).map(async ([kind, mail]) => {
+      if (sent[kind] || !mail.to) return;
+      try {
+        const r = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          signal: AbortSignal.timeout(8000),
+          headers: {
+            authorization: "Bearer " + env.RESEND_API_KEY,
+            "content-type": "application/json",
+            // If Billplz's message and the customer's return arrive together,
+            // Resend still sends each email only once.
+            "idempotency-key": "teasire-" + order.ref + "-" + kind,
+          },
+          body: JSON.stringify({
+            from: env.ORDER_EMAIL_FROM,
+            to: [mail.to],
+            ...(mail.replyTo ? { reply_to: mail.replyTo } : {}),
+            subject: mail.subject,
+            text: mail.text,
+            html: mail.html,
+          }),
+        });
+        if (!r.ok) throw new Error("Resend answered " + r.status);
+        sent[kind] = new Date().toISOString();
+        changed = true;
+      } catch (e) {
+        // No addresses or order details in the log.
+        console.error("Order email not sent", order.ref, kind, e.message);
+      }
+    }),
+  );
+  if (changed) order.emails = sent;
+  return changed;
 }
 
 // Only what the thank-you screen needs: no names, addresses or contact details.
 async function billStatus(id, env, cors) {
-  const order = JSON.parse((await env.ORDERS.get("bill:" + id)) || "null");
+  let order = JSON.parse((await env.ORDERS.get("bill:" + id)) || "null");
   if (!order) return fail("Order not found.", 404, cors);
   if (order.status !== "paid") {
     const r = await billplz(env, "/bills/" + id),
       bill = await r.json().catch(() => ({}));
-    if (r.ok && bill.paid === true && bill.amount === cents(order.total)) {
-      await markPaid(env, id, bill.paid_at);
-      order.status = "paid";
-    }
+    if (r.ok && bill.paid === true && bill.amount === cents(order.total))
+      order = (await markPaid(env, id, bill.paid_at)) || order;
   }
   return json(
-    { ref: order.ref, paid: order.status === "paid", total: order.total },
+    {
+      ref: order.ref,
+      paid: order.status === "paid",
+      total: order.total,
+      // Whether our own confirmation email went out, so the page can say so.
+      emailed: Boolean(order.emails?.customer),
+    },
     200,
     cors,
   );

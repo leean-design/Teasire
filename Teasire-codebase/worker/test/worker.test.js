@@ -2,14 +2,20 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import worker, {
+  orderEmails,
   priceOrder,
   signature,
   signatureSource,
 } from "../src/index.js";
 
-const prices = JSON.parse(
-  fs.readFileSync(new URL("../../dist/config/prices.json", import.meta.url)),
-);
+const config = (name) =>
+  JSON.parse(
+    fs.readFileSync(
+      new URL("../../dist/config/" + name + ".json", import.meta.url),
+    ),
+  );
+const prices = config("prices"),
+  business = config("business");
 const site = "https://leean-design.github.io/Teasire";
 // Tests follow whatever site.js charges, so a price change doesn't break them.
 const tea = prices.teas[0].name,
@@ -25,7 +31,12 @@ const customer = {
   location: "Peninsular Malaysia",
 };
 
-function setup() {
+// `emails` turns order emails on: the worker's key and sender, and the site's switch.
+function setup({
+  emails = false,
+  siteSwitch = emails,
+  resendStatus = 200,
+} = {}) {
   const store = new Map(),
     calls = [];
   const env = {
@@ -35,6 +46,12 @@ function setup() {
     BILLPLZ_API_KEY: "key",
     BILLPLZ_X_SIGNATURE: "sigkey",
     ADMIN_TOKEN: "admin",
+    ...(emails
+      ? {
+          RESEND_API_KEY: "resend-key",
+          ORDER_EMAIL_FROM: "Teasire <orders@example.com>",
+        }
+      : {}),
     ORDERS: {
       get: async (k) => store.get(k) ?? null,
       put: async (k, v) => void store.set(k, v),
@@ -46,6 +63,12 @@ function setup() {
     calls.push({ url: String(url), init });
     if (String(url).endsWith("/config/prices.json"))
       return Response.json(prices);
+    if (String(url).endsWith("/config/payments.json"))
+      return Response.json({ ...config("payments"), orderEmails: siteSwitch });
+    if (String(url).endsWith("/config/business.json"))
+      return Response.json(business);
+    if (String(url) === "https://api.resend.com/emails")
+      return Response.json({ id: "email1" }, { status: resendStatus });
     if (String(url).endsWith("/api/v3/bills") && init.method === "POST")
       return Response.json({
         id: "abc123",
@@ -189,7 +212,10 @@ test("creates a bill, takes the callback and reports paid", async () => {
     ref: bill.ref,
     paid: true,
     total: oneBag,
+    emailed: false,
   });
+  // Order emails are off unless set up: nothing was sent anywhere.
+  assert.ok(!calls.some((c) => c.url.includes("resend.com")));
 
   const unauth = await worker.fetch(
     new Request("https://pay.example.workers.dev/orders"),
@@ -233,6 +259,122 @@ test("status checks Billplz when the callback hasn't arrived", async () => {
   assert.equal(s.paid, true);
   assert.equal(JSON.parse(store.get("bill:abc123")).status, "paid");
   assert.equal(s.ref, bill.ref);
+});
+
+// Places an order and has Billplz report it paid, as in the test above.
+async function paidOrder(env, extra = {}) {
+  const bill = await (
+    await worker.fetch(
+      post("/bills", {
+        items: [{ name: tea, qty: 10 }],
+        customer: { ...customer, ...extra },
+      }),
+      env,
+    )
+  ).json();
+  const fields = {
+    id: "abc123",
+    paid: "true",
+    paid_amount: cents(oneBag),
+    paid_at: "2026-11-05 10:00:00 +0800",
+  };
+  fields.x_signature = await signature(fields, "sigkey");
+  const callback = () =>
+    worker.fetch(
+      new Request("https://pay.example.workers.dev/billplz/callback", {
+        method: "POST",
+        body: new URLSearchParams(fields),
+      }),
+      env,
+    );
+  return { bill, callback };
+}
+const emailsSent = (calls) =>
+  calls
+    .filter((c) => c.url === "https://api.resend.com/emails")
+    .map((c) => ({ ...JSON.parse(c.init.body), headers: c.init.headers }));
+
+test("a paid order emails the customer and the shop, once each", async () => {
+  const { env, store, calls } = setup({ emails: true });
+  const { bill, callback } = await paidOrder(env, {
+    notes: "Leave with <the guard> & call",
+  });
+  assert.equal(emailsSent(calls).length, 0); // nothing before payment
+  assert.equal((await callback()).status, 200);
+  const [toCustomer, toShop] = emailsSent(calls).sort((a) =>
+    a.to[0] === customer.email ? -1 : 1,
+  );
+  assert.equal(emailsSent(calls).length, 2);
+  assert.deepEqual(toCustomer.to, [customer.email]);
+  assert.equal(toCustomer.from, "Teasire <orders@example.com>");
+  assert.equal(toCustomer.reply_to, business.business.email);
+  assert.match(toCustomer.subject, new RegExp(bill.ref));
+  assert.match(toCustomer.text, new RegExp("10 × " + tea));
+  assert.ok(toCustomer.text.includes("Total paid: RM" + oneBag.toFixed(2)));
+  assert.ok(toCustomer.text.includes(customer.address));
+  assert.ok(toCustomer.text.includes(business.business.registeredName));
+  // What the customer typed can't add markup to the email.
+  assert.ok(
+    toCustomer.html.includes("Leave with &lt;the guard&gt; &amp; call"),
+  );
+  assert.ok(!toCustomer.html.includes("<the guard>"));
+  assert.equal(toCustomer.headers.authorization, "Bearer resend-key");
+  assert.equal(
+    toCustomer.headers["idempotency-key"],
+    "teasire-" + bill.ref + "-customer",
+  );
+  assert.deepEqual(toShop.to, [business.business.email]);
+  assert.equal(toShop.reply_to, customer.email);
+  assert.ok(toShop.text.includes("60123456789"));
+  const saved = JSON.parse(store.get("bill:abc123"));
+  assert.ok(saved.emails.customer && saved.emails.shop);
+
+  // Billplz repeating its message, or the customer coming back, sends nothing more.
+  await callback();
+  const status = await (
+    await worker.fetch(new Request("https://x/bills/abc123"), env)
+  ).json();
+  assert.equal(status.emailed, true);
+  assert.equal(emailsSent(calls).length, 2);
+});
+
+test("no emails while the site's switch is off", async () => {
+  const { env, store, calls } = setup({ emails: true, siteSwitch: false });
+  const { callback } = await paidOrder(env);
+  assert.equal((await callback()).status, 200);
+  assert.equal(emailsSent(calls).length, 0);
+  assert.equal(JSON.parse(store.get("bill:abc123")).status, "paid");
+});
+
+test("an email failure doesn't lose the payment, and is retried", async () => {
+  const failing = setup({ emails: true, resendStatus: 500 });
+  const { callback } = await paidOrder(failing.env);
+  assert.equal((await callback()).status, 200);
+  const saved = JSON.parse(failing.store.get("bill:abc123"));
+  assert.equal(saved.status, "paid");
+  assert.equal(saved.emails, undefined);
+  // Next time Billplz repeats its message, the emails are tried again.
+  await callback();
+  assert.equal(emailsSent(failing.calls).length, 4);
+});
+
+test("order emails read well as plain text", () => {
+  const { customer: mail } = orderEmails(
+    {
+      ref: "TS-261105-K7QM",
+      billId: "abc123",
+      paidAt: "2026-11-05 10:00:00 +0800",
+      items: [{ name: tea, qty: 80, price: per10 * 8 }],
+      customer: { ...customer, phone: "60123456789", notes: "" },
+      tea: per10 * 8,
+      delivery: 0,
+      total: per10 * 8,
+    },
+    business,
+  );
+  assert.ok(mail.text.includes("Delivery (Peninsular Malaysia): Free"));
+  assert.ok(!mail.text.includes("Your note"));
+  assert.ok(!/undefined|null|\[object/.test(mail.text + mail.html));
 });
 
 test("only the website may create bills", async () => {
