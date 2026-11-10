@@ -12,6 +12,9 @@ SITE_URL = "https://leean-design.github.io/Teasire"
 BILLPLZ_API = "https://www.billplz-sandbox.com"
 # Your Billplz collection ID (Billplz → Billing → Collections). Not secret.
 BILLPLZ_COLLECTION_ID = "ukys0roj"
+# Who order emails come from (see "Order emails" in ../README.md). The address
+# must be on a domain verified in your Resend account. Not secret.
+ORDER_EMAIL_FROM = "Teasire <peiwen@scircle.online>"
 
 # Every order is kept in a KV namespace bound as ORDERS. The deploy workflow
 # adds the section below itself. To deploy from your own computer, run
@@ -25,3 +28,4 @@ BILLPLZ_COLLECTION_ID = "ukys0roj"
 #   BILLPLZ_API_KEY      Billplz → Settings → Keys & Integration → API Secret Key
 #   BILLPLZ_X_SIGNATURE  Billplz → Settings → Keys & Integration → X Signature Key
 #   ADMIN_TOKEN          any long random string; lets you list orders at /orders
+#   RESEND_API_KEY       optional: Resend → API Keys. Order emails stay off without it.

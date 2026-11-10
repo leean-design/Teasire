@@ -2,5 +2,6 @@
   "provider": "billplz",
   "enabled": false,
   "apiUrl": "https://teasire-payments.teasire.workers.dev",
-  "currency": "MYR"
+  "currency": "MYR",
+  "orderEmails": false
 }

@@ -6,6 +6,8 @@
 #   BILLPLZ_API_KEY        Billplz → Settings → Keys & Integration → API Secret Key
 #   BILLPLZ_X_SIGNATURE    Billplz → Settings → Keys & Integration → X Signature Key
 #   ADMIN_TOKEN            any long random password, for listing orders at /orders
+# Optional, for order emails (see "Order emails" in Teasire-codebase/README.md):
+#   RESEND_API_KEY         Resend → API Keys. Without it, no emails are sent.
 name: Deploy payments worker
 
 on:
@@ -73,10 +75,17 @@ jobs:
           BILLPLZ_API_KEY: ${{ secrets.BILLPLZ_API_KEY }}
           BILLPLZ_X_SIGNATURE: ${{ secrets.BILLPLZ_X_SIGNATURE }}
           ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
           for name in BILLPLZ_API_KEY BILLPLZ_X_SIGNATURE ADMIN_TOKEN; do
             printf '%s' "${!name}" | $WRANGLER secret put "$name"
           done
+          # Optional: only set when the repository has it.
+          if [ -n "$RESEND_API_KEY" ]; then
+            printf '%s' "$RESEND_API_KEY" | $WRANGLER secret put RESEND_API_KEY
+          else
+            echo "RESEND_API_KEY is not set: order emails stay off."
+          fi
 
       - name: Show the worker address
         run: |
