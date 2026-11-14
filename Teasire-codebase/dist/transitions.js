@@ -9,6 +9,14 @@
 //    leaving the phone menu it rises in ("menu"), and otherwise it fades up
 //    ("rise"). Whatever the turn, the new page's opening lines arrive in turn.
 (() => {
+  // The floating bag button (site.js, enhancements.css) shows while <html> has
+  // the class "has-bag". Setting it here, before the first frame, keeps the
+  // button in place as pages change; site.js confirms it once it runs.
+  try {
+    const saved = JSON.parse(localStorage.getItem("teasire-bag") || "[]");
+    if (Array.isArray(saved) && saved.some((i) => i && i.qty >= 10))
+      document.documentElement.classList.add("has-bag");
+  } catch {}
   const FLIGHT = "teasire-flight"; // the tea whose photo is flying to the next page
   const FROM = "teasire-from"; // where the last page sits in the menu, and if its phone menu was open
   // Pages in menu order, left to right (Home first, the bag last); a tea's own

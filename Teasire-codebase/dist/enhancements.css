@@ -1015,6 +1015,13 @@ details > summary {
     min-height: max(560px, calc(100vh - 96px));
     min-height: max(560px, calc(100svh - 96px));
   }
+  /* Above phone width the header is 156px tall, not 96px. */
+  @media (min-width: 751px) {
+    .film-hero {
+      min-height: max(560px, calc(100vh - 156px));
+      min-height: max(560px, calc(100svh - 156px));
+    }
+  }
   .film-hero::before,
   .film-hero-ambient {
     display: none;
@@ -2138,10 +2145,12 @@ body[data-page="discover"] main {
   color: var(--night);
 }
 
-/* The bag within reach. Once something is in the bag, a round bag button with
-   the number of packs stays on screen above the WhatsApp button (on every page
-   but the bag's own), and the "Added" message carries a link to the bag. */
+/* The bag within reach. While something is in the bag (<html> then has the
+   class "has-bag"), a round bag button with the number of packs stays on
+   screen above the WhatsApp button, on every page but the bag's own, and the
+   "Added" message carries a link to the bag. */
 .bag-float {
+  display: none;
   position: fixed;
   right: 25px;
   bottom: 92px;
@@ -2156,7 +2165,10 @@ body[data-page="discover"] main {
     transform 0.35s var(--ease-out),
     color 0.2s;
 }
-.bag-float[hidden] {
+.has-bag .bag-float {
+  display: grid;
+}
+body[data-page="checkout"] .bag-float {
   display: none;
 }
 .bag-float:hover {
@@ -2186,8 +2198,21 @@ body[data-page="discover"] main {
 .bag-float .bag-count[hidden] {
   display: none;
 }
-.menu-is-open .bag-float {
+/* Out of the way, and out of reach of the keyboard, under the phone menu and
+   behind the open WhatsApp panel. */
+.menu-is-open .bag-float,
+body:has(#whatsapp-panel:not(.hidden)) .bag-float {
   visibility: hidden;
+}
+/* The foot of the page ends clear of both buttons. */
+.has-bag body:not([data-page="checkout"]) .footer-bottom {
+  padding-bottom: 156px;
+}
+/* The message moves to the top of the screen when its place at the foot would
+   cover the button just pressed (see toast() in site.js). */
+.toast.at-top {
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  bottom: auto;
 }
 .toast a {
   /* A taller target than the line of text, without making the message taller. */
@@ -2211,6 +2236,12 @@ body[data-page="discover"] main {
   /* Clear of both buttons on narrow screens. */
   .toast {
     bottom: calc(154px + env(safe-area-inset-bottom));
+  }
+}
+@media (max-width: 899px) {
+  /* Home's opening: the line about what is sold ends short of the bag button. */
+  .has-bag .film-hero-note {
+    padding-right: 64px;
   }
 }
 
@@ -2297,13 +2328,16 @@ body[data-page="discover"] main {
   margin-top: 14px;
 }
 #next-step:empty,
-#pay-status:empty,
-#copy-status:empty,
 #tng-description:empty {
   display: none;
 }
+/* An order number or amount not yet filled in doesn't show its label. */
+.pay-ref:has(#order-ref:empty),
+.pay-amount:has(#pay-amount:empty) {
+  display: none;
+}
 .pay-summary #next-step,
-.pay-summary #pay-status {
+.pay-summary #pay-status:not(:empty) {
   margin-top: 12px;
 }
 .order-steps > li + li {
@@ -2312,11 +2346,20 @@ body[data-page="discover"] main {
 .order-steps > li > p {
   margin: 0;
 }
+/* Each step's button or link shows once an order is prepared, that is, while
+   the summary above the steps shows. */
 .step-tools {
+  display: none;
   margin-top: 12px;
 }
+#order-review:not(.hidden) ~ .order-steps .step-tools {
+  display: block;
+}
 .step-tools #copy-status {
-  margin: 12px 0 0;
+  margin: 0;
+}
+.step-tools #copy-status:not(:empty) {
+  margin-top: 12px;
 }
 .order-message {
   margin-top: 4px;
