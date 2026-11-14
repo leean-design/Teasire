@@ -1126,9 +1126,6 @@ body:before {
   }
 }
 @media (max-width: 850px) {
-  .site-nav {
-    display: none;
-  }
   .footer-top {
     gap: 35px;
   }
@@ -1622,8 +1619,12 @@ body:before,
 .quiet-story {
   background: white;
 }
+/* The gap between the two columns is a share of the width. The gap between
+   rows (phones stack them) is fixed: as a percentage it isn't counted in the
+   block's height, and the last row spills onto whatever comes next. */
 .quiet-story .split {
-  gap: 12%;
+  column-gap: 12%;
+  row-gap: 35px;
 }
 .cta {
   background: #f6f7f3;
@@ -1652,7 +1653,8 @@ body:before,
   font-size: 46px;
 }
 .product-layout {
-  gap: 8%;
+  column-gap: 8%;
+  row-gap: 30px;
 }
 .product-layout > img {
   border-radius: 0;

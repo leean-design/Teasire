@@ -54,7 +54,7 @@ Prices are in RM per pack of 10 teabags, in `dist/site.js`:
 - `price` on each tea in the `teas` list.
 - `customBlendPrice` for blends made in the Blend Studio.
 - `freeDeliveryFrom` (RM150) and `freeDeliveryLocations` (Peninsular Malaysia): orders of that amount and above, delivered there, get free delivery. The bag, the WhatsApp order and every page that mentions free delivery follow these two values.
-- `deliveryFees`: the delivery fee for each location. The bag adds it to the total, and the Policies page lists it. The current fees (RM8 Peninsular Malaysia, RM15 Sabah, Sarawak and Labuan) are provisional until the courier's rates are confirmed.
+- `deliveryFees`: the delivery fee for each location. The bag adds it to the total and the Policies page lists it. The tea pages, the Pricing page, the FAQ and the bag also state the fees in words, built from this same list (`deliveryFeesText`), so a change here reaches every mention. The current fees (RM8 Peninsular Malaysia, RM15 Sabah, Sarawak and Labuan) are provisional until the courier's rates are confirmed.
 
 The payments worker charges from `config/prices.json`, which the preparation script writes from these values. After changing any of them, publish the site, then deploy the payments worker again (Actions → "Deploy payments worker"), so online payments charge the same total as the bag.
 
@@ -63,7 +63,7 @@ The payments worker charges from `config/prices.json`, which the preparation scr
 - Business details live in `dist/config/business.json` under `business`: `registeredName`, `registrationNumber` (SSM), `email`, `address`, and full `https://` links for `instagram`, `facebook` and `tiktok`. Empty values are hidden. The footer of every page shows "Teasire is operated by" the registered name with its SSM number, then the WhatsApp number (`whatsappNumber`); the Contact section of the Policies page shows the WhatsApp number, email and address. The preparation script writes these into each page's HTML, so run it after changing the file.
 - The privacy text describes what the site really does, so change the two together: parts marked `online-only` show only while online payment is on (or in test mode), and `email-only` only while order emails are on. If you add a service that receives customers' details (analytics, another payment or email provider), add it to the privacy text in the same change.
 - Search engines get each tea's name, photo, price and availability, and the shop's details on the home page, from hidden notes the preparation script writes into the pages (`teaData` and `shopData` in `scripts/prepare-site.mjs`). They follow `site.js` and `business.json` automatically. Every tea is listed as in stock.
-- The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` near the prices. The current text is a draft written as a placeholder: check every point matches how the shop runs.
+- The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` near the prices. The current text is a draft written as a placeholder: check every point matches how the shop runs. The packing and courier times are worded once, in `packingText` and `courierText` near the prices: the Policies page and the bag page's "What happens next" line both use them.
 
 ### Online payments (Billplz)
 
@@ -162,7 +162,7 @@ One-time setup: in the repository's **Settings → Pages**, set **Source** to **
 
 ## Payments and data
 
-Visitors send their order, with prices and a total, to Teasire on WhatsApp. DuitNow payments are checked manually after the order is confirmed. Card checkout and automatic billing are not connected. The cart and saved blends are held in the visitor's browser, not a server database.
+Visitors send their order, with prices and a total, to Teasire on WhatsApp. Each prepared order starts with an order number such as `WA-261114-K7QM`, which the receipt message repeats; it is worked out from the order and the date in the visitor's browser, and nothing is stored. DuitNow payments are checked manually after the order is confirmed. Card checkout and automatic billing are not connected. The cart and saved blends are held in the visitor's browser, not a server database.
 
 ## Audit improvements
 

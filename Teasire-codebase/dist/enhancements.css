@@ -945,8 +945,7 @@ details > summary {
   gap: 22px;
   justify-items: start;
 }
-.film-hero .eyebrow,
-.film-hero-note {
+.film-hero .eyebrow {
   font-size: 12px;
   letter-spacing: 0.16em;
   color: rgba(240, 237, 229, 0.75);
@@ -966,6 +965,13 @@ details > summary {
   font-size: 18px;
   line-height: 1.7;
   color: rgba(240, 237, 229, 0.88);
+}
+/* What is sold and how, in one plain line (smaller than the line above it). */
+.film-hero .film-hero-note {
+  max-width: none;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(240, 237, 229, 0.8);
 }
 .film-hero-actions {
   display: flex;
@@ -1025,6 +1031,9 @@ details > summary {
     position: absolute;
     inset: 0;
     z-index: 0;
+    /* Fill the whole opening, on upright tablets too. */
+    justify-self: stretch;
+    width: 100%;
     height: auto;
     aspect-ratio: auto;
     border-radius: 0;
@@ -1049,10 +1058,9 @@ details > summary {
   .film-hero p {
     font-size: 17px;
   }
-  .film-hero-note {
-    display: none;
-  }
+  /* On phones the line sits above the buttons, clear of the floating ones. */
   .film-hero-actions {
+    order: 1;
     width: 100%;
   }
   .film-hero-actions .button {
@@ -1279,6 +1287,9 @@ details > summary {
 .whatsapp-float {
   view-transition-name: whatsapp-button;
 }
+.bag-float {
+  view-transition-name: bag-button;
+}
 .nav-marker {
   view-transition-name: nav-marker;
 }
@@ -1443,8 +1454,8 @@ details > summary {
   }
 }
 /* Leaving the phone menu (data-turn "menu"): the menu lifts away, the page
-   rises in, and the header and WhatsApp button, hidden under the menu until
-   now, fade in where they stand. */
+   rises in, and the header and the WhatsApp and bag buttons, hidden under the
+   menu until now, fade in where they stand. */
 :root[data-turn="menu"]::view-transition-old(root) {
   animation:
     teasire-fade-out 200ms ease-out both,
@@ -1456,7 +1467,8 @@ details > summary {
     teasire-rise 640ms var(--ease-out) 100ms both;
 }
 ::view-transition-new(site-header):only-child,
-::view-transition-new(whatsapp-button):only-child {
+::view-transition-new(whatsapp-button):only-child,
+::view-transition-new(bag-button):only-child {
   animation: teasire-fade-in 360ms ease-out 140ms both;
 }
 @keyframes teasire-lift {
@@ -2071,6 +2083,12 @@ details > summary {
 .page:has(> .discover) > .page-intro {
   margin-bottom: 34px;
 }
+/* The wheel is a square that turns, so its corners can reach past the screen's
+   edge on phones. They are cut off there rather than making the page wider.
+   (clip, not hidden: hidden would turn the page area into a scrolling box.) */
+body[data-page="discover"] main {
+  overflow-x: clip;
+}
 
 /* Motion: one soft curve that settles gently, used for movement across the
    site, so things glide to a stop instead of stopping short. */
@@ -2116,6 +2134,213 @@ details > summary {
   color: var(--green);
 }
 .footer-business strong {
+  font-weight: 600;
+  color: var(--night);
+}
+
+/* The bag within reach. Once something is in the bag, a round bag button with
+   the number of packs stays on screen above the WhatsApp button (on every page
+   but the bag's own), and the "Added" message carries a link to the bag. */
+.bag-float {
+  position: fixed;
+  right: 25px;
+  bottom: 92px;
+  z-index: 55;
+  width: 52px;
+  height: 52px;
+  border: 1px solid #dfe3df;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 8px 30px #060d0c25;
+  transition:
+    transform 0.35s var(--ease-out),
+    color 0.2s;
+}
+.bag-float[hidden] {
+  display: none;
+}
+.bag-float:hover {
+  transform: translateY(-3px);
+}
+.bag-float .bag-icon {
+  width: 26px;
+  height: 26px;
+}
+.bag-float .bag-count {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--green);
+  box-shadow: 0 0 0 2px #fff;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+.bag-float .bag-count[hidden] {
+  display: none;
+}
+.menu-is-open .bag-float {
+  visibility: hidden;
+}
+.toast a {
+  /* A taller target than the line of text, without making the message taller. */
+  margin: -14px -4px;
+  padding: 14px 4px;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.toast.show a {
+  pointer-events: auto;
+}
+@media (max-width: 750px) {
+  .bag-float {
+    right: 18px;
+    bottom: calc(85px + env(safe-area-inset-bottom));
+    width: 57px;
+    height: 57px;
+  }
+  /* Clear of both buttons on narrow screens. */
+  .toast {
+    bottom: calc(154px + env(safe-area-inset-bottom));
+  }
+}
+
+/* The bag page: the delivery fee and total again, just above the order button
+   (on phones the totals box has scrolled away by then). */
+.order-total {
+  margin: 22px 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--night);
+}
+.order-total:empty {
+  display: none;
+}
+
+/* The bag page: how to pay, as one card. Preparing an order adds its number
+   and the amount to pay at the top, and each step then shows its own button
+   or QR, so nothing has to be hunted for further down the page. */
+.pay-card {
+  margin-top: 35px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border);
+}
+.pay-summary {
+  margin: 20px 0 8px;
+  padding: 20px;
+  border: 1px solid #dfe5dd;
+  background: #f7f8f5;
+  scroll-margin-top: 16px;
+}
+.pay-summary:focus {
+  outline: none;
+}
+.pay-summary .eyebrow {
+  margin-bottom: 4px;
+}
+.pay-ref {
+  margin: 0;
+}
+.pay-ref strong {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--night);
+}
+/* The amount with its Copy button beside it, or under it where there's no room. */
+.pay-amount {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 18px 0 14px;
+}
+.pay-amount .eyebrow {
+  flex-basis: 100%;
+}
+.pay-amount strong {
+  font-family: Lora, Georgia, serif;
+  font-size: clamp(30px, 8.4vw, 44px);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--night);
+}
+#copy-amount {
+  gap: 0;
+  padding: 12px 18px;
+  white-space: pre;
+}
+.nowrap {
+  white-space: nowrap;
+}
+@media (max-width: 750px) {
+  /* Just "Copy" on phones, so it fits beside the amount. */
+  #copy-amount span {
+    display: none;
+  }
+}
+.pay-summary .fine {
+  margin: 0;
+}
+.pay-summary #pay-online {
+  margin-top: 14px;
+}
+#next-step:empty,
+#pay-status:empty,
+#copy-status:empty,
+#tng-description:empty {
+  display: none;
+}
+.pay-summary #next-step,
+.pay-summary #pay-status {
+  margin-top: 12px;
+}
+.order-steps > li + li {
+  margin-top: 8px;
+}
+.order-steps > li > p {
+  margin: 0;
+}
+.step-tools {
+  margin-top: 12px;
+}
+.step-tools #copy-status {
+  margin: 12px 0 0;
+}
+.order-message {
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+}
+.order-message > summary {
+  display: inline-block;
+  min-height: 44px;
+  padding-block: 10px;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.order-message .field {
+  margin: 4px 0 0;
+}
+.order-steps .tng-payment {
+  margin: 14px 0 6px;
+}
+.what-next {
+  margin: 20px 0 6px;
+}
+.what-next strong {
   font-weight: 600;
   color: var(--night);
 }

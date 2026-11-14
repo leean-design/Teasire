@@ -94,15 +94,15 @@
   );
 
   // Leaving: a clicked tea card sends its photo; a tea page sends its big photo.
-  // From the open phone menu nothing flies, and the header and WhatsApp button,
-  // hidden under the menu, leave with it rather than float over it.
+  // From the open phone menu nothing flies, and the header and the WhatsApp and
+  // bag buttons, hidden under the menu, leave with it rather than float over it.
   addEventListener("pageswap", (e) => {
     clear();
     let flight = null;
     const menu = document.body.classList.contains("menu-is-open");
     if (e.viewTransition && menu)
       document
-        .querySelectorAll(".site-header, .whatsapp-float")
+        .querySelectorAll(".site-header, .whatsapp-float, .bag-float")
         .forEach((el) => name(el, "none", "off"));
     else if (e.viewTransition) {
       const tea = teaIn(clicked?.getAttribute("href"));
