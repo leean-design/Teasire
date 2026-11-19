@@ -6,10 +6,10 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 
 - `dist/site.js`: page content, tea catalogue, blend builder, cart and interactions.
 - `dist/site.css`: base design and styles.
-- `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions.
+- `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions. The shared heading sizes come from three variables near its end: `--type-title` (page titles), `--type-section` (section headings) and `--type-panel` (panel titles), each with a phone size. Headings that keep sizes of their own include Home's film title (`.film-hero h1`); a tea's name on its own page (`.product-details h1`), on its card (`.product h3`), in the bag (`.cart-item h3`) and on the Discovery card (`.spin-body h2`); the Policies page's section headings (`.policy h2`, 30px); and the card titles on Subscriptions and Pricing, which are plain `h3`s (20px).
 - `dist/transitions.js`: the page transitions. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. Moving along the menu, the line under it glides to the new item and the page sweeps in from that side; leaving the phone menu, the page rises in. Each new page's opening lines arrive one after another. It runs in Chrome, Edge and Safari; other browsers change page normally.
 - `dist/*.html`: generated page documents, including individual tea pages.
-- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film and its poster at the top of the home page, and the osmanthus film and its still further down; both are silent), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
+- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film, its poster and a still of its first frame at the top of the home page, and the osmanthus film and its still further down; both are silent), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
 - `dist/config/payments.json`: turns online payment (Billplz) on or off and holds the payments worker's address. See "Online payments (Billplz)" below.
 - `dist/config/prices.json`: generated from `site.js` by the preparation script. The payments worker charges from it.
@@ -37,7 +37,7 @@ Edit `dist/site.js` and the CSS files. After content edits, run:
 node scripts/prepare-site.mjs
 ```
 
-Pages show the HTML this script saves, and the browser doesn't redraw them, so always run it after changing `site.js` (the deploy runs it automatically). The preparation script requires Node.js 22 or later. When changing domains, update the `origin` value in the script before regenerating pages.
+Pages show the HTML this script saves, and the browser doesn't redraw them, so always run it after changing `site.js` (the deploy runs it automatically). The script also links each stylesheet and script with a `?v=` code made from its contents, so after a deploy no browser pairs a new page with an old file it kept; run it after changing a CSS file too. The preparation script requires Node.js 22 or later. When changing domains, update the `origin` value in the script before regenerating pages.
 
 Keep the code formatted so pull request diffs stay readable:
 
@@ -63,7 +63,7 @@ The payments worker charges from `config/prices.json`, which the preparation scr
 - Business details live in `dist/config/business.json` under `business`: `registeredName`, `registrationNumber` (SSM), `email`, `address`, and full `https://` links for `instagram`, `facebook` and `tiktok`. Empty values are hidden. The footer of every page shows "Teasire is operated by" the registered name with its SSM number, then the WhatsApp number (`whatsappNumber`); the Contact section of the Policies page shows the WhatsApp number, email and address. The preparation script writes these into each page's HTML, so run it after changing the file.
 - The privacy text describes what the site really does, so change the two together: parts marked `online-only` show only while online payment is on (or in test mode), and `email-only` only while order emails are on. If you add a service that receives customers' details (analytics, another payment or email provider), add it to the privacy text in the same change.
 - Search engines get each tea's name, photo, price and availability, and the shop's details on the home page, from hidden notes the preparation script writes into the pages (`teaData` and `shopData` in `scripts/prepare-site.mjs`). They follow `site.js` and `business.json` automatically. Every tea is listed as in stock.
-- The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` near the prices. The current text is a draft written as a placeholder: check every point matches how the shop runs. The packing and courier times are worded once, in `packingText` and `courierText` near the prices: the Policies page and the bag page's "What happens next" line both use them.
+- The delivery, returns, cancellation, terms and privacy text is in the `policies()` function in `dist/site.js`, with delivery fees in `deliveryFees` near the prices. The current text is a draft written as a placeholder: check every point matches how the shop runs. The packing and courier times are worded once, in `packingText` and `courierText` near the prices: the Policies page and the bag page's "What happens next" line both use them. The links at the top of the Policies page are written out in `policies()`: when you add a section, add its link there too (pointing at the section's `id`).
 
 ### Online payments (Billplz)
 
@@ -130,7 +130,7 @@ The preparation script stops with an error if a photo's smaller copies are missi
 
 On the Discovery page (`discover.html`), visitors choose a mood and spin a wheel of the teas that suit it. Wherever the wheel stops, 10 teabags of that tea go straight into the bag, and a card pops up with the tea's photo and description, Undo, and a link to the bag. "Surprise me" spins all the teas.
 
-The moods are the `moods` list in `dist/site.js`: each has a `chip` (its button), a `name`, the `teas` on its wheel (by `id`) and the `line` shown under the buttons ("Rosy & expressive · 4 blends with rose"). A mood without `teas` holds every tea. Each slice shows the tea's photo, with its name on a white ring round the edge. A wheel with fewer than six teas shows each tea more than once, so it still looks full.
+The moods are the `moods` list in `dist/site.js`: each has a `chip` (its button), a `name`, the `teas` on its wheel (by `id`) and the `line` shown under the buttons ("Rosy & expressive · 4 blends with rose"). A mood without `teas` holds every tea. Each slice shows the tea's photo, with its name on a white ring round the edge. A wheel with fewer than six teas shows each tea more than once, so it still looks full. The first spin takes about 7 seconds to the card; spinning again takes about 4.
 
 ### Hidden pages
 

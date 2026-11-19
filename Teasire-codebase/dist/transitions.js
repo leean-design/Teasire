@@ -82,6 +82,19 @@
       document.querySelector(".detail-image img"),
       document.querySelector(".product-details h1"),
     );
+  // A header scrolled more than half out of sight doesn't fly in from above the
+  // screen (or away upwards): it goes with its page, and the other page's
+  // header fades in where it stands. Its menu line goes with it.
+  function settleHeader() {
+    const header = document.querySelector(".site-header");
+    if (!header) return;
+    const r = header.getBoundingClientRect();
+    if (r.top > -r.height / 2) return;
+    name(header, "none", "off");
+    header
+      .querySelectorAll(".nav-marker")
+      .forEach((el) => name(el, "none", "off"));
+  }
   // The new page's opening lines, named one by one so each can arrive in turn.
   function markIntro() {
     const intro = document.querySelector(".page-intro, .film-hero-copy");
@@ -113,6 +126,7 @@
         .querySelectorAll(".site-header, .whatsapp-float, .bag-float")
         .forEach((el) => name(el, "none", "off"));
     else if (e.viewTransition) {
+      settleHeader();
       const tea = teaIn(clicked?.getAttribute("href"));
       const card = clicked?.closest(".product");
       const to = e.activation?.entry?.url;
@@ -148,6 +162,7 @@
       sessionStorage.removeItem(FROM);
     } catch {}
     if (!e.viewTransition) return;
+    settleHeader();
     const root = document.documentElement;
     const own = document.body.dataset.product;
     const card = flight && flight !== own ? cardFor(flight) : null;
