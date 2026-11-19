@@ -515,7 +515,7 @@ function product() {
   if (!t)
     return `<div class="page">${intro("THE TEASIRE COLLECTION", "Find your cup.", "This blend could not be found. Explore our tea collections to find your next little ritual.")}<a class="button" href="flower-tea.html">Explore Flower Tea ↗</a></div>`;
   document.title = t.name + " (" + t.blend + ") — Teasire";
-  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout" style="margin-top:30px"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${teaAlt(t)}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">Delivery per order: ${deliveryFeesText}. ${sentence(freeDeliveryText)}.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. ${sentence(freeDeliveryText)}; otherwise delivery is ${deliveryFeesText}. Card checkout is not active yet.</p><a class="link" href="policies.html#delivery">Delivery & returns ↗</a></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
+  return `<div class="page"><a class="link" href="${t.series}-tea.html">← ${t.series === "flower" ? "Flower Tea" : "Fruit Tea"}</a><div class="product-layout"><div class="detail-image"><img ${photoAttrs(t, "large")} alt="${teaAlt(t)}"></div><div class="product-details"><span class="eyebrow">${t.series.toUpperCase()} TEA SERIES · ${t.zh}</span><h1>${t.name}</h1><p class="tea-blend">${t.blend}</p><p class="tea-notes">${t.notes}</p><p class="price-tag">${rm(t.price)} <span>per 10 teabags</span></p><p>${t.description}</p><div class="facts"><div>THE INGREDIENTS<br><br><strong>${t.ingredients.join(" + ")}</strong></div><div>YOUR DAILY RITUAL<br><br><strong>Individually packed teabags</strong></div></div><label class="field">Choose your quantity<select id="product-qty">${[10, 20, 30, 50, 100].map((n) => `<option value="${n}">${n} teabags · ${rm((t.price * n) / 10)}</option>`).join("")}</select></label><button class="button full" id="product-add" data-id="${t.id}">Add to your bag ↗</button><p class="fine" style="margin-top:18px">Delivery per order: ${deliveryFeesText}. ${sentence(freeDeliveryText)}.</p><details open><summary>What’s in the blend?</summary><p>${t.ingredients.join(", ")}. Final ingredient details and balance will be confirmed before packing.</p></details><details><summary>Make it your own</summary><p>Prefer a different floral note? Explore the Blend Studio and create a personalised tea.</p><a class="link" href="blend-studio.html">Go to the Blend Studio ↗</a></details><details><summary>Delivery & payment</summary><p>Malaysia is our launch market. ${sentence(freeDeliveryText)}; otherwise delivery is ${deliveryFeesText}. Card checkout is not active yet.</p><a class="link" href="policies.html#delivery">Delivery & returns ↗</a></details></div></div></div><section class="section"><div class="page-top"><h2>A different note?</h2><a class="link" href="${t.series}-tea.html">Explore the collection ↗</a></div><div class="grid">${teas
     .filter((x) => x.series === t.series && x.id !== t.id)
     .map(card)
     .join("")}</div></section>`;
@@ -793,12 +793,20 @@ function renderSummary() {
 }
 // Pricing: a short table for each series (its name is the table's caption).
 // Each row is a blend, which heads the row, and its price, set out as on the
-// tea cards: the price, with the pack size under it.
+// tea cards: the price, with the pack size under it. Each ingredient keeps its
+// words together, and each dot stays on the line of the ingredient before it.
 const priceTable = (series, list) =>
   `<table class="pricing-table"><caption>${series}</caption><tbody>${list
     .map(
       (t) =>
-        `<tr><th scope="row"><a href="${t.href || productUrl(t.id)}">${t.name}</a>${t.blend ? `<small class="tea-blend">${t.blend}</small>` : ""}</th><td><span class="card-price"><strong>${rm(t.price)}</strong><small>10 teabags</small></span></td></tr>`,
+        `<tr><th scope="row"><a href="${t.href || productUrl(t.id)}">${t.name}</a>${
+          t.blend
+            ? `<small class="tea-blend">${t.blend
+                .split(" · ")
+                .map((x) => x.replaceAll(" ", "\u00a0"))
+                .join("\u00a0· ")}</small>`
+            : ""
+        }</th><td><span class="card-price"><strong>${rm(t.price)}</strong><small>10 teabags</small></span></td></tr>`,
     )
     .join("")}</tbody></table>`;
 function pricing() {
@@ -951,7 +959,7 @@ function policies() {
   return `<div class="page">${intro("SHOP POLICIES", "The small print.", "How ordering, delivery, returns and your details work at Teasire.")}<div class="policies">
 <nav class="policy-nav" aria-label="On this page"><a href="#delivery">Delivery</a><a href="#returns">Returns & refunds</a><a href="#cancellations">Cancellations</a><a href="#terms">Terms of sale</a><a href="#privacy">Privacy</a><a href="#contact">Contact</a></nav>
 <div class="policy-sections">
-<section class="policy" id="delivery"><h2>Delivery</h2>
+<section class="policy" tabindex="-1" id="delivery"><h2>Delivery</h2>
 <p>We deliver within Malaysia by tracked courier and send you the tracking number on WhatsApp.</p>
 <ul>
 <li>${packingText}</li>
@@ -965,7 +973,7 @@ ${Object.entries(deliveryFees)
   .join("")}
 <div class="summary-row"><span>${freeDeliveryLocations.join(" and ")}, orders of RM${freeDeliveryFrom} and above</span><strong>Free</strong></div>
 </section>
-<section class="policy" id="returns"><h2>Returns & refunds</h2>
+<section class="policy" tabindex="-1" id="returns"><h2>Returns & refunds</h2>
 <ul>
 <li><strong>Damaged, wrong or missing items:</strong> message us on WhatsApp within 7 days of delivery with a photo of the parcel and items. We’ll send a replacement or refund you in full, including delivery.</li>
 <li><strong>Change of mind:</strong> tea is a food product, so we can’t take back opened packs. Unopened signature teas can be returned within 7 days of delivery. You pay the return postage, and we refund the tea once it arrives.</li>
@@ -973,14 +981,14 @@ ${Object.entries(deliveryFees)
 <li>Refunds go back to your original payment method where available; otherwise we pay them by bank transfer or DuitNow. Refunds are made within 7 working days of approval.</li>
 </ul>
 </section>
-<section class="policy" id="cancellations"><h2>Cancellations</h2>
+<section class="policy" tabindex="-1" id="cancellations"><h2>Cancellations</h2>
 <ul>
 <li>Before you pay, there’s nothing to cancel: just let us know.</li>
 <li>After you pay, you can cancel for a full refund until your order is packed. Custom blends can’t be cancelled once blending has started.</li>
 <li>Once your order has been sent, our returns policy applies.</li>
 </ul>
 </section>
-<section class="policy" id="terms"><h2>Terms of sale</h2>
+<section class="policy" tabindex="-1" id="terms"><h2>Terms of sale</h2>
 <ul>
 <li>Prices are in Malaysian Ringgit (RM), per pack of 10 individually packed teabags. Delivery for your location is added in your bag, with ${freeDeliveryText}.</li>
 <li>You order by sending your bag to us on WhatsApp and paying the total shown. We confirm your order once we have checked your payment. If anything is unavailable, we refund that item in full, unless you agree to a substitute.</li>
@@ -991,7 +999,7 @@ ${Object.entries(deliveryFees)
 <li>We may update these policies. The version on this page when you order applies to your order.</li>
 </ul>
 </section>
-<section class="policy" id="privacy"><h2>Privacy</h2>
+<section class="policy" tabindex="-1" id="privacy"><h2>Privacy</h2>
 <ul>
 <li>When you send an order on WhatsApp, we receive what is in your message: your name, email, delivery details, notes and WhatsApp number. We use them only to confirm, deliver and support your order.</li>
 <li class="online-only hidden">If you pay online, pressing Pay sends your order, name, email, phone number, delivery address and notes to our payment service, which runs on Cloudflare and keeps a record of the order. It passes your name, email, phone number, delivery address and a summary of your order to Billplz, our payment provider, to take your payment. This happens when you press Pay, even if you don’t finish paying. Card and bank details are entered only on Billplz’s page; we never see them.</li>
@@ -1003,7 +1011,7 @@ ${Object.entries(deliveryFees)
 <li>To see, correct or delete your details, message us on WhatsApp.</li>
 </ul>
 </section>
-<section class="policy" id="contact"><h2>Contact</h2>
+<section class="policy" tabindex="-1" id="contact"><h2>Contact</h2>
 <div id="policy-contact-details">${contactDetails(pageBusiness)}</div>
 </section>
 </div></div></div>`;
@@ -1775,7 +1783,12 @@ if (teaFilm) {
     visible = false;
   const playFilm = () => {
     teaFilm.muted = true;
-    teaFilm.play().catch(() => {});
+    // A browser that won't start films by itself (iPhones in Low Power Mode)
+    // keeps the warm mid-pour still, not the empty glass the film opens on.
+    teaFilm.play().catch((e) => {
+      if (e.name === "NotAllowedError")
+        teaFilm.parentElement.classList.add("no-autoplay");
+    });
   };
   function tapFilm() {
     if (teaFilm.paused || teaFilm.ended) {
@@ -1787,10 +1800,12 @@ if (teaFilm) {
     }
   }
   // Its still stays underneath and the film fades in over it once it plays
-  // (enhancements.css), so the start of the pour doesn't cut in.
-  teaFilm.addEventListener("playing", () =>
-    teaFilm.parentElement.classList.add("is-playing"),
-  );
+  // (enhancements.css), so the start of the pour doesn't cut in. If it was held
+  // on the warm still, the film's first frame takes its place as it starts.
+  teaFilm.addEventListener("playing", () => {
+    teaFilm.parentElement.classList.remove("no-autoplay");
+    teaFilm.parentElement.classList.add("is-playing");
+  });
   teaFilm.addEventListener("click", tapFilm);
   teaFilm.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") {

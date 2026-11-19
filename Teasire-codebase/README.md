@@ -6,10 +6,10 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 
 - `dist/site.js`: page content, tea catalogue, blend builder, cart and interactions.
 - `dist/site.css`: base design and styles.
-- `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions. Heading sizes come from three variables near its end: `--type-title` (page titles), `--type-section` (section headings) and `--type-panel` (panel titles), each with a phone size.
+- `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions. The shared heading sizes come from three variables near its end: `--type-title` (page titles), `--type-section` (section headings) and `--type-panel` (panel titles), each with a phone size. Headings that keep sizes of their own include Home's film title (`.film-hero h1`); a tea's name on its own page (`.product-details h1`), on its card (`.product h3`), in the bag (`.cart-item h3`) and on the Discovery card (`.spin-body h2`); the Policies page's section headings (`.policy h2`, 30px); and the card titles on Subscriptions and Pricing, which are plain `h3`s (20px).
 - `dist/transitions.js`: the page transitions. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. Moving along the menu, the line under it glides to the new item and the page sweeps in from that side; leaving the phone menu, the page rises in. Each new page's opening lines arrive one after another. It runs in Chrome, Edge and Safari; other browsers change page normally.
 - `dist/*.html`: generated page documents, including individual tea pages.
-- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film and its poster at the top of the home page, and the osmanthus film and its still further down; both are silent), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
+- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film, its poster and a still of its first frame at the top of the home page, and the osmanthus film and its still further down; both are silent), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
 - `dist/config/payments.json`: turns online payment (Billplz) on or off and holds the payments worker's address. See "Online payments (Billplz)" below.
 - `dist/config/prices.json`: generated from `site.js` by the preparation script. The payments worker charges from it.
@@ -37,7 +37,7 @@ Edit `dist/site.js` and the CSS files. After content edits, run:
 node scripts/prepare-site.mjs
 ```
 
-Pages show the HTML this script saves, and the browser doesn't redraw them, so always run it after changing `site.js` (the deploy runs it automatically). The preparation script requires Node.js 22 or later. When changing domains, update the `origin` value in the script before regenerating pages.
+Pages show the HTML this script saves, and the browser doesn't redraw them, so always run it after changing `site.js` (the deploy runs it automatically). The script also links each stylesheet and script with a `?v=` code made from its contents, so after a deploy no browser pairs a new page with an old file it kept; run it after changing a CSS file too. The preparation script requires Node.js 22 or later. When changing domains, update the `origin` value in the script before regenerating pages.
 
 Keep the code formatted so pull request diffs stay readable:
 

@@ -889,8 +889,7 @@ details > summary {
 .tng-mark {
   font-size: 12px;
 }
-.pricing-table td,
-.pricing-table td a {
+.pricing-table td {
   font-size: 14px;
 }
 .pricing-table th {
@@ -1017,9 +1016,20 @@ details > summary {
   overflow: hidden;
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.45);
   /* Its still stays underneath, and the film fades in over it once it plays
-     (site.js), so the cut from the still to the start of the pour becomes a
-     soft dissolve. */
-  background: url("assets/teasire-pouring-poster.jpg") center / cover;
+     (site.js). The still is the film's own first frame, so the pour simply
+     begins: nothing in the glass changes as the film fades in. */
+  background: url("assets/teasire-pouring-first.jpg") center / cover;
+}
+/* Visitors who prefer less motion see the still unless they play the film, so
+   they keep the warm mid-pour photo. */
+@media (prefers-reduced-motion: reduce) {
+  .film-hero-media {
+    background-image: url("assets/teasire-pouring-poster.jpg");
+  }
+}
+/* So does a visitor whose browser won't start the film by itself (site.js). */
+.film-hero-media.no-autoplay {
+  background-image: url("assets/teasire-pouring-poster.jpg");
 }
 .film-hero-media video {
   display: block;
@@ -1964,6 +1974,8 @@ details > summary {
 /* What the wheel chose: the tea's photo, name, notes and intro. */
 .spin-dialog {
   width: min(92vw, 440px);
+  /* On phones the browser's own limit for dialogs would make it narrower. */
+  max-width: none;
   max-height: 92vh;
   padding: 0;
   border: 0;
@@ -2068,12 +2080,16 @@ details > summary {
   /* The photo gives way a little on short screens, so the whole card fits
      without scrolling inside it. */
   .spin-dialog img {
-    height: clamp(150px, calc(100vh - 500px), 200px);
-    height: clamp(150px, calc(100svh - 500px), 200px);
+    height: clamp(140px, calc(100vh - 500px), 200px);
+    height: clamp(140px, calc(100svh - 500px), 200px);
   }
+  /* The two buttons pair up on 375px-wide iPhones too. Their words are centred,
+     so the smaller side padding only lets them shrink a little further, with
+     room to spare for the arrow, which each system draws in its own font. */
   .spin-actions .button {
+    flex-basis: 136px;
     gap: 10px;
-    padding-inline: 12px;
+    padding-inline: 8px;
   }
   .spin-body {
     padding: 20px 20px 22px;
@@ -2635,8 +2651,8 @@ b {
 }
 
 /* Tea card rows. Upright tablets: four teas keep the size of the three-across
-   cards (as the flower teas above them on Home), three and then one in the
-   middle. 960-1099px: in one row of four the price and "Add 10" share a line. */
+   cards (as the flower teas above them on Home), two and two, centred.
+   960-1099px: in one row of four the price and "Add 10" share a line. */
 @media (min-width: 751px) and (max-width: 959px) {
   .grid:has(> .product:nth-child(4):last-child) {
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -2644,8 +2660,8 @@ b {
   .grid:has(> .product:nth-child(4):last-child) > .product {
     grid-column: span 2;
   }
-  .grid:has(> .product:nth-child(4):last-child) > .product:nth-child(4) {
-    grid-column: 3 / span 2;
+  .grid:has(> .product:nth-child(4):last-child) > .product:nth-child(odd) {
+    grid-column: 2 / span 2;
   }
 }
 @media (min-width: 960px) and (max-width: 1099px) {
@@ -2666,18 +2682,28 @@ b {
     grid-column: 2 / span 2;
   }
 }
+/* Phones, two teas to a row: the odd one out sits in the middle, under five
+   teas and under three (the other fruit teas under a fruit tea's page). */
 @media (max-width: 750px) {
-  .grid:has(> .product:nth-child(5):last-child) {
+  .grid:has(> .product:nth-child(5):last-child),
+  .grid:has(> .product:nth-child(3):last-child) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  .grid:has(> .product:nth-child(5):last-child) > .product {
+  .grid:has(> .product:nth-child(5):last-child) > .product,
+  .grid:has(> .product:nth-child(3):last-child) > .product {
     grid-column: span 2;
   }
-  .grid:has(> .product:nth-child(5):last-child) > .product:nth-child(5) {
+  .grid:has(> .product:nth-child(5):last-child) > .product:nth-child(5),
+  .grid:has(> .product:nth-child(3):last-child) > .product:nth-child(3) {
     grid-column: 2 / span 2;
   }
 }
 
+/* Tea pages: the photo and details start 30px under the link back to their
+   series (18px on phones, below). */
+.page > .product-layout {
+  margin-top: 30px;
+}
 /* Tea pages on phones: the two tea facts sit flush with the text above them,
    so a long ingredient (Chrysanthemum) no longer pushes a 320px-wide page
    sideways. */
@@ -2686,7 +2712,7 @@ b {
     grid-template-columns: minmax(0, 1fr);
   }
   .page > .product-layout {
-    margin-top: 18px !important; /* overrides the 30px set in the markup */
+    margin-top: 18px;
     row-gap: 24px;
   }
   .facts div {
@@ -2794,13 +2820,24 @@ b {
 .policy {
   scroll-margin-top: 12px;
 }
+.policy:focus {
+  outline: none;
+}
+/* Arriving from another page, the web fonts can swap in after the jump. The
+   browser would then hold the end of the section above in place and push the
+   linked section down; leaving that section out keeps the linked one still. */
+.policy:has(+ .policy:target) {
+  overflow-anchor: none;
+}
 @media (min-width: 600px) and (max-width: 899px) {
   .policy-nav {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 @media (min-width: 900px) {
-  .policies {
+  /* Only the page with the links: a Policies page saved by the browser before
+     they were added keeps its one column. */
+  .policies:has(> .policy-nav) {
     max-width: none;
     display: grid;
     grid-template-columns: 190px minmax(0, 700px);
@@ -2859,6 +2896,20 @@ html:not(.has-bag) .checkout-layout > aside {
   position: static;
   order: -1;
 }
+/* Tab and screen readers meet the bag's card first too, as it is shown. */
+html:not(.has-bag) .checkout-layout {
+  reading-flow: grid-order;
+}
+@media (max-width: 750px) {
+  html:not(.has-bag) .checkout-layout {
+    reading-flow: flex-visual;
+  }
+}
+/* "How to pay" then heads a card of its own under "Your tea selection", so it
+   takes the same panel size. */
+html:not(.has-bag) .pay-card > h3 {
+  font-size: var(--type-panel);
+}
 /* On phones "Prepare order request" spans the form, like the fields above it
    and the WhatsApp and Copy buttons it leads to. */
 @media (max-width: 750px) {
@@ -2915,6 +2966,31 @@ html:not(.has-bag) .checkout-layout > aside {
   margin-bottom: -6px;
   transform: rotate(-135deg);
 }
+/* The footer's Signature Blend opens in place on phones too, so there it
+   carries the same chevron, sized to the footer's type, in place of the hover
+   line (the extra classes outrank the hover-line rules further down). */
+@media (max-width: 750px) {
+  .footer-links .footer-signature.signature-menu > summary {
+    justify-content: flex-start;
+  }
+  .footer-links .footer-signature.signature-menu > summary::after,
+  .footer-links .footer-signature.signature-menu > summary:hover::after {
+    position: static;
+    flex: none;
+    width: 7px;
+    height: 7px;
+    margin: 0 0 4px 2px;
+    background: none;
+    border-right: 1.5px solid var(--green);
+    border-bottom: 1.5px solid var(--green);
+    transform: rotate(45deg);
+    transition: transform 0.35s var(--ease-out);
+  }
+  .footer-links .footer-signature.signature-menu[open] > summary::after {
+    margin: 4px 0 0 2px;
+    transform: rotate(-135deg);
+  }
+}
 
 /* Questions (Our Story), a tea's details and the bag's note on online
    payment: a fine plus at the right instead of the browser's black triangle.
@@ -2948,8 +3024,8 @@ html:not(.has-bag) .checkout-layout > aside {
   top: 50%;
   right: 3px;
   width: 13px;
-  height: 1.5px;
-  margin-top: -0.75px;
+  height: 1px;
+  margin-top: -0.5px;
   background: var(--green);
   transition:
     transform 0.35s var(--ease-out),
@@ -3097,9 +3173,24 @@ html:not(.has-bag) .checkout-layout > aside {
 .signature-menu > summary:focus-visible,
 #faq summary:focus-visible,
 .product-details details > summary:focus-visible,
-.card-availability > summary:focus-visible {
+.card-availability > summary:focus-visible,
+.order-message > summary:focus-visible,
+.tng-payment > summary:focus-visible {
   outline: 2px solid var(--green);
   outline-offset: 5px;
+}
+/* The payment card hides what is drawn outside it, so its ring goes just
+   inside. "See the message" sits 4px under the buttons above it, so its ring
+   hugs the row (with a little room either side of the words) to stay clear. */
+.tng-payment > summary:focus-visible {
+  outline-offset: -4px;
+}
+.order-message > summary {
+  padding-inline: 5px;
+  margin-inline: -5px;
+}
+.order-message > summary:focus-visible {
+  outline-offset: 0;
 }
 .film-hero :focus-visible,
 .toast a:focus-visible {
@@ -3107,4 +3198,29 @@ html:not(.has-bag) .checkout-layout > aside {
 }
 .toast a:focus-visible {
   outline-offset: -4px;
+}
+
+/* Windows Contrast Themes (forced colours) repaint backgrounds in the page
+   colour, which would hide the fine plus and minus: draw them in the theme's
+   text colour instead. */
+@media (forced-colors: active) {
+  #faq summary::before,
+  #faq summary::after,
+  .product-details details > summary::before,
+  .product-details details > summary::after,
+  .card-availability > summary::before,
+  .card-availability > summary::after {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
+
+/* Keyboard focus stops clear of the round WhatsApp button (and the bag button
+   above it while something is in the bag): when Tab brings a link into view
+   at the foot of the screen, it lands above them, not underneath. */
+html {
+  scroll-padding-bottom: 96px;
+}
+html.has-bag {
+  scroll-padding-bottom: 160px;
 }
