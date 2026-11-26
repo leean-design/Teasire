@@ -24,16 +24,23 @@ const origin = "https://leean-design.github.io/Teasire";
 // - the switch that turns transitions on (from the stylesheet it would sometimes
 //   load too late, and the browser would skip the transition);
 // - Chrome fetches a page as soon as a link to it is pointed at or touched.
+// (The not-found page leaves out the second: its <base> would point
+// "#main-content" at Home, and a browser only waits for a place on the page it
+// is showing. That page is small enough to arrive whole.)
+const waitForContent =
+  '<link rel="expect" href="#main-content" blocking="render">';
 const transitionHead =
   `<script src="${versioned("transitions.js")}"></script>` +
-  '<link rel="expect" href="#main-content" blocking="render">' +
+  waitForContent +
   "<style>@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }</style>" +
   '<script type="speculationrules">{"prefetch":[{"where":{"href_matches":"*.html"},"eagerness":"moderate"}]}</script>';
 // Home opens on the pouring film's still, which the stylesheet names; asking
 // for it straight away shows the top of the page sooner. Visitors who prefer
-// less motion see the other still (enhancements.css), so they skip this one.
+// less motion see the other still (enhancements.css), so they are sent that
+// one instead.
 const heroHead =
-  '<link rel="preload" href="assets/teasire-pouring-first.webp" as="image" type="image/webp" fetchpriority="high" media="(prefers-reduced-motion: no-preference)">';
+  '<link rel="preload" href="assets/teasire-pouring-first.webp" as="image" type="image/webp" fetchpriority="high" media="(prefers-reduced-motion: no-preference)">' +
+  '<link rel="preload" href="assets/teasire-pouring-poster.jpg" as="image" fetchpriority="high" media="(prefers-reduced-motion: reduce)">';
 // Titles and descriptions read back from existing pages are already escaped; decode them so each run escapes them exactly once.
 const unesc = (t) => {
   let prev;
@@ -195,6 +202,22 @@ for (const t of teas) {
       ),
     );
 }
+// The not-found page is made the same way if it is ever missing, so a deploy
+// never goes out without it.
+if (!fs.existsSync(path.join(dist, "404.html")))
+  fs.writeFileSync(
+    path.join(dist, "404.html"),
+    productTemplate
+      .replace('data-page="product"', 'data-page="notfound"')
+      .replace(
+        /<title>.*?<\/title>/s,
+        "<title>Page not found — Teasire</title>",
+      )
+      .replace(
+        /<meta name="description" content="[^"]*"/,
+        '<meta name="description" content="This page could not be found. Explore Teasire flower teas, fruit teas and custom botanical blends."',
+      ),
+  );
 const urls = [];
 let pageCount = 0;
 for (const file of fs
@@ -257,7 +280,7 @@ for (const file of fs
     body = body.replace(tag, tag.replace(">", attrs + ">"));
   }
   // Meaningful initial HTML is served before the interactive script starts.
-  html = `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">${base}<title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><meta name="theme-color" content="#ffffff">${base ? "" : `<link rel="canonical" href="${origin}/${file}">`}${noindex ? '<meta name="robots" content="noindex,follow">' : ""}<meta property="og:type" content="website"><meta property="og:site_name" content="Teasire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${origin}/${file}"><meta property="og:image" content="${image}"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="${esc(imageAlt)}"><meta name="twitter:card" content="summary_large_image">${tea ? teaData(tea, origin + "/" + file, origin + "/assets/clean/" + tea.image + ".webp") : file === "index.html" ? shopData : ""}<link rel="icon" type="image/png" sizes="192x192" href="assets/teasire-tab-icon.png"><link rel="apple-touch-icon" href="assets/teasire-touch-icon.png">${transitionHead}${file === "index.html" ? heroHead : ""}<link rel="stylesheet" href="${versioned("site.css")}"><link rel="stylesheet" href="${versioned("enhancements.css")}"><script src="${versioned("site.js")}" defer></script></head><body data-page="${page}"${product ? ' data-product="' + product + '"' : ""}${tea ? ' data-series="' + tea.series + '"' : ""}>${body}</body></html>\n`;
+  html = `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">${base}<title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><meta name="theme-color" content="#ffffff">${base ? "" : `<link rel="canonical" href="${origin}/${file}">`}${noindex ? '<meta name="robots" content="noindex,follow">' : ""}<meta property="og:type" content="website"><meta property="og:site_name" content="Teasire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${origin}/${file}"><meta property="og:image" content="${image}"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="${esc(imageAlt)}"><meta name="twitter:card" content="summary_large_image">${tea ? teaData(tea, origin + "/" + file, origin + "/assets/clean/" + tea.image + ".webp") : file === "index.html" ? shopData : ""}<link rel="icon" type="image/png" sizes="192x192" href="assets/teasire-tab-icon.png"><link rel="apple-touch-icon" href="assets/teasire-touch-icon.png">${base ? transitionHead.replace(waitForContent, "") : transitionHead}${file === "index.html" ? heroHead : ""}<link rel="stylesheet" href="${versioned("site.css")}"><link rel="stylesheet" href="${versioned("enhancements.css")}"><script src="${versioned("site.js")}" defer></script></head><body data-page="${page}"${product ? ' data-product="' + product + '"' : ""}${tea ? ' data-series="' + tea.series + '"' : ""}>${body}</body></html>\n`;
   fs.writeFileSync(p, html);
   pageCount++;
   if (!noindex) urls.push(origin + "/" + file);
