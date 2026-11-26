@@ -29,6 +29,11 @@ const transitionHead =
   '<link rel="expect" href="#main-content" blocking="render">' +
   "<style>@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }</style>" +
   '<script type="speculationrules">{"prefetch":[{"where":{"href_matches":"*.html"},"eagerness":"moderate"}]}</script>';
+// Home opens on the pouring film's still, which the stylesheet names; asking
+// for it straight away shows the top of the page sooner. Visitors who prefer
+// less motion see the other still (enhancements.css), so they skip this one.
+const heroHead =
+  '<link rel="preload" href="assets/teasire-pouring-first.webp" as="image" type="image/webp" fetchpriority="high" media="(prefers-reduced-motion: no-preference)">';
 // Titles and descriptions read back from existing pages are already escaped; decode them so each run escapes them exactly once.
 const unesc = (t) => {
   let prev;
@@ -139,17 +144,23 @@ const makeContext = (page, file, product) =>
 const inventory = makeContext("home", "index.html");
 vm.runInContext(renderSource, inventory);
 const teas = vm.runInContext("teas", inventory);
-// Phones are served smaller copies of each photo; stop before publishing broken images.
-const missing = teas.flatMap((t) =>
-  ["-480", "-800", ""]
-    .map((size) => `assets/clean/${t.image}${size}.webp`)
-    .filter((file) => !fs.existsSync(path.join(dist, file))),
-);
+// Phones are served smaller copies of each photo, and a shared link shows a
+// wide picture of the tea (or of three teas, for the other pages); stop before
+// publishing broken images.
+const missing = [
+  ...teas.flatMap((t) => [
+    ...["-480", "-800", ""].map(
+      (size) => `assets/clean/${t.image}${size}.webp`,
+    ),
+    `assets/share/${t.image}.jpg`,
+  ]),
+  "assets/share/teasire.jpg",
+].filter((file) => !fs.existsSync(path.join(dist, file)));
 if (missing.length)
   throw new Error(
     "Missing photo files:\n  " +
       missing.join("\n  ") +
-      "\nRun `python scripts/make-photo-sizes.py` to create the smaller copies.",
+      "\nRun `python scripts/make-photo-sizes.py` to create them.",
   );
 // The payments worker prices orders from this file, so a changed bag can't change what is charged.
 fs.writeFileSync(
@@ -211,17 +222,28 @@ for (const file of fs
       .replaceAll("&", "&amp;")
       .replaceAll('"', "&quot;")
       .replaceAll("<", "&lt;");
-  const image =
-    origin +
-    "/assets/clean/" +
-    (tea?.image || "01_Green_Tea_Jasmine") +
-    ".webp";
+  // The picture a shared link shows: wide, and a JPEG, which every app that
+  // previews links can read (scripts/make-photo-sizes.py makes them).
+  const image = origin + "/assets/share/" + (tea?.image || "teasire") + ".jpg";
+  const imageAlt = tea
+    ? tea.name + " (" + tea.blend.replaceAll(" · ", ", ") + ")"
+    : "Three Teasire teas in glassware, with their flowers, fruit and tea leaves";
   // Left out of search results and the sitemap: the bag, the template for each
-  // tea's page, and pages hidden for now (Aroma Bags, until the collection is
-  // confirmed; it is also left out of the menus in site.js).
-  const noindex = ["checkout.html", "product.html", "aroma.html"].includes(
-    file,
-  );
+  // tea's page, the page for a missing address, and pages hidden for now
+  // (Aroma Bags, until the collection is confirmed; it is also left out of the
+  // menus in site.js).
+  const noindex = [
+    "checkout.html",
+    "product.html",
+    "aroma.html",
+    "404.html",
+  ].includes(file);
+  // GitHub Pages shows 404.html for any missing address, however deep, so its
+  // links, files and pictures are all read from the site's own folder.
+  const base =
+    file === "404.html"
+      ? `<base href="${new URL(origin + "/").pathname}">`
+      : "";
   let body = markup.replace(
     '<main id="main-content" tabindex="-1">',
     '<noscript><div class="no-script">Explore our <a href="flower-tea.html">flower teas</a> and <a href="fruit-tea.html">fruit teas</a>. Enable JavaScript for blending and your bag, or <a href="https://wa.me/60126769675">contact Teasire on WhatsApp</a>.</div></noscript><main id="main-content" tabindex="-1">',
@@ -235,7 +257,7 @@ for (const file of fs
     body = body.replace(tag, tag.replace(">", attrs + ">"));
   }
   // Meaningful initial HTML is served before the interactive script starts.
-  html = `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><meta name="theme-color" content="#ffffff"><link rel="canonical" href="${origin}/${file}">${noindex ? '<meta name="robots" content="noindex,follow">' : ""}<meta property="og:type" content="website"><meta property="og:site_name" content="Teasire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${origin}/${file}"><meta property="og:image" content="${image}"><meta name="twitter:card" content="summary_large_image">${tea ? teaData(tea, origin + "/" + file, image) : file === "index.html" ? shopData : ""}<link rel="icon" type="image/png" sizes="192x192" href="assets/teasire-icon-192.png">${transitionHead}<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="${versioned("site.css")}"><link rel="stylesheet" href="${versioned("enhancements.css")}"><script src="${versioned("site.js")}" defer></script></head><body data-page="${page}"${product ? ' data-product="' + product + '"' : ""}${tea ? ' data-series="' + tea.series + '"' : ""}>${body}</body></html>\n`;
+  html = `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">${base}<title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><meta name="theme-color" content="#ffffff">${base ? "" : `<link rel="canonical" href="${origin}/${file}">`}${noindex ? '<meta name="robots" content="noindex,follow">' : ""}<meta property="og:type" content="website"><meta property="og:site_name" content="Teasire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${origin}/${file}"><meta property="og:image" content="${image}"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="${esc(imageAlt)}"><meta name="twitter:card" content="summary_large_image">${tea ? teaData(tea, origin + "/" + file, origin + "/assets/clean/" + tea.image + ".webp") : file === "index.html" ? shopData : ""}<link rel="icon" type="image/png" sizes="192x192" href="assets/teasire-tab-icon.png"><link rel="apple-touch-icon" href="assets/teasire-touch-icon.png">${transitionHead}${file === "index.html" ? heroHead : ""}<link rel="stylesheet" href="${versioned("site.css")}"><link rel="stylesheet" href="${versioned("enhancements.css")}"><script src="${versioned("site.js")}" defer></script></head><body data-page="${page}"${product ? ' data-product="' + product + '"' : ""}${tea ? ' data-series="' + tea.series + '"' : ""}>${body}</body></html>\n`;
   fs.writeFileSync(p, html);
   pageCount++;
   if (!noindex) urls.push(origin + "/" + file);

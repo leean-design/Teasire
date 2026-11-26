@@ -928,7 +928,9 @@ details > summary {
   position: absolute;
   inset: -60px;
   z-index: -2;
-  background: url("assets/teasire-pouring-poster.jpg") center / cover;
+  /* A tiny copy of the mid-pour still: under this much blur it looks the same
+     as the full-size photo, at a fraction of the download. */
+  background: url("assets/teasire-pouring-glow.jpg") center / cover;
   filter: blur(50px) saturate(1.2);
   opacity: 0.6;
 }
@@ -1018,7 +1020,7 @@ details > summary {
   /* Its still stays underneath, and the film fades in over it once it plays
      (site.js). The still is the film's own first frame, so the pour simply
      begins: nothing in the glass changes as the film fades in. */
-  background: url("assets/teasire-pouring-first.jpg") center / cover;
+  background: url("assets/teasire-pouring-first.webp") center / cover;
 }
 /* Visitors who prefer less motion see the still unless they play the film, so
    they keep the warm mid-pour photo. */
@@ -3198,6 +3200,16 @@ html:not(.has-bag) .pay-card > h3 {
 }
 .toast a:focus-visible {
   outline-offset: -4px;
+}
+
+/* The not-found page: the way back to Home, with the teas beside it, centred
+   under the page's centred opening lines. */
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 18px 28px;
 }
 
 /* Windows Contrast Themes (forced colours) repaint backgrounds in the page
