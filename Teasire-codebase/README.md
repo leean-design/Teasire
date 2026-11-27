@@ -8,15 +8,17 @@ A multi-page static website built with HTML, CSS and browser JavaScript, hosted 
 - `dist/site.css`: base design and styles.
 - `dist/enhancements.css`: accessibility, mobile and shopping improvements, and the page transitions. The shared heading sizes come from three variables near its end: `--type-title` (page titles), `--type-section` (section headings) and `--type-panel` (panel titles), each with a phone size. Headings that keep sizes of their own include Home's film title (`.film-hero h1`); a tea's name on its own page (`.product-details h1`), on its card (`.product h3`), in the bag (`.cart-item h3`) and on the Discovery card (`.spin-body h2`); the Policies page's section headings (`.policy h2`, 30px); and the card titles on Subscriptions and Pricing, which are plain `h3`s (20px).
 - `dist/transitions.js`: the page transitions. Click a tea card and its photo and name fly into the tea's page; going back flies them into the card again. Moving along the menu, the line under it glides to the new item and the page sweeps in from that side; leaving the phone menu, the page rises in. Each new page's opening lines arrive one after another. It runs in Chrome, Edge and Safari; other browsers change page normally.
-- `dist/*.html`: generated page documents, including individual tea pages.
-- `dist/assets/`: all photos, the magpie logo, the two tea films (the pouring film, its poster and a still of its first frame at the top of the home page, and the osmanthus film and its still further down; both are silent), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
+- `dist/*.html`: generated page documents, including individual tea pages. Each page's title and description (shown in search results and when its link is shared) are the `<title>` and `<meta name="description">` in its own file: edit them there, and the preparation script keeps them. The tea pages (`tea-*.html`) are the exception: theirs are rebuilt from the tea's `name`, `blend` and `description` in `dist/site.js`. `404.html` is the page shown for an address that doesn't exist.
+- `dist/assets/`: all photos, the magpie logo and its icons (`teasire-tab-icon.png` for browser tabs and `teasire-touch-icon.png` for phone home screens: the magpie on white, so it shows on dark backgrounds too), the two tea films (the pouring film at the top of the home page, and the osmanthus film and its still further down; both are silent), and DuitNow QR. Each tea photo in `assets/clean/` has smaller `-480` and `-800` copies that phones download instead of the full-size original.
+- `dist/assets/fonts/`: the site's two typefaces, Lora (with its italic) and Montserrat, as files of its own (both are free to use and share under the SIL Open Font License). `site.css` names them at its top. `lora.woff2`, `lora-italic.woff2` and `montserrat.woff2` hold the letters the site's own words use; the `-latin-ext` and `-vietnamese` files are fetched only when a visitor types a name with such letters (Łucja, Nguyễn). Other alphabets show in the device's own typeface. Nothing on the site is loaded from another company's servers.
+- `dist/assets/share/`: the wide picture shown when a page's link is shared on WhatsApp or social media: one per tea, and `teasire.jpg` (three teas side by side) for every other page.
 - `dist/assets/ingredients/`: 400px close-ups of each Blend Studio ingredient, cut from the tea photos (each ingredient's `photo` in `dist/site.js`).
 - `dist/config/payments.json`: turns online payment (Billplz) on or off and holds the payments worker's address. See "Online payments (Billplz)" below.
 - `dist/config/prices.json`: generated from `site.js` by the preparation script. The payments worker charges from it.
 - `worker/`: the small Cloudflare Worker that creates Billplz bills and records paid orders.
 - `dist/config/business.json`: WhatsApp number, business details shown in the footer and on the Policies page, and manual DuitNow payment settings.
 - `scripts/prepare-site.mjs`: refreshes initial HTML, sharing metadata and sitemap after content edits.
-- `scripts/make-photo-sizes.py`: creates the smaller copies of any new tea photo.
+- `scripts/make-photo-sizes.py`: creates the smaller copies of any new tea photo, and the pictures shown when pages are shared.
 - `scripts/prepare-story-film.py`: puts a new osmanthus film (and its still) on the home page.
 
 ## Preview locally
@@ -27,7 +29,7 @@ From this folder run:
 python -m http.server 8000 --directory dist
 ```
 
-Open http://localhost:8000 in a browser. Python is required for this preview command; no dependency installation is needed.
+Open http://localhost:8000 in a browser. Python is required for this preview command; no dependency installation is needed. (The not-found page, `404.html`, is written for the live address and reads its files from `/Teasire/`, so in this preview it appears without its styles.)
 
 ## Edit content
 
@@ -116,7 +118,7 @@ Testing tips: test payments only work from the published site (`https://leean-de
 ### Add a new tea
 
 1. Save its photo as `dist/assets/clean/09_Tea_Name.webp`, 1086 × 1448 pixels.
-2. Create the smaller copies (needs Python with Pillow: `pip install Pillow`):
+2. Create the smaller copies and the picture for sharing (needs Python with Pillow: `pip install Pillow`):
 
    ```sh
    python scripts/make-photo-sizes.py
@@ -124,7 +126,9 @@ Testing tips: test payments only work from the published site (`https://leean-de
 
 3. Add the tea to the `teas` list in `dist/site.js`, and its `id` to any `moods` it suits (see "The tea wheel" below). Then run `node scripts/prepare-site.mjs` to create its page.
 
-The preparation script stops with an error if a photo's smaller copies are missing, so a deploy never publishes broken images.
+The preparation script stops with an error if a photo's copies are missing, so a deploy never publishes broken images.
+
+The picture for sharing is a wide band cut from the photo, around the cup. If it cuts a new photo badly, set where its middle should sit in `SHARE_MIDDLE` in `scripts/make-photo-sizes.py`, delete the picture from `dist/assets/share/` and run the script again.
 
 ### The tea wheel (Discovery page)
 
@@ -135,6 +139,26 @@ The moods are the `moods` list in `dist/site.js`: each has a `chip` (its button)
 ### Hidden pages
 
 The Aroma Bags page (`aroma.html`) is hidden until the collection is confirmed. It is left out of the menus, the sitemap and search results, but its address still opens it, for previewing. To bring it back, add `["aroma.html", "Aroma Bags"]` to `navItems` in `dist/site.js`, take `aroma.html` off the `noindex` list in `scripts/prepare-site.mjs`, and run the script.
+
+### The pouring film
+
+At the top of the home page, tea pours over ice in a silent 10-second film (`dist/assets/teasire-pouring-film.mp4`). Three stills go with it:
+
+- `teasire-pouring-first.webp`: the film's first frame. It shows until the film plays, and the film fades in over it, so the change can't be seen. The home page asks for it before anything else.
+- `teasire-pouring-poster.jpg`: the warm mid-pour photo, shown instead to visitors who prefer less motion or whose browser won't start films by itself (an iPhone in Low Power Mode).
+- `teasire-pouring-glow.jpg`: a tiny copy of the poster, blurred into the glow behind the film on computers.
+
+If you replace the film, remake the first still from it, and the glow from the poster (needs ffmpeg, and Python with Pillow):
+
+```sh
+ffmpeg -i dist/assets/teasire-pouring-film.mp4 -frames:v 1 first.png
+python -c "from PIL import Image; Image.open('first.png').convert('RGB').save('dist/assets/teasire-pouring-first.webp', 'WEBP', quality=80, method=6)"
+python -c "from PIL import Image; Image.open('dist/assets/teasire-pouring-poster.jpg').resize((72, 128)).save('dist/assets/teasire-pouring-glow.jpg', quality=72)"
+```
+
+Then delete `first.png`. For a new poster, save a frame from the middle of the film as `teasire-pouring-poster.jpg` (720 × 1280) before the last command.
+
+`teasire-pouring-first.jpg` is the earlier copy of the first frame. No page uses it now; it is kept so that a page a browser saved before the change still finds it, and can be deleted once this version has been live for a day.
 
 ### The osmanthus film
 
